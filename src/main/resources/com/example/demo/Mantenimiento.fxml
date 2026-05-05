@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<BorderPane styleClass="root" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.MantenimientoController">
+    <stylesheets>
+        <URL value="@styles.css"/>
+    </stylesheets>
+    
+    <!-- Header -->
+    <top>
+        <VBox style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">
+            <padding>
+                <Insets top="20" right="20" bottom="15" left="20"/>
+            </padding>
+            
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label text="🔧 Mantenimiento de Equipos" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="registrarMantenimientoButton" text="🔧 Registrar Mantenimiento" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <Button fx:id="verHistorialButton" text="📋 Ver Historial" style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <Button fx:id="cambiarEstadoButton" text="⚙️ Cambiar Estado" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: #FAFAFA;">
+            <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+                
+                <!-- Alerts Section -->
+                <VBox spacing="15" alignment="TOP_CENTER">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <Label text="⚠️ Alertas de Mantenimiento" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #E74C3C;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="actualizarAlertasButton" text="🔄 Actualizar Alertas" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 15 8 15 8; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                    </HBox>
+                    
+                    <ListView fx:id="alertasListView" prefHeight="150" style="-fx-background-color: #FFF3E0; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 6; -fx-padding: 5;"/>
+                </VBox>
+                
+                <!-- Machines Table -->
+                <VBox spacing="15" alignment="TOP_CENTER">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <Label text="📋 Lista de Máquinas" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="totalLabel" text="Total: 0 máquinas" style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
+                    </HBox>
+                    
+                    <VBox styleClass="table-container" spacing="10">
+                        <TableView fx:id="maquinasTable" styleClass="maintenance-table">
+                            <columns>
+                                <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+                                <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="150"/>
+                                <TableColumn fx:id="utilidadColumn" text="Utilidad" prefWidth="150"/>
+                                <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="100"/>
+                                <TableColumn fx:id="ultimoMantenimientoColumn" text="Último Mantenimiento" prefWidth="120"/>
+                                <TableColumn fx:id="proximoMantenimientoColumn" text="Próximo Mantenimiento" prefWidth="120"/>
+                                <TableColumn fx:id="diasRestantesColumn" text="Días Restantes" prefWidth="100"/>
+                                <TableColumn fx:id="accionesColumn" text="Acciones" prefWidth="150"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

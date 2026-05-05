@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.PlanificacionController">
+    <stylesheets>
+        <URL value="@styles.css"/>
+    </stylesheets>
+
+    <!-- Header -->
+    <VBox style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">
+        <padding>
+            <Insets top="20" right="20" bottom="15" left="20"/>
+        </padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Button fx:id="pestana1Button" text="📅 Planificación Semanal" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            <Button fx:id="pestana2Button" text="⏱️ Seguimiento por Pedido" style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="usuarioLabel" style="-fx-text-fill: #8B5E3C; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+            <Button fx:id="cerrarSesionButton" text="Cerrar Sesión" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 15 8 15; -fx-background-radius: 8; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background-color: #FAFAFA;">
+        <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+
+            <!-- Vista de Planificación Semanal -->
+            <VBox fx:id="planificacionView" spacing="20" alignment="TOP_CENTER">
+                <Label text="📅 Planificación Semanal" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+
+                <GridPane fx:id="semanaGridPane" hgap="10" vgap="10" alignment="CENTER" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-background-radius: 8; -fx-padding: 15;">
+                    <Label text="Lunes" style="-fx-font-weight: bold; -fx-text-fill: #8B5E3C; -fx-font-size: 12px;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <Label text="Martes" style="-fx-font-weight: bold; -fx-text-fill: #8B5E3C; -fx-font-size: 12px;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                    <Label text="Miércoles" style="-fx-font-weight: bold; -fx-text-fill: #8B5E3C; -fx-font-size: 12px;" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                    <Label text="Jueves" style="-fx-font-weight: bold; -fx-text-fill: #8B5E3C; -fx-font-size: 12px;" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+                    <Label text="Viernes" style="-fx-font-weight: bold; -fx-text-fill: #8B5E3C; -fx-font-size: 12px;" GridPane.rowIndex="0" GridPane.columnIndex="5"/>
+                    <Label text="Sábado" style="-fx-font-weight: bold; -fx-text-fill: #666666; -fx-font-size: 12px;" GridPane.rowIndex="0" GridPane.columnIndex="6"/>
+                    <Label text="Domingo" style="-fx-font-weight: bold; -fx-text-fill: #666666; -fx-font-size: 12px;" GridPane.rowIndex="0" GridPane.columnIndex="7"/>
+
+                    <Label text="Capacidad (24h)" style="-fx-font-size: 10px; -fx-text-fill: #666666; -fx-font-style: italic;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <Label text="Ocupado" style="-fx-font-size: 10px; -fx-text-fill: #666666; -fx-font-style: italic;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <Label text="Disponible" style="-fx-font-size: 10px; -fx-text-fill: #666666; -fx-font-style: italic;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                </GridPane>
+
+                <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding-top: 20;">
+                    <VBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="📊 Estadísticas de Producción" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+
+                        <GridPane hgap="10" vgap="10" alignment="CENTER_LEFT">
+                            <Label text="Total Pedidos:" style="-fx-font-size: 12px; -fx-text-fill: #666666;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label fx:id="totalPedidosLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="En Producción:" style="-fx-font-size: 12px; -fx-text-fill: #666666;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Label fx:id="enProduccionLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #FF9800;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="Listos para Entregar:" style="-fx-font-size: 12px; -fx-text-fill: #666666;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <Label fx:id="listosEntregarLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #28A745;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        </GridPane>
+                    </VBox>
+
+                    <VBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="⚠️ Alertas de Producción" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #E74C3C;"/>
+                        <ListView fx:id="alertasListView" prefHeight="120" style="-fx-background-color: #FFF3E0; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 6; -fx-padding: 5;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Vista de Seguimiento por Pedido -->
+            <VBox fx:id="seguimientoView" spacing="20" alignment="TOP_CENTER" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 15;">
+                <Label text="⏱️ Seguimiento por Pedido" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #007BFF;"/>
+
+                <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding-bottom: 15;">
+                    <VBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Seleccionar Pedido:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                        <HBox spacing="10" alignment="CENTER">
+                            <TextField fx:id="buscarPedidoField" promptText="🔍 Buscar pedido por ID o cliente" styleClass="form-field" prefWidth="200"/>
+                            <Button fx:id="buscarPedidoButton" text="🔍 Buscar" style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+                        </HBox>
+
+                        <Button fx:id="verDetallesButton" text="📋 Ver Detalles del Pedido" style="-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                    </VBox>
+                </HBox>
+
+                <VBox fx:id="detallesView" spacing="15" alignment="TOP_CENTER">
+                    <Label text="📋 Detalles del Pedido" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #007BFF;"/>
+
+                    <GridPane hgap="15" vgap="15" alignment="CENTER_LEFT">
+                        <Label text="ID Pedido:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label fx:id="pedidoIdLabel" text="-" style="-fx-font-size: 16px; -fx-text-fill: #333333;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                        <Label text="Cliente:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Label fx:id="clienteLabel" text="-" style="-fx-font-size: 16px; -fx-text-fill: #333333;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <Label text="Estado Actual:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <Label fx:id="estadoActualLabel" text="-" style="-fx-font-size: 16px; -fx-text-fill: #333333;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                        <Label text="Timeline de Producción:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
+                        <ListView fx:id="timelineListView" prefHeight="150" style="-fx-background-color: #F8F9FA; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 6; -fx-padding: 5;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                        <Label text="Pasos de Producción:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
+                        <GridPane fx:id="pasosGridPane" hgap="10" vgap="10" alignment="CENTER_LEFT" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                    </GridPane>
+
+                    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding-top: 15;">
+                        <Button fx:id="actualizarButton" text="🔄 Actualizar Estado" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                        <Button fx:id="marcarListoButton" text="✅ Marcar como Listo para Entregar" style="-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+</VBox>

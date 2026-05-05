@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.PedidosController">
+    <stylesheets>
+        <URL value="@styles.css"/>
+    </stylesheets>
+
+    <!-- Header -->
+    <VBox style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">
+        <padding>
+            <Insets top="20" right="20" bottom="15" left="20"/>
+        </padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Label text="📦 Gestión de Pedidos" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="nuevoPedidoButton" text="+ Nuevo Pedido" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Filters Section -->
+    <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+
+        <HBox style="-fx-background-color: #F8F9FA; -fx-background-radius: 12; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-padding: 15;" alignment="CENTER_LEFT" spacing="20">
+            <VBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="🔍 Búsqueda" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                <HBox spacing="10" alignment="CENTER">
+                    <TextField fx:id="buscarField" promptText="🔍 Buscar por cliente, producto o ID" styleClass="form-field" prefWidth="300"/>
+                    <Button fx:id="buscarButton" text="🔍 Buscar" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="📊 Filtros" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                <HBox spacing="10" alignment="CENTER">
+                    <VBox spacing="5">
+                        <Label text="Cliente:" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+                        <ComboBox fx:id="clienteFilter" styleClass="form-field" prefWidth="150"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label text="Estado:" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+                        <ComboBox fx:id="estadoFilter" styleClass="form-field" prefWidth="150"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label text="Fecha Desde:" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+                        <DatePicker fx:id="fechaDesdePicker" styleClass="form-field" prefWidth="150"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label text="Fecha Hasta:" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+                        <DatePicker fx:id="fechaHastaPicker" styleClass="form-field" prefWidth="150"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="10" alignment="CENTER">
+                    <Button fx:id="filtrarButton" text="🔍 Filtrar" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+                    <Button fx:id="limpiarFiltrosButton" text="🧹 Limpiar Filtros" style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- Orders Table -->
+    <VBox spacing="15" style="-fx-padding: 0 20 20 20;">
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Label text="Lista de Pedidos" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+            <Label fx:id="totalLabel" text="Total: 0 pedidos" style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="nuevoPedidoButton2" text="+ Nuevo Pedido" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20;"/>
+        </HBox>
+
+        <TableView fx:id="pedidosTable" styleClass="orders-table">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+                <TableColumn fx:id="clienteColumn" text="Cliente" prefWidth="150"/>
+                <TableColumn fx:id="fechaPedidoColumn" text="Fecha Pedido" prefWidth="120"/>
+                <TableColumn fx:id="fechaEntregaColumn" text="Fecha Entrega" prefWidth="120"/>
+                <TableColumn fx:id="productoColumn" text="Producto" prefWidth="150"/>
+                <TableColumn fx:id="librasColumn" text="Libras" prefWidth="80"/>
+                <TableColumn fx:id="totalColumn" text="Total" prefWidth="100"/>
+                <TableColumn fx:id="adelantoColumn" text="Adelanto" prefWidth="100"/>
+                <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="120"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

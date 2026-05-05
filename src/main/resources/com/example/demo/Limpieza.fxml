@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.LimpiezaController">
+    <stylesheets>
+        <URL value="@styles.css"/>
+    </stylesheets>
+
+    <!-- Header -->
+    <VBox style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">
+        <padding>
+            <Insets top="20" right="20" bottom="15" left="20"/>
+        </padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Label text="🧹 Limpieza e Higiene" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="registrarLimpiezaButton" text="🧹 Registrar Limpieza" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            <Button fx:id="exportarReporteButton" text="📄 Exportar Reporte" style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Main Content -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: #FAFAFA;">
+        <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+
+            <!-- Materials Checklist -->
+            <VBox spacing="15" alignment="TOP_CENTER">
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <Label text="📋 Checklist de Materiales" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="actualizarMaterialesButton" text="🔄 Actualizar" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8 15 8 15; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                </HBox>
+
+                <HBox style="-fx-background-color: #F8F9FA; -fx-background-radius: 12; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-padding: 15;" alignment="CENTER_LEFT" spacing="20">
+                    <VBox spacing="10" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="guantesCheckBox" text="Guantes desechables" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
+                        <CheckBox fx:id="panosCheckBox" text="Paños microfibra" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
+                        <CheckBox fx:id="detergenteCheckBox" text="Detergente" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
+                    </VBox>
+
+                    <VBox spacing="10" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="desinfectanteCheckBox" text="Desinfectante" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
+                        <CheckBox fx:id="alcoholCheckBox" text="Alcohol" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
+                        <CheckBox fx:id="escobillonCheckBox" text="Escobillón" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Cleaning Control Table -->
+            <VBox spacing="15" alignment="TOP_CENTER">
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <Label text="📊 Control de Limpieza" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="totalLabel" text="Total: 0 áreas" style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
+                </HBox>
+
+                <TableView fx:id="limpiezaTable" styleClass="cleaning-table">
+                    <columns>
+                        <TableColumn fx:id="areaColumn" text="Área/Equipo" prefWidth="150"/>
+                        <TableColumn fx:id="ultimaLimpiezaColumn" text="Última Limpieza" prefWidth="120"/>
+                        <TableColumn fx:id="diasSinLimpiezaColumn" text="Días sin Limpieza" prefWidth="120"/>
+                        <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="100"/>
+                        <TableColumn fx:id="accionColumn" text="Acción" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+</VBox>
