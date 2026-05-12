@@ -226,6 +226,7 @@ public class DashboardAdminController {
     }
 
     @FXML private void mostrarDashboard(ActionEvent event) { cargarDatosAdministrador(); actualizarTimestamp(); }
+    @FXML private void mostrarProductos(ActionEvent event) { mostrarMensaje("Gestión de Productos", "Módulo en desarrollo"); }
     @FXML private void mostrarClientes(ActionEvent event) { mostrarMensaje("Gestión de Clientes", "Módulo en desarrollo"); }
     @FXML private void mostrarPedidos(ActionEvent event) { mostrarMensaje("Gestión de Pedidos", "Módulo en desarrollo"); }
     @FXML private void mostrarProduccion(ActionEvent event) { mostrarMensaje("Gestión de Producción", "Módulo en desarrollo"); }

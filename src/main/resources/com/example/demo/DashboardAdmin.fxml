@@ -61,13 +61,13 @@
                         <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
                             <Label text="💰" style="-fx-font-size: 40px;"/>
                             <Label text="Ingresos Mes" styleClass="kpi-label"/>
-                            <Label fx:id="ingresosMesLabel" text="\$0.00" styleClass="kpi-value"/>
+                            <Label fx:id="ingresosMesLabel" text="&#36;0.00" styleClass="kpi-value"/>
                         </VBox>
 
                         <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
                             <Label text="💳" style="-fx-font-size: 40px;"/>
                             <Label text="Saldo Pendiente" styleClass="kpi-label"/>
-                            <Label fx:id="saldoPendienteLabel" text="\$0.00" styleClass="kpi-value"/>
+                            <Label fx:id="saldoPendienteLabel" text="&#36;0.00" styleClass="kpi-value"/>
                         </VBox>
 
                         <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">

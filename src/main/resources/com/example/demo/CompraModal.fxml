@@ -90,7 +90,7 @@
                     <TextField fx:id="unidadField" promptText="Unidad" styleClass="form-field" prefWidth="75"/>
                     <TextField fx:id="precioUnitarioField" promptText="Precio Unit." styleClass="form-field" prefWidth="105"/>
                     <TextField fx:id="descuentoField" promptText="Desc." styleClass="form-field" prefWidth="80"/>
-                    <Label fx:id="subtotalItemLabel" text="\$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2E7D32; -fx-min-width: 90;"/>
+                    <Label fx:id="subtotalItemLabel" text="&#36;0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2E7D32; -fx-min-width: 90;"/>
                     <Button text="✅ Añadir" onAction="#confirmarAgregarProducto"
                             style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-background-radius: 5; -fx-cursor: hand;"/>
                 </HBox>
