@@ -18,9 +18,9 @@
             </padding>
             
             <HBox alignment="CENTER_LEFT" spacing="15">
-                <Label text="🔧 Mantenimiento de Equipos" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                <Label text="Mantenimiento de Equipos" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="registrarMantenimientoButton" text="🔧 Registrar Mantenimiento" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <Button fx:id="registrarMantenimientoButton" text="Registrar Mantenimiento" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
                 <Button fx:id="verHistorialButton" text="📋 Ver Historial" style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
                 <Button fx:id="cambiarEstadoButton" text="⚙️ Cambiar Estado" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
             </HBox>

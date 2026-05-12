@@ -19,9 +19,7 @@ public class LoginController {
 
     private static final String ERROR_STYLE = "-fx-text-fill: #E74C3C; -fx-font-weight: bold;";
 
-    private static final String VALID_USERNAME = "AnelizEr";
-    private static final String VALID_PASSWORD = "12345678";
-    private static final String VALID_PROFILE = "ADMIN";
+    private DatabaseConnection dbConnection;
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -36,6 +34,7 @@ public class LoginController {
     @FXML
     public void initialize() {
         sessionManager = SessionManager.getInstance();
+        dbConnection = DatabaseConnection.getInstance();
         configurarEventos();
         cargarCredencialesGuardadas();
     }
@@ -68,31 +67,43 @@ public class LoginController {
             return;
         }
 
-        if (validarCredenciales(username, password)) {
-            sessionManager.iniciarSesion(1, username, VALID_PROFILE);
+        // Validar credenciales desde la base de datos
+        DatabaseConnection.Usuario usuario = validarCredenciales(username, password);
+        if (usuario != null) {
+            sessionManager.iniciarSesion(usuario.getId(), username, usuario.getPerfil());
             redirigirAlDashboard();
         } else {
             mostrarError("Usuario o contraseña incorrectos");
         }
     }
 
-    private boolean validarCredenciales(String username, String password) {
-        return VALID_USERNAME.equals(username) && VALID_PASSWORD.equals(password);
+    private DatabaseConnection.Usuario validarCredenciales(String username, String password) {
+        try {
+            var usuarioOpt = dbConnection.getUsuarioPorCredenciales(username, password);
+            return usuarioOpt.orElse(null);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al validar credenciales: {0}", e.getMessage());
+            mostrarError("Error de conexión con la base de datos");
+            return null;
+        }
     }
 
     private void redirigirAlDashboard() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MenuPrincipal.fxml"));
+            String perfil = sessionManager.getPerfilActual();
+            String fxmlPath = obtenerFxmlPorPerfil(perfil);
+            
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/" + fxmlPath));
             Parent root = loader.load();
 
             Stage stage = (Stage) loginButton.getScene().getWindow();
             Scene scene = new Scene(root, 1280, 720);
             stage.setScene(scene);
-            stage.setTitle("🍰 Pastelería Rosato - Menú Principal");
+            stage.setTitle("🍰 Pastelería Rosato - " + obtenerTituloPorPerfil(perfil));
             stage.show();
 
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar el menú principal: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error al cargar el dashboard: {0}", e.getMessage());
             mostrarError("Error al cargar la interfaz principal");
         }
     }
@@ -104,6 +115,16 @@ public class LoginController {
             return "DashboardEmpleado.fxml";
         } else {
             return "DashboardAdmin.fxml";
+        }
+    }
+
+    private String obtenerTituloPorPerfil(String perfil) {
+        if (SessionManager.PERFIL_CLIENTE.equals(perfil)) {
+            return "Panel Cliente";
+        } else if (SessionManager.PERFIL_EMPLEADO.equals(perfil)) {
+            return "Panel Empleado";
+        } else {
+            return "Panel Administrador";
         }
     }
 

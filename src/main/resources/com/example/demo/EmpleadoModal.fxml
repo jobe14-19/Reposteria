@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
@@ -17,7 +18,7 @@
     <spacing>15</spacing>
 
     <!-- Title -->
-    <Label fx:id="tituloLabel" text="➕ Contratar Empleado" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+    <Label fx:id="tituloLabel" text="Contratar Empleado" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
 
     <!-- Form Fields -->
     <GridPane hgap="15" vgap="15" alignment="CENTER_LEFT">

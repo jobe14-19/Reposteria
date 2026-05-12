@@ -39,6 +39,16 @@
                 </VBox>
                 
                 <VBox spacing="5">
+                    <Label text="Teléfono" styleClass="checkbox-label"/>
+                    <TextField fx:id="telefonoField" promptText="Tu número de teléfono" styleClass="form-field"/>
+                </VBox>
+                
+                <VBox spacing="5">
+                    <Label text="Dirección" styleClass="checkbox-label"/>
+                    <TextField fx:id="direccionField" promptText="Tu dirección completa" styleClass="form-field"/>
+                </VBox>
+                
+                <VBox spacing="5">
                     <Label text="Contraseña" styleClass="checkbox-label"/>
                     <PasswordField fx:id="passwordField" styleClass="form-field"/>
                 </VBox>

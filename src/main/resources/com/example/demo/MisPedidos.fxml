@@ -18,9 +18,9 @@
     <VBox style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">
         <padding><Insets top="20" right="20" bottom="15" left="20"/></padding>
         <HBox alignment="CENTER_LEFT" spacing="15">
-            <Label text="📦 Mis Pedidos" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+            <Label text="Mis Pedidos" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="nuevoPedidoButton" text="➕ Nuevo Pedido" onAction="#nuevoPedido"
+            <Button fx:id="nuevoPedidoButton" text="Nuevo Pedido" onAction="#nuevoPedido"
                     style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
         </HBox>
     </VBox>
@@ -32,11 +32,11 @@
             <!-- Client Info Card -->
             <HBox style="-fx-background-color: #F8F9FA; -fx-background-radius: 12; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-padding: 15;" alignment="CENTER_LEFT" spacing="20">
                 <VBox spacing="5" alignment="CENTER_LEFT">
-                    <Label text="👤 Cliente:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                    <Label text="Cliente:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
                     <Label fx:id="clienteLabel" text="-" style="-fx-font-size: 16px; -fx-text-fill: #333333;"/>
                 </VBox>
                 <VBox spacing="5" alignment="CENTER_LEFT">
-                    <Label text="📊 Total Pedidos:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                    <Label text="Total Pedidos:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
                     <Label fx:id="totalPedidosLabel" text="0" style="-fx-font-size: 16px; -fx-text-fill: #333333;"/>
                 </VBox>
                 <VBox spacing="5" alignment="CENTER_LEFT">

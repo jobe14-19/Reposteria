@@ -14,14 +14,14 @@
     <top>
         <VBox>
             <HBox styleClass="nav-bar" alignment="CENTER_LEFT">
-                <Label text="🍰 Pastelería Rosato" styleClass="nav-logo"/>
+                <Label text="Pastelería Rosato" styleClass="nav-logo"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <HBox spacing="5" alignment="CENTER">
-                    <Button text="🏠 Mi Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
-                    <Button text="📦 Mis Pedidos" onAction="#verMisPedidos" styleClass="nav-button"/>
-                    <Button text="👤 Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
-                    <Button text="✨ Chef's Box" onAction="#verChefsBox" styleClass="nav-button"/>
+                    <Button text="Mi Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
+                    <Button text="Mis Pedidos" onAction="#verMisPedidos" styleClass="nav-button"/>
+                    <Button text="Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
+                    <Button text="Chef's Box" onAction="#verChefsBox" styleClass="nav-button"/>
                 </HBox>
 
                 <Region HBox.hgrow="ALWAYS"/>
@@ -50,25 +50,25 @@
 
                     <HBox spacing="20" alignment="CENTER">
                         <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="📦" style="-fx-font-size: 40px;"/>
+                            <Label text="Total" style="-fx-font-size: 40px;"/>
                             <Label text="Total Pedidos" styleClass="kpi-label"/>
                             <Label fx:id="totalPedidosLabel" text="0" styleClass="kpi-value"/>
                         </VBox>
 
                         <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="📅" style="-fx-font-size: 40px;"/>
+                            <Label text="Fecha" style="-fx-font-size: 40px;"/>
                             <Label text="Próximo Pedido" styleClass="kpi-label"/>
                             <Label fx:id="proxPedidoLabel" text="No programado" styleClass="kpi-value-small"/>
                         </VBox>
 
                         <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="⭐" style="-fx-font-size: 40px;"/>
+                            <Label text="Puntos" style="-fx-font-size: 40px;"/>
                             <Label text="Puntos Fidelidad" styleClass="kpi-label"/>
                             <Label fx:id="puntosLabel" text="0" styleClass="kpi-value"/>
                         </VBox>
 
                         <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="💰" style="-fx-font-size: 40px;"/>
+                            <Label text="Ingresos" style="-fx-font-size: 40px;"/>
                             <Label text="Total Gastado" styleClass="kpi-label"/>
                             <Label fx:id="totalGastadoLabel" text="\$0.00" styleClass="kpi-value"/>
                         </VBox>
@@ -98,7 +98,7 @@
 
                     <VBox styleClass="suggestion-card" alignment="CENTER_LEFT" spacing="15">
                         <HBox alignment="CENTER_LEFT" spacing="20">
-                            <Label text="🎂" style="-fx-font-size: 50px;"/>
+                            <Label text="Pastel" style="-fx-font-size: 50px;"/>
                             <VBox spacing="5">
                                 <Label fx:id="sugerenciaProductoLabel" text="Basado en tu historial..." styleClass="suggestion-title"/>
                                 <Label fx:id="sugerenciaDescLabel" text="Te recomendamos tu pastel favorito" styleClass="suggestion-desc"/>
@@ -114,21 +114,21 @@
 
                     <HBox spacing="20" alignment="CENTER">
                         <VBox styleClass="promo-card" alignment="CENTER" spacing="10">
-                            <Label text="🎉" style="-fx-font-size: 35px;"/>
+                            <Label text="Promo" style="-fx-font-size: 35px;"/>
                             <Label text="10% OFF" styleClass="promo-title"/>
                             <Label text="En tu próximo pedido" styleClass="promo-desc"/>
                             <Label fx:id="promo1Label" text="Código: WELCOME10" styleClass="promo-code"/>
                         </VBox>
 
                         <VBox styleClass="promo-card" alignment="CENTER" spacing="10">
-                            <Label text="✨" style="-fx-font-size: 35px;"/>
+                            <Label text="Chef" style="-fx-font-size: 35px;"/>
                             <Label text="Chef's Box" styleClass="promo-title"/>
                             <Label text="Suscripción mensual" styleClass="promo-desc"/>
                             <Button text="Ver Planes" onAction="#verChefsBox" styleClass="promo-button"/>
                         </VBox>
 
                         <VBox styleClass="promo-card" alignment="CENTER" spacing="10">
-                            <Label text="🎂" style="-fx-font-size: 35px;"/>
+                            <Label text="Pastel" style="-fx-font-size: 35px;"/>
                             <Label text="Cumpleaños" styleClass="promo-title"/>
                             <Label text="Descuento especial" styleClass="promo-desc"/>
                             <Label fx:id="promo3Label" text="Este mes" styleClass="promo-valid"/>

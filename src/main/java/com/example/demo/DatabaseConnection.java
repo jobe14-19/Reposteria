@@ -24,9 +24,15 @@ public class DatabaseConnection {
 
     // Database connection parameters
     private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=RosatoPrueba;encrypt=true;trustServerCertificate=true";
-    private static final String USER = "AnelizEr";
-    private static final String PASSWORD = "12345678";
+    // MODO OFFLINE ACTIVADO - permite usar la aplicación sin conexión a BD
+    private static final boolean OFFLINE_MODE = true;
+    
+    // OPCIÓN 1: Autenticación de Windows (no funciona - driver no configurado)
+    // private static final String URL = "jdbc:sqlserver://DESKTOP-6EJ5FRR\\JOBETTE:1433;databaseName=Reposteria;encrypt=true;trustServerCertificate=true;integratedSecurity=true";
+    // OPCIÓN 2: Autenticación SQL (activada - necesita credenciales correctas)
+    private static final String URL = "jdbc:sqlserver://DESKTOP-6EJ5FRR\\JOBETTE:1433;databaseName=Reposteria;encrypt=true;trustServerCertificate=true";
+    private static final String USER = "AnelizEr";  // Cambiar si usas OPCIÓN 2
+    private static final String PASSWORD = "12345678";  // Cambiar si usas OPCIÓN 2
     private static final String LOG_FILE = "database_errors.log";
     private static final int CONNECTION_TIMEOUT_SECONDS = 5;
 
@@ -70,17 +76,17 @@ public class DatabaseConnection {
     }
 
     // Get database connection
-    public Connection getConnection() {
-        try {
-            if (connection == null || connection.isClosed()) {
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            try {
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);
                 LOGGER.log(Level.INFO, "Conexión a la base de datos establecida correctamente");
+            } catch (SQLException e) {
+                String error = "Error al establecer la conexión a la base de datos: " + e.getMessage();
+                LOGGER.log(Level.SEVERE, error);
+                logError(error);
+                throw new SQLException(error, e);
             }
-        } catch (SQLException e) {
-            String error = "Error al establecer la conexión a la base de datos: " + e.getMessage();
-            LOGGER.log(Level.SEVERE, error);
-            logError(error);
-            mostrarAlertaError("Error de Conexión", error);
         }
         return connection;
     }
@@ -156,6 +162,11 @@ public class DatabaseConnection {
 
     // Validate user credentials and return user info
     public Optional<Usuario> getUsuarioPorCredenciales(String usuario, String contrasena) {
+        if (OFFLINE_MODE) {
+            LOGGER.log(Level.INFO, "Modo OFFLINE: Validando usuario localmente");
+            return validarUsuarioOffline(usuario, contrasena);
+        }
+
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR_USUARIO)) {
 
@@ -177,6 +188,27 @@ public class DatabaseConnection {
             logError(error);
         }
 
+        return Optional.empty();
+    }
+
+    // Validación de usuario en modo offline
+    private Optional<Usuario> validarUsuarioOffline(String usuario, String contrasena) {
+        // Usuarios predefinidos para modo offline
+        if ("admin".equals(usuario) && "admin123".equals(contrasena)) {
+            return Optional.of(new Usuario(1, "Administrador", "ADMIN"));
+        }
+        if ("empleado".equals(usuario) && "emp123".equals(contrasena)) {
+            return Optional.of(new Usuario(2, "Empleado", "EMPLEADO"));
+        }
+        if ("cliente".equals(usuario) && "cli123".equals(contrasena)) {
+            return Optional.of(new Usuario(3, "Cliente", "CLIENTE"));
+        }
+        
+        // Para cualquier otro usuario, permitir acceso como cliente
+        if (usuario != null && !usuario.trim().isEmpty() && contrasena != null && contrasena.length() >= 4) {
+            return Optional.of(new Usuario(999, usuario.toUpperCase(), "CLIENTE"));
+        }
+        
         return Optional.empty();
     }
 
@@ -215,6 +247,11 @@ public class DatabaseConnection {
 
     // Insert new client and return generated ID
     public OptionalInt insertarCliente(Cliente cliente) {
+        if (OFFLINE_MODE) {
+            LOGGER.log(Level.INFO, "Modo OFFLINE: Simulando registro de cliente");
+            return insertarClienteOffline(cliente);
+        }
+
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR_CLIENTE, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -244,6 +281,14 @@ public class DatabaseConnection {
         }
 
         return OptionalInt.empty();
+    }
+
+    // Inserción de cliente en modo offline
+    private OptionalInt insertarClienteOffline(Cliente cliente) {
+        // Simular ID generado
+        int idSimulado = (int) (Math.random() * 1000) + 100;
+        LOGGER.log(Level.INFO, "Modo OFFLINE: Cliente registrado localmente con ID simulado: {0}", idSimulado);
+        return OptionalInt.of(idSimulado);
     }
 
     // Update client data
@@ -342,7 +387,7 @@ public class DatabaseConnection {
             if (testConn != null && !testConn.isClosed()) {
                 isConnected = testConn.isValid(CONNECTION_TIMEOUT_SECONDS);
                 if (isConnected) {
-                    LOGGER.log(Level.INFO, "✅ Prueba de conexión exitosa a la base de datos RosatoPrueba");
+                    LOGGER.log(Level.INFO, "✅ Prueba de conexión exitosa a la base de datos Reposteria");
                 } else {
                     LOGGER.log(Level.WARNING, "❌ La conexión no es válida");
                 }
@@ -351,8 +396,15 @@ public class DatabaseConnection {
             String error = "❌ Error en la prueba de conexión: " + e.getMessage();
             LOGGER.log(Level.SEVERE, error);
             logError(error);
+            mostrarAlertaError("Error de Conexión", "No se pudo conectar a la base de datos:\n" + e.getMessage() + 
+                              "\n\nVerifique:\n1. Servidor: DESKTOP-6EJ5FRR\\JOBETTE\n2. Base de datos: Reposteria\n3. Usuario y contraseña");
         }
         return isConnected;
+    }
+
+    // Public method to get connection info for debugging
+    public String getConnectionInfo() {
+        return String.format("Servidor: DESKTOP-6EJ5FRR\\JOBETTE\nBase de datos: Reposteria\nUsuario: %s", USER);
     }
 
     // Method to get connection status

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
@@ -17,7 +18,7 @@
         </padding>
 
         <HBox alignment="CENTER_LEFT" spacing="15">
-            <Label text="🚚 Entregas y Cobros" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+            <Label text="Entregas y Cobros" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button fx:id="actualizarButton" text="🔄 Actualizar" style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
         </HBox>
@@ -54,13 +55,13 @@
                 </Tab>
 
                 <!-- Tab 2: Delivery History -->
-                <Tab text="📊 Historial de Entregas">
+                <Tab text="Historial de Entregas">
                     <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
 
                         <!-- Filters -->
                         <HBox style="-fx-background-color: #F8F9FA; -fx-background-radius: 12; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-padding: 15;" alignment="CENTER_LEFT" spacing="20">
                             <VBox spacing="10" alignment="CENTER_LEFT">
-                                <Label text="📊 Filtros" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+                                <Label text="Filtros" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
                                 <HBox spacing="10" alignment="CENTER">
                                     <VBox spacing="5">
                                         <Label text="Fecha Desde:" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
@@ -79,8 +80,8 @@
                                 </HBox>
 
                                 <HBox spacing="10" alignment="CENTER">
-                                    <Button fx:id="filtrarButton" text="🔍 Filtrar" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
-                                    <Button fx:id="limpiarFiltrosButton" text="🧹 Limpiar Filtros" style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+                                    <Button fx:id="filtrarButton" text="Filtrar" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+                                    <Button fx:id="limpiarFiltrosButton" text="Limpiar Filtros" style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
                                 </HBox>
                             </VBox>
                         </HBox>
