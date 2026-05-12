@@ -3,8 +3,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import java.net.URL?>
 
-<VBox styleClass="root" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.MantenimientoModalController">
+<VBox styleClass="root" spacing="15" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.MantenimientoModalController">
     <stylesheets>
         <URL value="@styles.css"/>
     </stylesheets>
@@ -12,10 +13,6 @@
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
-    
-    <spacing>
-        <Double fx:value="15"/>
-    </spacing>
     
     <!-- Title -->
     <Label fx:id="tituloLabel" text="🔧 Registrar Mantenimiento" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
@@ -32,7 +29,7 @@
         <ComboBox fx:id="tipoComboBox" styleClass="form-field" prefWidth="250" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
         
         <Label text="Descripción:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <TextArea fx:id="descripcionTextArea" promptText="Cambios realizados durante el mantenimiento" styleClass="form-field" prefWidth="250" prefHeight="80" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <TextArea fx:id="descripcionTextArea" styleClass="form-field" prefWidth="250" prefHeight="80" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
         
         <Label text="Próximo Mantenimiento:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
         <DatePicker fx:id="proximoMantenimientoPicker" styleClass="form-field" prefWidth="250" GridPane.rowIndex="4" GridPane.columnIndex="1"/>

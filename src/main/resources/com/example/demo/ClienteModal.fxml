@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import java.net.URL?>
 
 <VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.ClienteModalController">
     <stylesheets>
@@ -42,7 +43,7 @@
         <TextField fx:id="usuarioField" promptText="Nombre de usuario para el sistema" styleClass="form-field" prefWidth="250" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
         <Label text="Contraseña:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-        <PasswordField fx:id="contrasenaField" promptText="Contraseña del cliente" styleClass="form-field" prefWidth="250" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+        <PasswordField fx:id="contrasenaField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
     </GridPane>
 
     <!-- Action Buttons -->

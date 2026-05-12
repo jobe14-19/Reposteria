@@ -77,7 +77,7 @@
                     <VBox spacing="10" alignment="CENTER_LEFT">
                         <Label text="Seleccionar Pedido:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
                         <HBox spacing="10" alignment="CENTER">
-                            <TextField fx:id="buscarPedidoField" promptText="🔍 Buscar pedido por ID o cliente" styleClass="form-field" prefWidth="200"/>
+                            <TextField fx:id="buscarPedidoField" promptText="Buscar pedido por ID o cliente" styleClass="form-field" prefWidth="200"/>
                             <Button fx:id="buscarPedidoButton" text="🔍 Buscar" style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
                         </HBox>
 

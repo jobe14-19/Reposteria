@@ -232,7 +232,7 @@ public class InventarioController {
 
     private void abrirModalCompra() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("CompraModal.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/CompraModal.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();
@@ -253,7 +253,7 @@ public class InventarioController {
 
     private void editarIngrediente(Ingrediente ingrediente) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("IngredienteModal.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/IngredienteModal.fxml"));
             Parent root = loader.load();
 
             IngredienteModalController controller = loader.getController();

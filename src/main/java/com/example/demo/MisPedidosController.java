@@ -28,7 +28,7 @@ public class MisPedidosController {
 
     private static final String SQL_PEDIDOS_CLIENTE = """
         SELECT p.id_pedido, p.producto, p.libras,
-               strftime('%Y-%m-%d', p.fecha_entrega) as fecha_entrega,
+               CAST(p.fecha_entrega AS DATE) as fecha_entrega,
                p.total, p.adelanto, p.total - p.adelanto as saldo, p.estado
         FROM pedidos p
         WHERE p.id_cliente = ?
@@ -264,7 +264,7 @@ public class MisPedidosController {
     @FXML
     private void nuevoPedido(ActionEvent event) {
         try {
-            var loader = new FXMLLoader(getClass().getResource("Pedidos.fxml"));
+            var loader = new FXMLLoader(getClass().getResource("/com/example/demo/Pedidos.fxml"));
             var root = loader.<Parent>load();
 
             var stage = new Stage();
@@ -303,7 +303,7 @@ public class MisPedidosController {
 
     private void abrirModalDetalle(PedidoCliente pedido) {
         try {
-            var loader = new FXMLLoader(getClass().getResource("PedidoDetalleModal.fxml"));
+            var loader = new FXMLLoader(getClass().getResource("/com/example/demo/PedidoDetalleModal.fxml"));
             var root = loader.<Parent>load();
 
             var controller = loader.<PedidoDetalleModalController>getController();

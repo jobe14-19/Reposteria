@@ -3,8 +3,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import java.net.URL?>
 
-<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.PedidoModalController">
+<VBox styleClass="root" spacing="15" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.PedidoModalController">
     <stylesheets>
         <URL value="@styles.css"/>
     </stylesheets>
@@ -12,8 +13,6 @@
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
-
-    <spacing>15</spacing>
 
     <!-- Title -->
     <Label fx:id="tituloLabel" text="📋 Nuevo Pedido" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
@@ -30,7 +29,11 @@
         <ComboBox fx:id="tipoBizcochoComboBox" styleClass="form-field" prefWidth="250" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
         <Label text="Libras:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <Spinner fx:id="librasSpinner" min="0.5" max="20" initialValue="1" amountToStep="0.5" prefWidth="250" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Spinner fx:id="librasSpinner" prefWidth="250" GridPane.rowIndex="3" GridPane.columnIndex="1">
+            <valueFactory>
+                <SpinnerValueFactory.DoubleSpinnerValueFactory min="0.5" max="20.0" initialValue="1.0" amountToStepBy="0.5"/>
+            </valueFactory>
+        </Spinner>
 
         <Label text="Diseño:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
         <TextArea fx:id="disenoTextArea" promptText="Describe el diseño del pastel (obligatorio)" styleClass="form-field" prefWidth="250" prefHeight="80" GridPane.rowIndex="4" GridPane.columnIndex="1"/>

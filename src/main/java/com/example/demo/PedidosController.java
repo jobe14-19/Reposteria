@@ -313,7 +313,7 @@ public class PedidosController {
 
     private void abrirModalPedido(Pedido pedido) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("PedidoModal.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/PedidoModal.fxml"));
             Parent root = loader.load();
 
             PedidoModalController controller = loader.getController();

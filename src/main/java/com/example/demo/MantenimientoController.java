@@ -34,7 +34,7 @@ public class MantenimientoController {
     @FXML
     private void abrirModalMantenimiento() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("mantenimientoModal.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MantenimientoModal.fxml"));
             Parent root = loader.load();
 
             MantenimientoModalController modalController = loader.getController();

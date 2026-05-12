@@ -3,8 +3,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import java.net.URL?>
 
-<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.EntregaModalController">
+<VBox styleClass="root" spacing="15" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.EntregaModalController">
     <stylesheets>
         <URL value="@styles.css"/>
     </stylesheets>
@@ -13,7 +14,9 @@
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
 
-    <spacing>15</spacing>
+    <fx:define>
+        <ToggleGroup fx:id="tipoEntregaGroup"/>
+    </fx:define>
 
     <!-- Title -->
     <Label fx:id="tituloLabel" text="🚚 Registrar Entrega y Cobro" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
@@ -45,8 +48,8 @@
         <Label text="🚚 Tipo de Entrega" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
 
         <HBox spacing="20" alignment="CENTER_LEFT">
-            <RadioButton fx:id="localRadioButton" text="🏪 Recogida en Local" selected="true" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
-            <RadioButton fx:id="deliveryRadioButton" text="🚗 Delivery" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
+            <RadioButton fx:id="localRadioButton" text="🏪 Recogida en Local" toggleGroup="$tipoEntregaGroup" selected="true" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
+            <RadioButton fx:id="deliveryRadioButton" text="🚗 Delivery" toggleGroup="$tipoEntregaGroup" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>
         </HBox>
     </VBox>
 

@@ -35,7 +35,7 @@ public class LimpiezaController {
     @FXML
     private void abrirModalLimpieza() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("limpiezaModal.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/LimpiezaModal.fxml"));
             Parent root = loader.load();
 
             LimpiezaModalController modalController = loader.getController();

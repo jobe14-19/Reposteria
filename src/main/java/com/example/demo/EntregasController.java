@@ -26,7 +26,7 @@ public class EntregasController {
 
     // Constantes SQL - CORREGIDO para SQLite
     private static final String SQL_PEDIDOS_PENDIENTES = """
-        SELECT p.id_pedido, c.nombre || ' ' || c.apellido as nombre_cliente,
+        SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente,
                c.direccion, p.total, p.adelanto,
                p.total - p.adelanto as saldo,
                CASE WHEN p.tipo_entrega = 'L' THEN 'Local' ELSE 'Delivery' END as tipo
@@ -38,12 +38,12 @@ public class EntregasController {
         """;
 
     private static final String SQL_HISTORIAL_ENTREGAS = """
-        SELECT p.id_pedido, c.nombre || ' ' || c.apellido as nombre_cliente,
-               strftime('%Y-%m-%d', p.fecha_entrega) as fecha_entrega,
+        SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente,
+               CAST(p.fecha_entrega AS DATE) as fecha_entrega,
                CASE WHEN p.tipo_entrega = 'L' THEN 'Local' ELSE 'Delivery' END as tipo,
                p.total,
                COALESCE((SELECT SUM(monto) FROM pagos WHERE id_pedido = p.id_pedido), 0) as pagado,
-               (SELECT metodo_pago FROM pagos WHERE id_pedido = p.id_pedido ORDER BY fecha_pago DESC LIMIT 1) as metodo_pago
+               (SELECT TOP 1 metodo_pago FROM pagos WHERE id_pedido = p.id_pedido ORDER BY fecha_pago DESC) as metodo_pago
         FROM pedidos p
         INNER JOIN clientes c ON p.id_cliente = c.id_cliente
         WHERE p.estado = 'Entregado'
@@ -342,12 +342,12 @@ public class EntregasController {
 
     private void aplicarFiltrosHistorial() {
         StringBuilder sqlBuilder = new StringBuilder("""
-            SELECT p.id_pedido, c.nombre || ' ' || c.apellido as nombre_cliente,
-                   strftime('%Y-%m-%d', p.fecha_entrega) as fecha_entrega,
+            SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente,
+                   CAST(p.fecha_entrega AS DATE) as fecha_entrega,
                    CASE WHEN p.tipo_entrega = 'L' THEN 'Local' ELSE 'Delivery' END as tipo,
                    p.total,
                    COALESCE((SELECT SUM(monto) FROM pagos WHERE id_pedido = p.id_pedido), 0) as pagado,
-                   (SELECT metodo_pago FROM pagos WHERE id_pedido = p.id_pedido ORDER BY fecha_pago DESC LIMIT 1) as metodo_pago
+                   (SELECT TOP 1 metodo_pago FROM pagos WHERE id_pedido = p.id_pedido ORDER BY fecha_pago DESC) as metodo_pago
             FROM pedidos p
             INNER JOIN clientes c ON p.id_cliente = c.id_cliente
             WHERE p.estado = 'Entregado'
@@ -415,7 +415,7 @@ public class EntregasController {
 
     private void abrirModalEntrega(PedidoPendiente pedido) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("EntregaModal.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/EntregaModal.fxml"));
             Parent root = loader.load();
 
             EntregaModalController controller = loader.getController();

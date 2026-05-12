@@ -223,7 +223,7 @@ public class DashboardClienteController {
         sessionManager.cerrarSesion();
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/Login.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) userLabel.getScene().getWindow();
@@ -245,7 +245,7 @@ public class DashboardClienteController {
     @FXML
     private void verMisPedidos(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("MisPedidos.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MisPedidos.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();
@@ -263,7 +263,7 @@ public class DashboardClienteController {
     @FXML
     private void verMiPerfil(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("MiPerfil.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MiPerfil.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();

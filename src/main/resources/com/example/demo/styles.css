@@ -103,6 +103,29 @@
     -fx-font-weight: bold;
 }
 
+/* Menu Principal Styles */
+.menu-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 15, 0, 0, 8);
+    -fx-padding: 30;
+}
+
+.menu-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(139, 94, 60, 0.15), 20, 0, 0, 10);
+    -fx-translate-y: -2;
+}
+
+.section-header {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B5E3C;
+    -fx-padding: 0 0 10 0;
+    -fx-border-color: #F9E6E8;
+    -fx-border-width: 0 0 2 0;
+}
+
 /* Dashboard Styles */
 .stat-card {
     -fx-background-color: white;

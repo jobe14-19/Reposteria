@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<BorderPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.MenuPrincipalController">
+    <stylesheets>
+        <URL value="@styles.css"/>
+    </stylesheets>
+    
+    <top>
+        <VBox styleClass="nav-bar" alignment="CENTER">
+            <padding>
+                <Insets top="20" bottom="20" left="40" right="40"/>
+            </padding>
+            <Label text="🍰 Pastelería Rosato - Menú Principal" styleClass="nav-logo" style="-fx-font-size: 28px;"/>
+            <Label text="Selecciona un módulo para comenzar" styleClass="subtitle-label" style="-fx-text-fill: white;"/>
+        </VBox>
+    </top>
+    
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+            <VBox fx:id="sectionsContainer" spacing="30" alignment="TOP_CENTER" style="-fx-padding: 40;">
+                <!-- Dinámicamente llenado por el controlador -->
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 20;">
+            <Button text="Cerrar Sesión" onAction="#cerrarSesion" styleClass="nav-logout" style="-fx-font-size: 14px; -fx-padding: 10 20;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

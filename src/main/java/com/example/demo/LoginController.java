@@ -81,21 +81,18 @@ public class LoginController {
     }
 
     private void redirigirAlDashboard() {
-        String perfil = sessionManager.getPerfilActual();
-        String fxmlFile = obtenerFxmlPorPerfil(perfil);
-
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MenuPrincipal.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) loginButton.getScene().getWindow();
             Scene scene = new Scene(root, 1280, 720);
             stage.setScene(scene);
-            stage.setTitle("🍰 Pastelería Rosato - Dashboard " + perfil);
+            stage.setTitle("🍰 Pastelería Rosato - Menú Principal");
             stage.show();
 
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar el dashboard: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error al cargar el menú principal: {0}", e.getMessage());
             mostrarError("Error al cargar la interfaz principal");
         }
     }
@@ -118,15 +115,14 @@ public class LoginController {
     @FXML
     private void abrirRegistro(MouseEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("RegistroCliente.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/RegistroCliente.fxml"));
             Parent root = loader.load();
 
-            Stage stage = new Stage();
-            Scene scene = new Scene(root, 600, 500);
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            Scene scene = new Scene(root, 1000, 700);
             stage.setScene(scene);
             stage.setTitle("🍰 Pastelería Rosato - Registro de Cliente");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.showAndWait();
+            stage.show();
 
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error al abrir formulario de registro: {0}", e.getMessage());

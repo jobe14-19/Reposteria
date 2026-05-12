@@ -243,7 +243,7 @@ public class DashboardEmpleadoController {
         sessionManager.cerrarSesion();
         try {
             Stage stage = (Stage) userLabel.getScene().getWindow();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("Login.fxml")), 1280, 720));
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml")), 1280, 720));
             stage.setTitle("🍰 Pastelería Rosato - Sistema de Gestión");
         } catch (Exception ex) { LOGGER.log(Level.SEVERE, "Error: {0}", ex.getMessage()); }
     }
@@ -258,7 +258,7 @@ public class DashboardEmpleadoController {
     private void verMiPerfil(ActionEvent e) {
         try {
             Stage stage = new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("MiPerfil.fxml")), 800, 600));
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/MiPerfil.fxml")), 800, 600));
             stage.setTitle("🍰 Pastelería Rosato - Mi Perfil");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();

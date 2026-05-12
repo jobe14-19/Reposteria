@@ -4,11 +4,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.shape.Circle?>
+<?import java.net.URL?>
 
-<VBox xmlns="http://javafx.com/javafx/17"
+<VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.demo.MiPerfilController"
       spacing="20" alignment="TOP_CENTER" style="-fx-background-color: #FAFAFA;">
+      
+    <stylesheets>
+        <URL value="@styles.css"/>
+    </stylesheets>
 
     <!-- Header -->
     <VBox style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">

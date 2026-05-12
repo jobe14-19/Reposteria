@@ -32,7 +32,7 @@
             <VBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="🔍 Búsqueda" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
                 <HBox spacing="10" alignment="CENTER">
-                    <TextField fx:id="buscarField" promptText="🔍 Buscar por nombre, apellido o teléfono" styleClass="form-field" prefWidth="300"/>
+                    <TextField fx:id="buscarField" promptText="Buscar por nombre, apellido o telefono" styleClass="form-field" prefWidth="300"/>
                 </HBox>
             </VBox>
 

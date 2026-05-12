@@ -59,7 +59,7 @@ public class PlanificacionController {
     @FXML
     private ListView<String> timelineListView;
     @FXML
-    private GridPane pasasGridPane;
+    private GridPane pasosGridPane;
     @FXML
     private Button actualizarButton;
     @FXML
@@ -644,7 +644,7 @@ public class PlanificacionController {
         sessionManager.cerrarSesion();
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/Login.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) cerrarSesionButton.getScene().getWindow();

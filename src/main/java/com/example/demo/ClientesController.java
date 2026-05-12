@@ -311,7 +311,7 @@ public class ClientesController {
 
     private void abrirModalCliente(Cliente cliente) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ClienteModal.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/ClienteModal.fxml"));
             Parent root = loader.load();
 
             ClienteModalController controller = loader.getController();

@@ -401,7 +401,7 @@ public class PersonalController {
 
     private void abrirModalEmpleado(Empleado empleado) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("EmpleadoModal.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/EmpleadoModal.fxml"));
             Parent root = loader.load();
 
             EmpleadoModalController controller = loader.getController();
@@ -424,7 +424,7 @@ public class PersonalController {
 
     private void abrirModalCapacitacion(Empleado empleado) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("CapacitacionModal.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/CapacitacionModal.fxml"));
             Parent root = loader.load();
 
             CapacitacionModalController controller = loader.getController();

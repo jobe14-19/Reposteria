@@ -218,7 +218,7 @@ public class DashboardAdminController {
         sessionManager.cerrarSesion();
         try {
             Stage stage = (Stage) userLabel.getScene().getWindow();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("Login.fxml")), 1280, 720));
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml")), 1280, 720));
             stage.setTitle("🍰 Pastelería Rosato - Sistema de Gestión");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
@@ -241,7 +241,7 @@ public class DashboardAdminController {
     @FXML private void verMiPerfil(ActionEvent event) {
         try {
             Stage stage = new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("MiPerfil.fxml")), 800, 600));
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/MiPerfil.fxml")), 800, 600));
             stage.setTitle("🍰 Pastelería Rosato - Mi Perfil");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
@@ -254,7 +254,7 @@ public class DashboardAdminController {
     @FXML private void mostrarAlertas(ActionEvent event) {
         try {
             Stage stage = new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("AlertasAdmin.fxml")), 1000, 600));
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/AlertasAdmin.fxml")), 1000, 600));
             stage.setTitle("🍰 Pastelería Rosato - Sistema de Alertas");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
@@ -267,7 +267,7 @@ public class DashboardAdminController {
     @FXML private void mostrarLogs(ActionEvent event) {
         try {
             Stage stage = new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("LogsAdmin.fxml")), 1000, 600));
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/LogsAdmin.fxml")), 1000, 600));
             stage.setTitle("🍰 Pastelería Rosato - Logs del Sistema");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
