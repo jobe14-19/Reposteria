@@ -113,7 +113,7 @@ public class DashboardAdminController {
             cargarActividades(conn);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
-            mostrarError("No se pudieron cargar los datos.");
+            mostrarError("Error", "No se pudieron cargar los datos.");
         }
     }
 
@@ -218,108 +218,72 @@ public class DashboardAdminController {
         sessionManager.cerrarSesion();
         try {
             Stage stage = (Stage) userLabel.getScene().getWindow();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("Login.fxml")), 1280, 720));
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml")), 1280, 720));
             stage.setTitle("🍰 Pastelería Rosato - Sistema de Gestión");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
         }
     }
 
-    @FXML private void mostrarDashboard(ActionEvent event) {
-        actualizarTimestamp();
-    }
-
-    @FXML private void mostrarClientes(ActionEvent event) {
-        mostrarMensaje("Gestión de Clientes", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarPedidos(ActionEvent event) {
-        mostrarMensaje("Gestión de Pedidos", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarProduccion(ActionEvent event) {
-        mostrarMensaje("Gestión de Producción", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarInventario(ActionEvent event) {
-        mostrarMensaje("Gestión de Inventario", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarEntregas(ActionEvent event) {
-        mostrarMensaje("Gestión de Entregas", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarMantenimiento(ActionEvent event) {
-        mostrarMensaje("Gestión de Mantenimiento", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarPersonal(ActionEvent event) {
-        mostrarMensaje("Gestión de Personal", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarHigiene(ActionEvent event) {
-        mostrarMensaje("Gestión de Higiene", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarChefsBox(ActionEvent event) {
-        mostrarMensaje("Chef's Box", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarReportes(ActionEvent event) {
-        mostrarMensaje("Gestión de Reportes", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarConfiguracion(ActionEvent event) {
-        mostrarMensaje("Configuración del Sistema", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarAlertas(ActionEvent event) {
-        mostrarMensaje("Gestión de Alertas", "Módulo en desarrollo");
-    }
-
-    @FXML private void mostrarProductos(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/Inventario.fxml"));
-            Parent root = loader.load();
-            
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Gestión de Productos - Inventario");
-            stage.setScene(new Scene(root, 1200, 700));
-            stage.show();
-            
-        } catch (Exception e) {
-            mostrarError("Error al abrir Productos: " + e.getMessage());
-        }
-    }
+    @FXML private void mostrarDashboard(ActionEvent event) { cargarDatosAdministrador(); actualizarTimestamp(); }
+    @FXML private void mostrarClientes(ActionEvent event) { mostrarMensaje("Gestión de Clientes", "Módulo en desarrollo"); }
+    @FXML private void mostrarPedidos(ActionEvent event) { mostrarMensaje("Gestión de Pedidos", "Módulo en desarrollo"); }
+    @FXML private void mostrarProduccion(ActionEvent event) { mostrarMensaje("Gestión de Producción", "Módulo en desarrollo"); }
+    @FXML private void mostrarInventario(ActionEvent event) { mostrarMensaje("Gestión de Inventario", "Módulo en desarrollo"); }
+    @FXML private void mostrarEntregas(ActionEvent event) { mostrarMensaje("Gestión de Entregas", "Módulo en desarrollo"); }
+    @FXML private void mostrarMantenimiento(ActionEvent event) { mostrarMensaje("Gestión de Mantenimiento", "Módulo en desarrollo"); }
+    @FXML private void mostrarPersonal(ActionEvent event) { mostrarMensaje("Gestión de Personal", "Módulo en desarrollo"); }
+    @FXML private void mostrarHigiene(ActionEvent event) { mostrarMensaje("Gestión de Higiene", "Módulo en desarrollo"); }
+    @FXML private void mostrarChefsBox(ActionEvent event) { mostrarMensaje("Chef's Box", "Módulo en desarrollo"); }
+    @FXML private void mostrarReportes(ActionEvent event) { mostrarMensaje("Gestión de Reportes", "Módulo en desarrollo"); }
+    @FXML private void mostrarConfiguracion(ActionEvent event) { mostrarMensaje("Configuración del Sistema", "Módulo en desarrollo"); }
 
     @FXML private void verMiPerfil(ActionEvent event) {
         try {
             Stage stage = new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("MiPerfil.fxml")), 800, 600));
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/MiPerfil.fxml")), 800, 600));
             stage.setTitle("🍰 Pastelería Rosato - Mi Perfil");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
-            mostrarError("No se pudo abrir la ventana de perfil");
+            mostrarError("Error", "No se pudo abrir la ventana de perfil");
         }
     }
 
-    private void mostrarError(String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+    @FXML private void mostrarAlertas(ActionEvent event) {
+        try {
+            Stage stage = new Stage();
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/AlertasAdmin.fxml")), 1000, 600));
+            stage.setTitle("🍰 Pastelería Rosato - Sistema de Alertas");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
+            mostrarError("Error", "No se pudo abrir la ventana de alertas");
+        }
     }
 
-    private void mostrarMensaje(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+    @FXML private void mostrarLogs(ActionEvent event) {
+        try {
+            Stage stage = new Stage();
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/LogsAdmin.fxml")), 1000, 600));
+            stage.setTitle("🍰 Pastelería Rosato - Logs del Sistema");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
+            mostrarError("Error", "No se pudo abrir la ventana de logs");
+        }
+    }
+
+    private void mostrarError(String t, String m) { mostrarAlerta(Alert.AlertType.ERROR, t, m); }
+    private void mostrarMensaje(String t, String m) { mostrarAlerta(Alert.AlertType.INFORMATION, t, m); }
+
+    private void mostrarAlerta(Alert.AlertType tipo, String t, String m) {
+        Alert a = new Alert(tipo);
+        a.setTitle(t); a.setHeaderText(null); a.setContentText(m);
+        a.showAndWait();
     }
 
     // CLASES TRADICIONALES (NO Records) - Compatible con Java 8/11/15

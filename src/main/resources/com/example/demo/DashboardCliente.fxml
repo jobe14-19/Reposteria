@@ -70,7 +70,7 @@
                         <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
                             <Label text="Ingresos" style="-fx-font-size: 40px;"/>
                             <Label text="Total Gastado" styleClass="kpi-label"/>
-                            <Label fx:id="totalGastadoLabel" text="\$0.00" styleClass="kpi-value"/>
+                            <Label fx:id="totalGastadoLabel" text="&#36;0.00" styleClass="kpi-value"/>
                         </VBox>
                     </HBox>
                 </VBox>
