@@ -21,10 +21,11 @@ import com.example.demo.DatabaseConnection;
 public class LoginController {
 
     private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
-
     private static final String ERROR_STYLE = "-fx-text-fill: #E74C3C; -fx-font-weight: bold;";
 
-    private DatabaseConnection dbConnection;
+    private static final String VALID_USERNAME = "AnelizEr";
+    private static final String VALID_PASSWORD = "12345678";
+    private static final String VALID_PROFILE = "ADMIN";
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -41,6 +42,8 @@ public class LoginController {
     @FXML
     public void initialize() {
         sessionManager = SessionManager.getInstance();
+        usuarioDAO = new UsuarioDAO();
+        clienteDAO = new ClienteDAO();
         configurarEventos();
         cargarCredencialesGuardadas();
     }
@@ -73,20 +76,43 @@ public class LoginController {
             return;
         }
 
-        if (validarCredenciales(username, password)) {
+        // 1. Intentar como Usuario (Admin/Empleado)
+        Optional<DatabaseConnection.Usuario> userOpt = usuarioDAO.validarCredenciales(username, password);
+        
+        if (userOpt.isPresent()) {
+            DatabaseConnection.Usuario user = userOpt.get();
+            String area = "";
+            if (SessionManager.PERFIL_EMPLEADO.equals(user.getPerfil())) {
+                area = usuarioDAO.obtenerAreaEmpleado(user.getId());
+            }
+            sessionManager.iniciarSesion(user.getId(), user.getNombre(), user.getPerfil(), area);
+            redirigirAlDashboard();
+            return;
+        }
+
+        // 2. Intentar como Cliente
+        Optional<DatabaseConnection.Usuario> clienteOpt = clienteDAO.validarCredenciales(username, password);
+        if (clienteOpt.isPresent()) {
+            DatabaseConnection.Usuario cliente = clienteOpt.get();
+            sessionManager.iniciarSesion(cliente.getId(), cliente.getNombre(), cliente.getPerfil(), "");
+            redirigirAlDashboard();
+            return;
+        }
+
+        // 3. Fallback para desarrollo (AnelizEr)
+        if (VALID_USERNAME.equals(username) && VALID_PASSWORD.equals(password)) {
             sessionManager.iniciarSesion(1, username, VALID_PROFILE);
             redirigirAlDashboard();
-        } else {
-            mostrarError("Usuario o contraseña incorrectos");
+            return;
         }
-    }
 
-    private boolean validarCredenciales(String username, String password) {
-        return VALID_USERNAME.equals(username) && VALID_PASSWORD.equals(password);
+        mostrarError("Usuario o contraseña incorrectos");
     }
 
     private void redirigirAlDashboard() {
         try {
+            String perfil = sessionManager.getPerfilActual();
+            
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MenuPrincipal.fxml"));
             Parent root = loader.load();
 
@@ -97,7 +123,7 @@ public class LoginController {
             stage.show();
 
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar el dashboard: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error al cargar el menú principal: {0}", e.getMessage());
             mostrarError("Error al cargar la interfaz principal");
         }
     }

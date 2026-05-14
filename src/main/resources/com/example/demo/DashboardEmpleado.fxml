@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import java.net.URL?>
+<?import java.net.URL?>
 
 <BorderPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.DashboardEmpleadoController">
     <stylesheets>
@@ -18,12 +19,12 @@
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <HBox spacing="5" alignment="CENTER">
-                    <Button text="🏠 Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
-                    <Button text="👩‍🍳 Producción" onAction="#mostrarProduccion" styleClass="nav-button"/>
-                    <Button text="🚚 Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
-                    <Button text="📦 Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
-                    <Button text="🧼 Higiene" onAction="#mostrarHigiene" styleClass="nav-button"/>
-                    <Button text="👤 Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
+                    <Button fx:id="btnDashboard" text="🏠 Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
+                    <Button fx:id="btnProduccion" text="👩‍🍳 Producción" onAction="#mostrarProduccion" styleClass="nav-button"/>
+                    <Button fx:id="btnEntregas" text="🚚 Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
+                    <Button fx:id="btnInventario" text="📦 Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
+                    <Button fx:id="btnHigiene" text="🧼 Higiene" onAction="#mostrarHigiene" styleClass="nav-button"/>
+                    <Button fx:id="btnPerfil" text="👤 Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
                 </HBox>
 
                 <Region HBox.hgrow="ALWAYS"/>
