@@ -10,8 +10,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.example.demo.dao.UsuarioDAO;
+import com.example.demo.dao.ClienteDAO;
+import com.example.demo.SessionManager;
+import com.example.demo.DatabaseConnection;
 
 public class LoginController {
 
@@ -32,10 +37,14 @@ public class LoginController {
     @FXML private Button loginButton;
 
     private SessionManager sessionManager;
+    private UsuarioDAO usuarioDAO;
+    private ClienteDAO clienteDAO;
 
     @FXML
     public void initialize() {
         sessionManager = SessionManager.getInstance();
+        usuarioDAO = new UsuarioDAO();
+        clienteDAO = new ClienteDAO();
         configurarEventos();
         cargarCredencialesGuardadas();
     }
@@ -68,20 +77,45 @@ public class LoginController {
             return;
         }
 
-        if (validarCredenciales(username, password)) {
-            sessionManager.iniciarSesion(1, username, VALID_PROFILE);
+        // 1. Intentar como Usuario (Admin/Empleado)
+        Optional<DatabaseConnection.Usuario> userOpt = usuarioDAO.validarCredenciales(username, password);
+        
+        if (userOpt.isPresent()) {
+            DatabaseConnection.Usuario user = userOpt.get();
+            String area = "";
+            if (SessionManager.PERFIL_EMPLEADO.equals(user.getPerfil())) {
+                area = usuarioDAO.obtenerAreaEmpleado(user.getId());
+            }
+            sessionManager.iniciarSesion(user.getId(), user.getNombre(), user.getPerfil(), area);
             redirigirAlDashboard();
-        } else {
-            mostrarError("Usuario o contraseña incorrectos");
+            return;
         }
-    }
 
-    private boolean validarCredenciales(String username, String password) {
-        return VALID_USERNAME.equals(username) && VALID_PASSWORD.equals(password);
+        // 2. Intentar como Cliente
+        Optional<DatabaseConnection.Usuario> clienteOpt = clienteDAO.validarCredenciales(username, password);
+        if (clienteOpt.isPresent()) {
+            DatabaseConnection.Usuario cliente = clienteOpt.get();
+            sessionManager.iniciarSesion(cliente.getId(), cliente.getNombre(), cliente.getPerfil(), "");
+            redirigirAlDashboard();
+            return;
+        }
+
+        mostrarError("Usuario o contraseña incorrectos");
     }
 
     private void redirigirAlDashboard() {
         try {
+            String perfil = sessionManager.getPerfilActual();
+            String fxml = obtenerFxmlPorPerfil(perfil);
+            
+            // Si es ADMIN, lo llevamos al Menu Principal que tiene acceso a todo
+            // Para otros roles, también podemos llevarlos al Menu Principal pero filtrado,
+            // o directamente a su Dashboard. El usuario pidió que si es cliente solo vea lo relevante.
+            
+            // Decisión: Todos van al MenuPrincipal, pero el MenuPrincipal se filtrará.
+            // Excepto si queremos una experiencia más directa.
+            // El usuario dijo "si yo entro con un usuario de tipo cliente solo dejes acceder a l informacion que es relevante para un cliente"
+            
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MenuPrincipal.fxml"));
             Parent root = loader.load();
 

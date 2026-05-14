@@ -18,7 +18,9 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MenuPrincipalController {
@@ -29,7 +31,13 @@ public class MenuPrincipalController {
 
     @FXML
     public void initialize() {
-        sections.put("Autenticación y Acceso", new String[]{"Login.fxml", "RegistroCliente.fxml"});
+        SessionManager session = SessionManager.getInstance();
+        String perfil = session.getPerfilActual();
+        String area = session.getAreaActual();
+
+        // Mapa de visibilidad: Perfil -> Lista de FXMLs permitidos
+        // Si el perfil es ADMIN, se permite todo.
+        
         sections.put("Dashboards Principales", new String[]{"DashboardAdmin.fxml", "DashboardCliente.fxml", "DashboardEmpleado.fxml"});
         sections.put("Gestión de Pedidos", new String[]{"Pedidos.fxml", "MisPedidos.fxml", "PedidoModal.fxml", "PedidoDetalleModal.fxml", "CompraModal.fxml"});
         sections.put("Entregas", new String[]{"Entregas.fxml", "EntregaModal.fxml"});
@@ -37,13 +45,27 @@ public class MenuPrincipalController {
         sections.put("Inventario e Ingredientes", new String[]{"Inventario.fxml", "IngredienteModal.fxml"});
         sections.put("Personal y Capacitación", new String[]{"Personal.fxml", "Planificacion.fxml", "EmpleadoModal.fxml", "CapacitacionModal.fxml"});
         sections.put("Limpieza y Mantenimiento", new String[]{"Limpieza.fxml", "LimpiezaModal.fxml", "Mantenimiento.fxml", "MantenimientoModal.fxml"});
+        sections.put("Autenticación y Acceso", new String[]{"Login.fxml", "RegistroCliente.fxml"});
 
         for (Map.Entry<String, String[]> entry : sections.entrySet()) {
+            String sectionTitleStr = entry.getKey();
+            String[] fxmls = entry.getValue();
+            
+            // Filtrar FXMLs por sección
+            List<String> filteredFxmls = new ArrayList<>();
+            for (String fxml : fxmls) {
+                if (esVisible(fxml, perfil, area)) {
+                    filteredFxmls.add(fxml);
+                }
+            }
+            
+            if (filteredFxmls.isEmpty()) continue;
+
             VBox sectionBox = new VBox(15);
             sectionBox.setAlignment(Pos.CENTER);
             sectionBox.getStyleClass().add("menu-card");
             
-            Label sectionTitle = new Label(entry.getKey());
+            Label sectionTitle = new Label(sectionTitleStr);
             sectionTitle.getStyleClass().add("section-header");
             
             FlowPane flowPane = new FlowPane();
@@ -51,11 +73,11 @@ public class MenuPrincipalController {
             flowPane.setVgap(20);
             flowPane.setAlignment(Pos.CENTER);
             
-            for (String fxml : entry.getValue()) {
+            for (String fxml : filteredFxmls) {
                 Button btn = new Button(fxml.replace(".fxml", ""));
                 btn.setPrefWidth(200);
                 btn.setPrefHeight(50);
-                btn.getStyleClass().add("login-button"); // Reusing login-button style for consistency
+                btn.getStyleClass().add("login-button");
                 btn.setStyle(btn.getStyle() + "; -fx-font-size: 14px;");
                 
                 btn.setOnAction(e -> abrirVista(fxml));
@@ -65,6 +87,39 @@ public class MenuPrincipalController {
             sectionBox.getChildren().addAll(sectionTitle, flowPane);
             sectionsContainer.getChildren().add(sectionBox);
         }
+    }
+
+    private boolean esVisible(String fxml, String perfil, String area) {
+        if (SessionManager.PERFIL_ADMIN.equals(perfil)) return true;
+        
+        if (SessionManager.PERFIL_CLIENTE.equals(perfil)) {
+            return fxml.equals("DashboardCliente.fxml") || 
+                   fxml.equals("MisPedidos.fxml") || 
+                   fxml.equals("PedidoModal.fxml") || 
+                   fxml.equals("MiPerfil.fxml");
+        }
+        
+        if (SessionManager.PERFIL_EMPLEADO.equals(perfil)) {
+            // Reglas generales para empleados
+            if (fxml.equals("DashboardEmpleado.fxml") || fxml.equals("MiPerfil.fxml")) return true;
+            
+            // Reglas por área
+            if (SessionManager.AREA_PRODUCCION.equals(area) || SessionManager.AREA_DECORACION.equals(area)) {
+                return fxml.equals("Pedidos.fxml") || fxml.equals("PedidoDetalleModal.fxml") || 
+                       fxml.equals("Inventario.fxml") || fxml.equals("IngredienteModal.fxml");
+            }
+            
+            if (SessionManager.AREA_DELIVERY.equals(area)) {
+                return fxml.equals("Entregas.fxml") || fxml.equals("EntregaModal.fxml");
+            }
+            
+            if (SessionManager.AREA_LIMPIEZA.equals(area)) {
+                return fxml.equals("Limpieza.fxml") || fxml.equals("LimpiezaModal.fxml") || 
+                       fxml.equals("Mantenimiento.fxml") || fxml.equals("MantenimientoModal.fxml");
+            }
+        }
+        
+        return false;
     }
 
     private void abrirVista(String fxmlName) {

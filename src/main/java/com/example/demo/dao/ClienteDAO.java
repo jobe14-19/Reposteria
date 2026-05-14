@@ -32,8 +32,34 @@ public class ClienteDAO {
     private static final String SQL_INSERT_CLIENTE =
             "INSERT INTO clientes (nombre, apellido, telefono, email, direccion, rnc, usuario, contrasena, fecha_registro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
 
+    private static final String SQL_VALIDAR_CLIENTE =
+            "SELECT id_cliente, nombre, apellido FROM clientes WHERE usuario = ? AND contrasena = ?";
+
     public ClienteDAO() {
         this.dbConnection = DatabaseConnection.getInstance();
+    }
+
+    public Optional<DatabaseConnection.Usuario> validarCredenciales(String usuario, String contrasena) {
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR_CLIENTE)) {
+
+            stmt.setString(1, usuario);
+            stmt.setString(2, contrasena);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String nombreCompleto = rs.getString("nombre") + " " + rs.getString("apellido");
+                    return Optional.of(new DatabaseConnection.Usuario(
+                            rs.getInt("id_cliente"),
+                            nombreCompleto.trim(),
+                            SessionManager.PERFIL_CLIENTE
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al validar credenciales del cliente: {0}", e.getMessage());
+        }
+        return Optional.empty();
     }
 
     public List<Cliente> obtenerTodosLosClientes() {

@@ -30,11 +30,11 @@ public class DashboardClienteController {
     private static final String SQL_KPI_CLIENTE =
             "SELECT COUNT(*) as total_pedidos, COALESCE(SUM(total), 0) as total_gastado FROM pedidos WHERE username = ?";
     private static final String SQL_PROXIMO_PEDIDO =
-            "SELECT fecha_entrega FROM pedidos WHERE username = ? AND estado = 'PROGRAMADO' ORDER BY fecha_entrega ASC LIMIT 1";
+            "SELECT TOP 1 fecha_entrega FROM pedidos WHERE username = ? AND estado = 'PROGRAMADO' ORDER BY fecha_entrega ASC";
     private static final String SQL_PEDIDOS_RECIENTES =
-            "SELECT id_pedido, producto, libras, fecha_entrega, total, estado FROM pedidos WHERE username = ? ORDER BY fecha_entrega DESC LIMIT 5";
+            "SELECT TOP 5 id_pedido, producto, libras, fecha_entrega, total, estado FROM pedidos WHERE username = ? ORDER BY fecha_entrega DESC";
     private static final String SQL_PRODUCTO_FAVORITO =
-            "SELECT producto, COUNT(*) as frecuencia FROM pedidos WHERE username = ? GROUP BY producto ORDER BY frecuencia DESC LIMIT 1";
+            "SELECT TOP 1 producto, COUNT(*) as frecuencia FROM pedidos WHERE username = ? GROUP BY producto ORDER BY frecuencia DESC";
 
     // Constantes
     private static final int REFRESH_INTERVAL_MS = 30000;

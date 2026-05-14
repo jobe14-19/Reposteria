@@ -36,12 +36,11 @@ public class InventarioController {
         """;
 
     private static final String SQL_CARGAR_ALERTAS = """
-        SELECT i.nombre || ' - Stock: ' || CAST(i.stock_actual AS TEXT) || ' / ' ||
-               CAST(i.stock_minimo AS TEXT) || ' (' || i.unidad || ')' as alerta
+        SELECT TOP 10 i.nombre + ' - Stock: ' + CAST(i.stock_actual AS VARCHAR) + ' / ' +
+               CAST(i.stock_minimo AS VARCHAR) + ' (' + i.unidad + ')' as alerta
         FROM ingredientes i
         WHERE i.stock_actual <= i.stock_minimo * 1.2
         ORDER BY i.stock_actual
-        LIMIT 10
         """;
 
     private static final String SQL_ELIMINAR_INGREDIENTE = "DELETE FROM ingredientes WHERE id_ingrediente = ?";

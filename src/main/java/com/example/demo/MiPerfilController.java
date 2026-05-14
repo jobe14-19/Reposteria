@@ -22,7 +22,7 @@ public class MiPerfilController {
     private static final String SQL_CLIENTE_DATA = "SELECT id_cliente, nombre, telefono, email, direccion, usuario, estado FROM clientes WHERE id_cliente = ?";
     private static final String SQL_EMPLEADO_DATA = "SELECT id_empleado, nombre, cedula as telefono, area, estado FROM empleados WHERE id_empleado = ?";
     private static final String SQL_CAPACITACIONES_COUNT = "SELECT COUNT(*) as total FROM capacitaciones WHERE id_empleado = ?";
-    private static final String SQL_HISTORIAL_ACTIVIDAD = "SELECT datetime(fecha_hora, 'localtime') as fecha, accion, detalle FROM actividad WHERE usuario = ? ORDER BY fecha_hora DESC";
+    private static final String SQL_HISTORIAL_ACTIVIDAD = "SELECT FORMAT(fecha_hora, 'dd/MM/yyyy HH:mm:ss') as fecha, accion, detalle FROM actividad WHERE usuario = ? ORDER BY fecha_hora DESC";
     private static final String SQL_UPDATE_CLIENTE = "UPDATE clientes SET nombre = ?, telefono = ?, email = ?, direccion = ? WHERE id_cliente = ?";
     private static final String SQL_UPDATE_EMPLEADO = "UPDATE empleados SET nombre = ?, cedula = ? WHERE id_empleado = ?";
     private static final String SQL_UPDATE_CLIENTE_PASSWORD = "UPDATE clientes SET contrasena = ? WHERE id_cliente = ?";

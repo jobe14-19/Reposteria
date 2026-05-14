@@ -13,11 +13,18 @@ public class SessionManager {
     private int idUsuario;
     private String nombreUsuario;
     private String perfil;
+    private String area;
 
     // Constantes de perfil
     public static final String PERFIL_CLIENTE = "CLIENTE";
     public static final String PERFIL_EMPLEADO = "EMPLEADO";
     public static final String PERFIL_ADMIN = "ADMIN";
+
+    // Constantes de Area
+    public static final String AREA_PRODUCCION = "Producción";
+    public static final String AREA_DECORACION = "Decoración";
+    public static final String AREA_DELIVERY = "Delivery";
+    public static final String AREA_LIMPIEZA = "Limpieza";
 
     // Constructor privado
     private SessionManager() {
@@ -34,6 +41,10 @@ public class SessionManager {
 
     // Iniciar sesión
     public void iniciarSesion(int id, String nombre, String perfil) {
+        iniciarSesion(id, nombre, perfil, "");
+    }
+
+    public void iniciarSesion(int id, String nombre, String perfil, String area) {
         if (!esPerfilValido(perfil)) {
             LOGGER.log(Level.WARNING, "Perfil inválido: {0}", perfil);
             throw new IllegalArgumentException("Perfil inválido: " + perfil);
@@ -52,9 +63,10 @@ public class SessionManager {
         this.idUsuario = id;
         this.nombreUsuario = nombre;
         this.perfil = perfil;
+        this.area = area != null ? area : "";
 
-        LOGGER.log(Level.INFO, "Sesión iniciada - Usuario: {0} (ID: {1}, Perfil: {2})",
-                new Object[]{nombre, id, perfil});
+        LOGGER.log(Level.INFO, "Sesión iniciada - Usuario: {0} (ID: {1}, Perfil: {2}, Area: {3})",
+                new Object[]{nombre, id, perfil, this.area});
     }
 
     // Cerrar sesión
@@ -69,12 +81,14 @@ public class SessionManager {
         this.idUsuario = 0;
         this.nombreUsuario = "";
         this.perfil = "";
+        this.area = "";
     }
 
     // Getters
     public int getIdUsuarioActual() { return idUsuario; }
     public String getUsuarioActual() { return nombreUsuario; }
     public String getPerfilActual() { return perfil; }
+    public String getAreaActual() { return area; }
 
     // Verificadores
     public boolean isLoggedIn() {
@@ -93,6 +107,18 @@ public class SessionManager {
         return isLoggedIn() && PERFIL_ADMIN.equals(perfil);
     }
 
+    public boolean isAreaProduccion() {
+        return isEmpleado() && (AREA_PRODUCCION.equals(area) || AREA_DECORACION.equals(area));
+    }
+
+    public boolean isAreaDelivery() {
+        return isEmpleado() && AREA_DELIVERY.equals(area);
+    }
+
+    public boolean isAreaLimpieza() {
+        return isEmpleado() && AREA_LIMPIEZA.equals(area);
+    }
+
     private boolean esPerfilValido(String perfil) {
         return PERFIL_CLIENTE.equals(perfil) || PERFIL_EMPLEADO.equals(perfil) || PERFIL_ADMIN.equals(perfil);
     }
@@ -101,6 +127,6 @@ public class SessionManager {
         if (!isLoggedIn()) {
             return "No hay sesión activa";
         }
-        return String.format("Usuario: %s (ID: %d, Perfil: %s)", nombreUsuario, idUsuario, perfil);
+        return String.format("Usuario: %s (ID: %d, Perfil: %s, Area: %s)", nombreUsuario, idUsuario, perfil, area);
     }
-}
+}

@@ -42,11 +42,11 @@ public class DashboardEmpleadoController {
     private static final String SQL_PARA_HOY =
             "SELECT COUNT(*) as para_hoy FROM pedidos WHERE CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE)";
     private static final String SQL_PRODUCCION_ACTIVA =
-            "SELECT id_produccion, producto, cantidad, progreso, estado FROM produccion WHERE estado IN ('En Progreso', 'Pendiente') ORDER BY id_produccion DESC LIMIT 5";
+            "SELECT TOP 5 id_produccion, producto, cantidad, progreso, estado FROM produccion WHERE estado IN ('En Progreso', 'Pendiente') ORDER BY id_produccion DESC";
     private static final String SQL_STOCK_CRITICO =
             "SELECT ingrediente, stock_actual, stock_minimo, (stock_minimo - stock_actual) as diferencia, CASE WHEN stock_actual < stock_minimo THEN 'CRÍTICO' WHEN stock_actual < stock_minimo * 1.2 THEN 'BAJO' ELSE 'OK' END as urgencia FROM inventario WHERE stock_actual < stock_minimo * 1.5 ORDER BY (stock_minimo - stock_actual) DESC";
     private static final String SQL_ENTREGAS_HOY =
-            "SELECT FORMAT(hora_entrega, 'HH:mm') as hora, cliente, direccion, producto, estado FROM entregas WHERE CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE) ORDER BY hora_entrega ASC LIMIT 10";
+            "SELECT TOP 10 FORMAT(hora_entrega, 'HH:mm') as hora, cliente, direccion, producto, estado FROM entregas WHERE CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE) ORDER BY hora_entrega ASC";
 
     // Constantes
     private static final int REFRESH_INTERVAL_MS = 30000;
@@ -55,8 +55,7 @@ public class DashboardEmpleadoController {
     private static final String COLOR_FONDO_FIN_SEMANA = "#FAFAFA";
     private static final String COLOR_TEXTO_NORMAL = "#666666";
     private static final String COLOR_TEXTO_CLARO = "#999999";
-
-    // UI Components
+    // UI Components
     @FXML private Label userLabel;
     @FXML private Label lastUpdateLabel;
     @FXML private Label pendientesHoyLabel;
@@ -83,6 +82,19 @@ public class DashboardEmpleadoController {
     @FXML private TableColumn<Entrega, String> entEstadoColumn;
     @FXML private GridPane calendarGrid;
 
+    // Navigation Buttons
+    @FXML private Button btnProduccion;
+    @FXML private Button btnEntregas;
+    @FXML private Button btnInventario;
+    @FXML private Button btnHigiene;
+
+    // Content Sections
+    @FXML private VBox sectionKPIs;
+    @FXML private VBox sectionProduccion;
+    @FXML private VBox sectionStock;
+    @FXML private VBox sectionEntregas;
+    @FXML private VBox sectionCalendario;
+
     private SessionManager sessionManager;
     private DatabaseConnection dbConnection;
     private Timer refreshTimer;
@@ -93,13 +105,47 @@ public class DashboardEmpleadoController {
         sessionManager = SessionManager.getInstance();
         dbConnection = DatabaseConnection.getInstance();
         timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        
         configurarTablas();
+        filtrarVistasPorArea();
         cargarDatosEmpleado();
         iniciarAutoRefresh();
         actualizarInfoUsuario();
         actualizarTimestamp();
         inicializarCalendario();
     }
+
+    private void filtrarVistasPorArea() {
+        String area = sessionManager.getAreaActual();
+        
+        // Reset visibility
+        btnProduccion.setVisible(false); btnProduccion.setManaged(false);
+        btnEntregas.setVisible(false); btnEntregas.setManaged(false);
+        btnInventario.setVisible(false); btnInventario.setManaged(false);
+        btnHigiene.setVisible(false); btnHigiene.setManaged(false);
+        
+        sectionProduccion.setVisible(false); sectionProduccion.setManaged(false);
+        sectionStock.setVisible(false); sectionStock.setManaged(false);
+        sectionEntregas.setVisible(false); sectionEntregas.setManaged(false);
+        sectionCalendario.setVisible(false); sectionCalendario.setManaged(false);
+        
+        if (SessionManager.AREA_PRODUCCION.equals(area) || SessionManager.AREA_DECORACION.equals(area)) {
+            btnProduccion.setVisible(true); btnProduccion.setManaged(true);
+            btnInventario.setVisible(true); btnInventario.setManaged(true);
+            sectionProduccion.setVisible(true); sectionProduccion.setManaged(true);
+            sectionStock.setVisible(true); sectionStock.setManaged(true);
+            sectionCalendario.setVisible(true); sectionCalendario.setManaged(true);
+        } else if (SessionManager.AREA_DELIVERY.equals(area)) {
+            btnEntregas.setVisible(true); btnEntregas.setManaged(true);
+            sectionEntregas.setVisible(true); sectionEntregas.setManaged(true);
+            sectionKPIs.setVisible(false); sectionKPIs.setManaged(false); // No necesita KPIs de producción
+        } else if (SessionManager.AREA_LIMPIEZA.equals(area)) {
+            btnHigiene.setVisible(true); btnHigiene.setManaged(true);
+            // Mostrar algo relevante para limpieza si existiera, por ahora ocultamos todo lo de producción
+            sectionKPIs.setVisible(false); sectionKPIs.setManaged(false);
+        }
+    }
+
 
     private void configurarTablas() {
         prodIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));

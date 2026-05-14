@@ -44,4 +44,20 @@ public class UsuarioDAO {
 
         return Optional.empty();
     }
+
+    public String obtenerAreaEmpleado(int idUsuario) {
+        String sql = "SELECT area FROM empleados WHERE id_empleado = ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idUsuario);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("area");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Error al obtener área del empleado: {0}", e.getMessage());
+        }
+        return "";
+    }
 }

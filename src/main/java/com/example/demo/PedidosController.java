@@ -61,6 +61,9 @@ public class PedidosController {
     @FXML private ComboBox<String> estadoFilter;
     @FXML private DatePicker fechaDesdePicker;
     @FXML private DatePicker fechaHastaPicker;
+    @FXML private Button buscarButton;
+    @FXML private Button filtrarButton;
+    @FXML private Button limpiarFiltrosButton;
     @FXML private TableView<Pedido> pedidosTable;
     @FXML private TableColumn<Pedido, Integer> idColumn;
     @FXML private TableColumn<Pedido, String> clienteColumn;
@@ -280,6 +283,26 @@ public class PedidosController {
             LOGGER.log(Level.SEVERE, "Error al aplicar filtros: {0}", e.getMessage());
             mostrarError("Error de Filtros", "No se pudieron aplicar los filtros: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void buscarPedidosAction(ActionEvent event) {
+        String texto = buscarField.getText();
+        if (texto == null || texto.trim().isEmpty()) {
+            cargarPedidos();
+        } else {
+            buscarPedidos(texto);
+        }
+    }
+
+    @FXML
+    private void limpiarFiltros(ActionEvent event) {
+        buscarField.clear();
+        clienteFilter.getSelectionModel().selectFirst();
+        estadoFilter.getSelectionModel().selectFirst();
+        fechaDesdePicker.setValue(null);
+        fechaHastaPicker.setValue(null);
+        cargarPedidos();
     }
 
     private Pedido crearPedidoDesdeResultSet(ResultSet rs) throws SQLException {
