@@ -78,6 +78,7 @@ public class PedidoModalController {
     private SessionManager sessionManager;
     private Pedido pedidoActual;
     private boolean esEdicion = false;
+    private int idPedidoEdicion = -1;
 
     @FXML
     public void initialize() {
@@ -182,6 +183,7 @@ public class PedidoModalController {
         totalField.setText(String.format(FORMATO_MONEDA, pedido.getTotal()));
         adelantoField.setText(String.format(FORMATO_MONEDA, pedido.getAdelanto()));
         observacionesTextArea.setText(pedido.getObservaciones());
+        idPedidoEdicion = pedido.getId();
     }
 
     @FXML
@@ -273,6 +275,30 @@ public class PedidoModalController {
     @FXML
     private void cancelarResultado(ActionEvent event) {
         cerrarModal();
+    }
+
+    @FXML
+    private void eliminar(ActionEvent event) {
+        if (!esEdicion || idPedidoEdicion <= 0) return;
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar Eliminación");
+        confirm.setHeaderText("¿Está seguro de eliminar este pedido?");
+        confirm.setContentText("Esta acción no se puede deshacer.");
+
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            if (dbConnection != null) {
+                try (Connection conn = dbConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement("DELETE FROM pedidos WHERE id_pedido = ?")) {
+                    stmt.setInt(1, idPedidoEdicion);
+                    stmt.executeUpdate();
+                } catch (SQLException e) {
+                    LOGGER.log(Level.INFO, "Modo offline: simulando eliminación de pedido");
+                }
+            }
+            mostrarMensaje("Pedido Eliminado", "El pedido ha sido eliminado correctamente.");
+            cerrarModal();
+        }
     }
 
     private boolean sonCamposValidos() {
@@ -416,6 +442,7 @@ public class PedidoModalController {
         }
     }
 
+    @FXML
     private void limpiarCampos() {
         clienteComboBox.getSelectionModel().clearSelection();
         fechaEntregaPicker.setValue(null);

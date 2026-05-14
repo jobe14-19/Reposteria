@@ -71,6 +71,10 @@
                 <HBox alignment="CENTER_RIGHT" spacing="10">
                     <Button text="💾 Guardar Cambios" onAction="#guardarCambios" style="-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
                 </HBox>
+                <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding-top: 10;">
+                    <Button text="Limpiar" onAction="#limpiarCampos"
+                            style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                </HBox>
             </VBox>
 
             <!-- Password Change Section -->
@@ -102,6 +106,12 @@
                 </HBox>
                 <ListView fx:id="actividadListView" prefHeight="200" style="-fx-background-color: #F8F9FA; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 6;"/>
             </VBox>
+
+            <!-- Volver al Menú -->
+            <HBox alignment="CENTER" spacing="10" style="-fx-padding-top: 20;">
+                <Button text="← Volver al Menú" onAction="#volverAlMenu"
+                        style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            </HBox>
         </VBox>
     </ScrollPane>
 </VBox>

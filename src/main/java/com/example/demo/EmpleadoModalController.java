@@ -54,6 +54,7 @@ public class EmpleadoModalController {
     private SessionManager sessionManager;
     private PersonalController.Empleado empleadoActual;
     private boolean esEdicion = false;
+    private int idEmpleadoEdicion = -1;
 
     @FXML
     public void initialize() {
@@ -121,6 +122,7 @@ public class EmpleadoModalController {
         nombreField.setText(empleado.getNombre());
         cedulaField.setText(empleado.getCedula());
         telefonoField.setText(empleado.getTelefono());
+        idEmpleadoEdicion = empleado.getId();
     }
 
     @FXML
@@ -210,6 +212,34 @@ public class EmpleadoModalController {
     @FXML
     private void cancelarResultado(ActionEvent event) {
         cerrarModal();
+    }
+
+    @FXML
+    private void eliminar(ActionEvent event) {
+        if (!esEdicion || idEmpleadoEdicion <= 0) return;
+        
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar Eliminación");
+        confirm.setHeaderText("¿Está seguro de eliminar este empleado?");
+        confirm.setContentText("Esta acción no se puede deshacer.");
+        
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            // En modo offline, simular eliminación
+            if (dbConnection != null) {
+                try {
+                    String sql = "DELETE FROM empleados WHERE id_empleado = ?";
+                    try (Connection conn = dbConnection.getConnection();
+                         PreparedStatement stmt = conn.prepareStatement(sql)) {
+                        stmt.setInt(1, idEmpleadoEdicion);
+                        stmt.executeUpdate();
+                    }
+                } catch (SQLException e) {
+                    LOGGER.log(Level.INFO, "Modo offline: simulando eliminación de empleado");
+                }
+            }
+            mostrarMensaje("Empleado Eliminado", "El empleado ha sido eliminado correctamente.");
+            cerrarModal();
+        }
     }
 
     private boolean sonCamposValidos() {

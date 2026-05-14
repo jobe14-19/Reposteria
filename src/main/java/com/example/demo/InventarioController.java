@@ -80,12 +80,17 @@ public class InventarioController {
     // Services and Managers
     private SessionManager sessionManager;
     private DatabaseConnection dbConnection;
-    private ObservableList<Ingrediente> ingredientesList;
+    private ObservableList<Ingrediente> ingredientesList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         sessionManager = SessionManager.getInstance();
         dbConnection = DatabaseConnection.getInstance();
+
+        if (!sessionManager.isAdmin() && !sessionManager.isAreaProduccion()) {
+            mostrarError("Acceso Denegado", "Solo administradores y personal de producción pueden acceder al inventario.");
+            return;
+        }
 
         configurarTabla();
         cargarInventario();

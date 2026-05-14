@@ -1,71 +1,68 @@
 package com.example.demo;
 
+import com.example.demo.dao.LimpiezaDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class LimpiezaModalController {
 
-    // Definir el enum aquí también (puede ser el mismo nombre)
-    public enum AreaLimpieza {
-        COCINA, BANIO, SALA, COMEDOR, PATIO, OFICINA, ALMACEN, OTRO
-    }
+    private static final Logger LOGGER = Logger.getLogger(LimpiezaModalController.class.getName());
 
     @FXML private Label tituloLabel;
-    @FXML private Label fechaLabel;
-    @FXML private ComboBox<AreaLimpieza> areaComboBox;
-    @FXML private TextArea descripcionTextArea;
-    @FXML private TextField responsableField;
-    @FXML private DatePicker fechaLimpiezaPicker;
+    @FXML private ComboBox<String> areaComboBox;
+    @FXML private DatePicker fechaPicker;
+    @FXML private ComboBox<String> tipoComboBox;
+    @FXML private ListView<String> responsablesListView;
+    @FXML private CheckBox guantesUsadosCheckBox;
+    @FXML private CheckBox panosUsadosCheckBox;
+    @FXML private CheckBox detergenteUsadoCheckBox;
+    @FXML private CheckBox desinfectanteUsadoCheckBox;
+    @FXML private CheckBox alcoholUsadoCheckBox;
+    @FXML private CheckBox verificadoCheckBox;
+    @FXML private Button limpiarButton;
     @FXML private Button cancelarButton;
-    @FXML private Button guardarButton;
+    @FXML private Button guardarResultado;
 
-    private AreaLimpieza areaLimpieza;
+    private LimpiezaDAO limpiezaDAO;
 
     @FXML
     public void initialize() {
-        if (fechaLimpiezaPicker != null) {
-            fechaLimpiezaPicker.setValue(LocalDate.now());
-        }
+        limpiezaDAO = new LimpiezaDAO();
 
-        if (fechaLabel != null) {
-            fechaLabel.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-        }
+        // Initialize area combobox
+        areaComboBox.getItems().addAll("Cocina", "Ba\u00f1o", "Sala", "Comedor", "Patio", "Oficina", "Almac\u00e9n", "\u00c1rea de Producci\u00f3n", "Decoraci\u00f3n", "Delivery");
+        areaComboBox.getSelectionModel().selectFirst();
 
-        if (areaComboBox != null) {
-            areaComboBox.getItems().setAll(AreaLimpieza.values());
-            areaComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-                this.areaLimpieza = newVal;
-                validarCampos();
-            });
-        }
+        // Initialize tipo combobox
+        tipoComboBox.getItems().addAll("Limpieza General", "Limpieza Profunda", "Desinfecci\u00f3n", "Mantenimiento de \u00c1rea", "Limpieza de Equipos", "Otra");
+        tipoComboBox.getSelectionModel().selectFirst();
 
-        if (responsableField != null) {
-            responsableField.textProperty().addListener((obs, oldVal, newVal) -> validarCampos());
-        }
-        if (descripcionTextArea != null) {
-            descripcionTextArea.textProperty().addListener((obs, oldVal, newVal) -> validarCampos());
-        }
+        // Initialize fecha
+        fechaPicker.setValue(LocalDate.now());
 
-        if (guardarButton != null) {
-            guardarButton.setDisable(true);
-        }
+        // Initialize responsables list
+        responsablesListView.getItems().addAll(
+                SessionManager.getInstance().getUsuarioActual()
+        );
+        responsablesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        responsablesListView.getSelectionModel().selectFirst();
+
+        // Add listeners for validation
+        areaComboBox.valueProperty().addListener((obs, old, val) -> validarCampos());
+        fechaPicker.valueProperty().addListener((obs, old, val) -> validarCampos());
+        tipoComboBox.valueProperty().addListener((obs, old, val) -> validarCampos());
+
+        guardarResultado.setDisable(false);
     }
 
-    // Recibir el área como String y convertir al enum local
     public void setAreaLimpieza(String area) {
-        try {
-            this.areaLimpieza = AreaLimpieza.valueOf(area);
-            if (areaComboBox != null) {
-                areaComboBox.getSelectionModel().select(this.areaLimpieza);
-            }
-        } catch (IllegalArgumentException e) {
-            this.areaLimpieza = AreaLimpieza.OTRO;
-        }
+        areaComboBox.getSelectionModel().select(area);
         validarCampos();
     }
 
@@ -77,22 +74,41 @@ public class LimpiezaModalController {
         }
 
         try {
-            String area = areaLimpieza != null ? areaLimpieza.name() : "";
-            String descripcion = descripcionTextArea != null ? descripcionTextArea.getText() : "";
-            String responsable = responsableField != null ? responsableField.getText() : "";
-            LocalDate fecha = fechaLimpiezaPicker != null ? fechaLimpiezaPicker.getValue() : LocalDate.now();
+            String area = areaComboBox.getValue();
+            String tipo = tipoComboBox.getValue();
+            LocalDate fecha = fechaPicker.getValue();
 
-            System.out.println("Guardando limpieza:");
-            System.out.println("Área: " + area);
-            System.out.println("Descripción: " + descripcion);
-            System.out.println("Responsable: " + responsable);
-            System.out.println("Fecha: " + fecha);
+            // Build description from available info
+            StringBuilder descripcion = new StringBuilder("Tipo: ").append(tipo);
+            descripcion.append(". Productos utilizados: ");
+            descripcion.append(guantesUsadosCheckBox.isSelected() ? "Guantes, " : "");
+            descripcion.append(panosUsadosCheckBox.isSelected() ? "Pa\u00f1os, " : "");
+            descripcion.append(detergenteUsadoCheckBox.isSelected() ? "Detergente, " : "");
+            descripcion.append(desinfectanteUsadoCheckBox.isSelected() ? "Desinfectante, " : "");
+            descripcion.append(alcoholUsadoCheckBox.isSelected() ? "Alcohol, " : "");
+            if (descripcion.length() >= 2 && descripcion.charAt(descripcion.length() - 2) == ',') {
+                descripcion.setLength(descripcion.length() - 2);
+            } else {
+                descripcion.append("Ninguno");
+            }
+            if (verificadoCheckBox.isSelected()) {
+                descripcion.append(". Verificado por supervisor.");
+            }
 
-            mostrarMensaje("Éxito", "El registro de limpieza ha sido guardado correctamente.");
-            cerrarModal();
+            // Join selected responsables
+            String responsables = responsablesListView.getSelectionModel().getSelectedItems().stream()
+                    .collect(Collectors.joining(", "));
+
+            boolean guardado = limpiezaDAO.registrarLimpieza(area, descripcion.toString(), responsables, fecha);
+            if (guardado) {
+                mostrarMensaje("\u00c9xito", "El registro de limpieza ha sido guardado correctamente en el \u00e1rea: " + area);
+                cerrarModal();
+            } else {
+                mostrarError("Error", "No se pudo guardar el registro de limpieza. Intente nuevamente.");
+            }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error al guardar limpieza", e);
             mostrarError("Error", "No se pudo guardar el registro: " + e.getMessage());
         }
     }
@@ -102,21 +118,32 @@ public class LimpiezaModalController {
         cerrarModal();
     }
 
+    @FXML
+    private void limpiarCampos(ActionEvent event) {
+        areaComboBox.getSelectionModel().clearSelection();
+        fechaPicker.setValue(null);
+        tipoComboBox.getSelectionModel().clearSelection();
+        responsablesListView.getSelectionModel().clearSelection();
+        guantesUsadosCheckBox.setSelected(false);
+        panosUsadosCheckBox.setSelected(false);
+        detergenteUsadoCheckBox.setSelected(false);
+        desinfectanteUsadoCheckBox.setSelected(false);
+        alcoholUsadoCheckBox.setSelected(false);
+        verificadoCheckBox.setSelected(false);
+    }
+
     private boolean validarCamposObligatorios() {
-        return areaLimpieza != null &&
-                responsableField != null && !responsableField.getText().trim().isEmpty() &&
-                descripcionTextArea != null && !descripcionTextArea.getText().trim().isEmpty() &&
-                fechaLimpiezaPicker != null && fechaLimpiezaPicker.getValue() != null;
+        return areaComboBox.getValue() != null &&
+                fechaPicker.getValue() != null &&
+                tipoComboBox.getValue() != null;
     }
 
     private void validarCampos() {
-        if (guardarButton != null) {
-            guardarButton.setDisable(!validarCamposObligatorios());
-        }
+        guardarResultado.setDisable(!validarCamposObligatorios());
     }
 
     private void cerrarModal() {
-        Stage stage = (Stage) guardarButton.getScene().getWindow();
+        Stage stage = (Stage) guardarResultado.getScene().getWindow();
         stage.close();
     }
 

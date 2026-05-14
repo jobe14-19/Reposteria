@@ -128,16 +128,6 @@ public class LoginController {
         }
     }
 
-    private String obtenerFxmlPorPerfil(String perfil) {
-        if (SessionManager.PERFIL_CLIENTE.equals(perfil)) {
-            return "DashboardCliente.fxml";
-        } else if (SessionManager.PERFIL_EMPLEADO.equals(perfil)) {
-            return "DashboardEmpleado.fxml";
-        } else {
-            return "DashboardAdmin.fxml";
-        }
-    }
-
     private String obtenerTituloPorPerfil(String perfil) {
         if (SessionManager.PERFIL_CLIENTE.equals(perfil)) {
             return "Panel Cliente";

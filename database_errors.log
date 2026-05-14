@@ -128,3 +128,7 @@
 [2026-05-12 14:53:54] Error al establecer la conexión a la base de datos: Login failed for user 'AnelizEr'. ClientConnectionId:bd287a95-b6ef-4609-a14f-202fb025c7d7
 [2026-05-12 14:54:05] Error al establecer la conexión a la base de datos: Login failed for user 'AnelizEr'. ClientConnectionId:6a419f11-9693-4961-b5c8-ba4033e1f263
 [2026-05-12 14:54:06] Error al establecer la conexión a la base de datos: Login failed for user 'AnelizEr'. ClientConnectionId:8296bfbc-e8e8-4228-b50f-8fea381bf24e
+[2026-05-14 07:49:03] Error al establecer la conexión a la base de datos: Login failed for user 'AnelizEr'. ClientConnectionId:3fb1caa6-b8f3-4c70-8486-a3cd9a016718
+[2026-05-14 07:49:03] Error al establecer la conexión a la base de datos: Login failed for user 'AnelizEr'. ClientConnectionId:3dcf417c-2a85-48bc-80f8-ec5e7de1b486
+[2026-05-14 07:49:19] Error al establecer la conexión a la base de datos: Login failed for user 'AnelizEr'. ClientConnectionId:3e06a127-62ea-4819-aaca-cdefb29a2020
+[2026-05-14 07:49:20] Error al establecer la conexión a la base de datos: Login failed for user 'AnelizEr'. ClientConnectionId:a1a2eead-2b33-4662-9841-ae3e3feee5e3

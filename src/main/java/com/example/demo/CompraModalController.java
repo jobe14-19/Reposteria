@@ -292,8 +292,28 @@ public class CompraModalController {
     }
 
     @FXML
+    private void confirmarAgregarProducto(ActionEvent event) {
+        agregarProducto(event);
+    }
+
+    @FXML
     private void cancelarResultado(ActionEvent event) {
         cerrarModal();
+    }
+
+    @FXML
+    private void limpiarCampos(ActionEvent event) {
+        proveedorComboBox.getSelectionModel().selectFirst();
+        fechaCompraPicker.setValue(java.time.LocalDate.now());
+        productoComboBox.getSelectionModel().clearSelection();
+        cantidadField.clear();
+        precioUnitarioField.clear();
+        descuentoField.clear();
+        totalField.clear();
+        productoDelicadoCheckBox.setSelected(false);
+        requiereRefrigeracionCheckBox.setSelected(false);
+        productosList.clear();
+        productosTable.refresh();
     }
 
     @FXML

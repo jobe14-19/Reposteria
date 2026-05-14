@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.model.Cliente;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -51,6 +52,7 @@ public class ClienteModalController {
     private SessionManager sessionManager;
     private Cliente clienteActual;
     private boolean esEdicion = false;
+    private int idClienteEdicion = -1;
 
     @FXML
     public void initialize() {
@@ -84,7 +86,9 @@ public class ClienteModalController {
         rncField.setText(cliente.getRnc());
         usuarioField.setText(cliente.getUsuario());
         contrasenaField.setText(cliente.getContrasena());
+        idClienteEdicion = cliente.getId();
     }
+
 
     private void setupFieldValidation() {
         nombreField.textProperty().addListener((obs, oldVal, newVal) -> validarCampos());
@@ -198,6 +202,32 @@ public class ClienteModalController {
         cerrarModal();
     }
 
+    @FXML
+    private void eliminar(ActionEvent event) {
+        if (!esEdicion || idClienteEdicion <= 0) return;
+        
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar Eliminación");
+        confirm.setHeaderText("¿Está seguro de eliminar este cliente?");
+        confirm.setContentText("Esta acción no se puede deshacer.");
+        
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            try {
+                com.example.demo.dao.ClienteDAO dao = new com.example.demo.dao.ClienteDAO();
+                boolean eliminado = dao.eliminarCliente(idClienteEdicion);
+                if (eliminado) {
+                    mostrarMensaje("Cliente Eliminado", "El cliente ha sido eliminado correctamente.");
+                } else {
+                    mostrarMensaje("No se pudo eliminar", "El cliente no pudo ser eliminado. Verifique si tiene pedidos asociados.");
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error al eliminar cliente: {0}", e.getMessage());
+                mostrarError("Error", "No se pudo eliminar el cliente: " + e.getMessage());
+            }
+            cerrarModal();
+        }
+    }
+
     private boolean sonCamposObligatoriosValidos() {
         return !esVacio(nombreField) &&
                 !esVacio(apellidoField) &&
@@ -262,45 +292,4 @@ public class ClienteModalController {
         alert.showAndWait();
     }
 
-    /**
-     * CLASE TRADICIONAL para Cliente (NO Record)
-     */
-    public static class Cliente {
-        private int id;
-        private String nombre;
-        private String apellido;
-        private String telefono;
-        private String email;
-        private String direccion;
-        private String rnc;
-        private String usuario;
-        private String contrasena;
-
-        public Cliente(int id, String nombre, String apellido, String telefono, String email,
-                       String direccion, String rnc, String usuario, String contrasena) {
-            this.id = id;
-            this.nombre = nombre;
-            this.apellido = apellido;
-            this.telefono = telefono;
-            this.email = email;
-            this.direccion = direccion;
-            this.rnc = rnc;
-            this.usuario = usuario;
-            this.contrasena = contrasena;
-        }
-
-        public int getId() { return id; }
-        public String getNombre() { return nombre; }
-        public String getApellido() { return apellido; }
-        public String getTelefono() { return telefono; }
-        public String getEmail() { return email; }
-        public String getDireccion() { return direccion; }
-        public String getRnc() { return rnc; }
-        public String getUsuario() { return usuario; }
-        public String getContrasena() { return contrasena; }
-
-        public String nombreCompleto() {
-            return nombre + " " + apellido;
-        }
-    }
 }

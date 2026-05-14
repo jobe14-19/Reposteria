@@ -167,6 +167,8 @@
 
         <!-- ===== ACTION BUTTONS ===== -->
         <HBox alignment="CENTER_RIGHT" spacing="12">
+            <Button fx:id="limpiarButton" text="Limpiar"
+                    style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#limpiarCampos"/>
             <Button fx:id="cancelarButton" text="Cancelar"
                     style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;"/>
             <Button fx:id="guardarResultado" text="💾 Registrar Compra"

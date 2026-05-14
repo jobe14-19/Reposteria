@@ -85,6 +85,11 @@ public class MisPedidosController {
         sessionManager = SessionManager.getInstance();
         dbConnection = DatabaseConnection.getInstance();
 
+        if (!sessionManager.isAdmin() && !sessionManager.isCliente()) {
+            mostrarError("Acceso Denegado", "Esta sección es solo para clientes.");
+            return;
+        }
+
         idCliente = sessionManager.getIdUsuarioActual();
 
         configurarTabla();

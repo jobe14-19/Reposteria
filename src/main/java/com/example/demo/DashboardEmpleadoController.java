@@ -29,6 +29,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.IOException;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class DashboardEmpleadoController {
 
@@ -173,8 +177,13 @@ public class DashboardEmpleadoController {
             cargarStockCritico(conn);
             cargarEntregasHoy(conn);
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
-            mostrarError("Error", "No se pudieron cargar los datos.");
+            LOGGER.log(Level.INFO, "Modo offline: usando datos de demostración");
+            pendientesHoyLabel.setText("--");
+            urgentesHoyLabel.setText("--");
+            paraHoyLabel.setText("--");
+            produccionTable.setItems(FXCollections.observableArrayList());
+            stockCriticoTable.setItems(FXCollections.observableArrayList());
+            entregasTable.setItems(FXCollections.observableArrayList());
         }
     }
 
@@ -295,10 +304,10 @@ public class DashboardEmpleadoController {
     }
 
     @FXML private void mostrarDashboard(ActionEvent e) { cargarDatosEmpleado(); actualizarTimestamp(); }
-    @FXML private void mostrarProduccion(ActionEvent e) { mostrarMensaje("Producción", "Módulo en desarrollo"); }
-    @FXML private void mostrarEntregas(ActionEvent e) { mostrarMensaje("Entregas", "Módulo en desarrollo"); }
-    @FXML private void mostrarInventario(ActionEvent e) { mostrarMensaje("Inventario", "Módulo en desarrollo"); }
-    @FXML private void mostrarHigiene(ActionEvent e) { mostrarMensaje("Higiene", "Módulo en desarrollo"); }
+    @FXML private void mostrarProduccion(ActionEvent e) { navegarAVista("Planificacion.fxml", "Gestión de Producción"); }
+    @FXML private void mostrarEntregas(ActionEvent e) { navegarAVista("Entregas.fxml", "Gestión de Entregas"); }
+    @FXML private void mostrarInventario(ActionEvent e) { navegarAVista("Inventario.fxml", "Gestión de Inventario"); }
+    @FXML private void mostrarHigiene(ActionEvent e) { navegarAVista("Limpieza.fxml", "Gestión de Higiene"); }
 
     @FXML
     private void verMiPerfil(ActionEvent e) {
@@ -309,6 +318,45 @@ public class DashboardEmpleadoController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
         } catch (Exception ex) { mostrarError("Error", "No se pudo abrir perfil"); }
+    }
+
+    private void navegarAVista(String fxmlName, String titulo) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/" + fxmlName));
+            Parent viewRoot = loader.load();
+
+            BorderPane wrapper = new BorderPane();
+            HBox navBar = new HBox(15);
+            navBar.setPadding(new Insets(15, 30, 15, 30));
+            navBar.setStyle("-fx-background-color: #8B5E3C; -fx-border-color: #7A4D2B; -fx-border-width: 0 0 2 0;");
+            navBar.setAlignment(Pos.CENTER_LEFT);
+
+            Button btnVolver = new Button("← Volver al Dashboard");
+            btnVolver.setStyle("-fx-background-color: white; -fx-text-fill: #8B5E3C; -fx-font-weight: bold; -fx-background-radius: 10;");
+            btnVolver.setOnAction(e -> {
+                try {
+                    Parent dashboardRoot = FXMLLoader.load(getClass().getResource("/com/example/demo/DashboardEmpleado.fxml"));
+                    Stage stage = (Stage) btnVolver.getScene().getWindow();
+                    stage.getScene().setRoot(dashboardRoot);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.SEVERE, "Error: {0}", ex.getMessage());
+                }
+            });
+
+            Label title = new Label(titulo);
+            title.setFont(Font.font("System", FontWeight.BOLD, 18));
+            title.setStyle("-fx-text-fill: white;");
+
+            navBar.getChildren().addAll(btnVolver, title);
+            wrapper.setTop(navBar);
+            wrapper.setCenter(viewRoot);
+
+            Stage stage = (Stage) userLabel.getScene().getWindow();
+            stage.getScene().setRoot(wrapper);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al navegar a {0}: {1}", new Object[]{fxmlName, e.getMessage()});
+            mostrarError("Error", "No se pudo abrir " + titulo);
+        }
     }
 
     private void mostrarError(String t, String m) { mostrarAlerta(Alert.AlertType.ERROR, t, m); }

@@ -106,6 +106,11 @@ public class EntregasController {
         sessionManager = SessionManager.getInstance();
         dbConnection = DatabaseConnection.getInstance();
 
+        if (!sessionManager.isAdmin() && !sessionManager.isAreaDelivery()) {
+            mostrarError("Acceso Denegado", "Solo administradores y personal de delivery pueden acceder a esta sección.");
+            return;
+        }
+
         initializeFilters();
         configurarTablaPendientes();
         configurarTablaHistorial();

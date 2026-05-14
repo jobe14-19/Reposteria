@@ -29,6 +29,7 @@ public class CapacitacionModalController {
     @FXML private DatePicker fechaPicker;
     @FXML private TextField duracionField;
     @FXML private TextField capacitadorField;
+    @FXML private Button limpiarButton;
     @FXML private Button cancelarButton;
     @FXML private Button guardarResultado;
 
@@ -168,6 +169,15 @@ public class CapacitacionModalController {
     @FXML
     private void cancelarResultado(ActionEvent event) {
         cerrarModal();
+    }
+
+    @FXML
+    private void limpiarCampos(ActionEvent event) {
+        empleadoComboBox.getSelectionModel().clearSelection();
+        temaField.clear();
+        fechaPicker.setValue(null);
+        duracionField.clear();
+        capacitadorField.clear();
     }
 
     private boolean validarCamposObligatorios() {

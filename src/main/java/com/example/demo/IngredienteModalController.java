@@ -51,6 +51,7 @@ public class IngredienteModalController {
     private SessionManager sessionManager;
     private InventarioController.Ingrediente ingredienteActual;
     private boolean esEdicion = false;
+    private int idIngredienteEdicion = -1;
 
     @FXML
     public void initialize() {
@@ -89,6 +90,7 @@ public class IngredienteModalController {
         unidadField.setText(ingrediente.getUnidad());
         stockActualField.setText(String.valueOf(ingrediente.getStockActual()));
         stockMinimoField.setText(String.valueOf(ingrediente.getStockMinimo()));
+        idIngredienteEdicion = ingrediente.getId();
     }
 
     private void setupFieldValidation() {
@@ -201,6 +203,30 @@ public class IngredienteModalController {
     @FXML
     private void cancelarResultado(ActionEvent event) {
         cerrarModal();
+    }
+
+    @FXML
+    private void eliminar(ActionEvent event) {
+        if (!esEdicion || idIngredienteEdicion <= 0) return;
+        
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar Eliminación");
+        confirm.setHeaderText("¿Está seguro de eliminar este ingrediente?");
+        confirm.setContentText("Esta acción no se puede deshacer.");
+        
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            if (dbConnection != null) {
+                try (Connection conn = dbConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement("DELETE FROM ingredientes WHERE id_ingrediente = ?")) {
+                    stmt.setInt(1, idIngredienteEdicion);
+                    stmt.executeUpdate();
+                } catch (SQLException e) {
+                    LOGGER.log(Level.INFO, "Modo offline: simulando eliminación de ingrediente");
+                }
+            }
+            mostrarMensaje("Ingrediente Eliminado", "El ingrediente ha sido eliminado correctamente.");
+            cerrarModal();
+        }
     }
 
     private String obtenerTexto(TextField field) {

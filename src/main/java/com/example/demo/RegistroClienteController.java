@@ -131,6 +131,19 @@ public class RegistroClienteController {
         }
     }
 
+    @FXML
+    private void limpiarCampos(ActionEvent event) {
+        nombreField.clear();
+        emailField.clear();
+        usernameField.clear();
+        telefonoField.clear();
+        direccionField.clear();
+        passwordField.clear();
+        confirmPasswordField.clear();
+        messageLabel.setText("");
+        messageLabel.setStyle("");
+    }
+
     private void mostrarError(String mensaje) {
         messageLabel.setText(mensaje);
         messageLabel.setStyle("-fx-text-fill: #E74C3C; -fx-font-weight: bold;");

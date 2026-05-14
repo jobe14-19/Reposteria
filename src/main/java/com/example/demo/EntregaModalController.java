@@ -59,6 +59,7 @@ public class EntregaModalController {
     @FXML private TextField montoCobrarField;
     @FXML private ComboBox<String> metodoPagoComboBox;
     @FXML private TextField referenciaField;
+    @FXML private Button limpiarButton;
     @FXML private Button cancelarButton;
     @FXML private Button guardarResultado;
 
@@ -236,6 +237,17 @@ public class EntregaModalController {
     @FXML
     private void cancelarResultado(ActionEvent event) {
         cerrarModal();
+    }
+
+    @FXML
+    private void limpiarCampos(ActionEvent event) {
+        localRadioButton.setSelected(true);
+        direccionField.clear();
+        distanciaField.clear();
+        costoDeliveryField.clear();
+        montoCobrarField.clear();
+        metodoPagoComboBox.getSelectionModel().selectFirst();
+        referenciaField.clear();
     }
 
     private boolean sonCamposValidos() {

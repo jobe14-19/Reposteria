@@ -86,6 +86,11 @@ public class PedidosController {
         sessionManager = SessionManager.getInstance();
         dbConnection = DatabaseConnection.getInstance();
 
+        if (!sessionManager.isAdmin() && !sessionManager.isAreaProduccion()) {
+            mostrarError("Acceso Denegado", "Solo administradores y personal de producción pueden acceder a esta sección.");
+            return;
+        }
+
         initializeFilters();
         configurarTabla();
         cargarPedidos();
@@ -227,6 +232,7 @@ public class PedidosController {
         }
     }
 
+    @FXML
     private void aplicarFiltros() {
         StringBuilder sqlBuilder = new StringBuilder(
                 "SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente, FORMAT(p.fecha_pedido, 'yyyy-MM-dd') as fecha_pedido, FORMAT(p.fecha_entrega, 'yyyy-MM-dd') as fecha_entrega, pr.nombre as producto, p.libras, p.total, p.adelanto, p.estado FROM pedidos p INNER JOIN clientes c ON p.id_cliente = c.id_cliente INNER JOIN productos pr ON p.id_producto = pr.id_producto WHERE 1=1 ");

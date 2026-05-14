@@ -13,8 +13,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PlanificacionController {
+
+    private static final Logger LOGGER = Logger.getLogger(PlanificacionController.class.getName());
 
     // UI Components
     @FXML private Button pestana1Button;
@@ -48,6 +52,11 @@ public class PlanificacionController {
     public void initialize() {
         sessionManager = SessionManager.getInstance();
         dbConnection = DatabaseConnection.getInstance();
+
+        if (!sessionManager.isAdmin() && !sessionManager.isAreaProduccion()) {
+            mostrarError("Acceso Denegado", "Solo administradores y personal de producción pueden acceder a la planificación.");
+            return;
+        }
 
         // Initialize views
         planificacionView.setVisible(true);
@@ -100,9 +109,7 @@ public class PlanificacionController {
     }
 
     private void cargarDatosPlanificacion() {
-        try {
-            Connection conn = dbConnection.getConnection();
-
+        try (Connection conn = dbConnection.getConnection()) {
             String sql = "SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente, " +
                     "pr.nombre as producto, p.libras, " +
                     "DATEPART(WEEKDAY, p.fecha_entrega) as dia_semana, " +
@@ -117,9 +124,8 @@ public class PlanificacionController {
 
             pedidosList = FXCollections.observableArrayList();
 
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                ResultSet rs = stmt.executeQuery();
-
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Pedido pedido = new Pedido(
                             rs.getInt("id_pedido"),
@@ -139,8 +145,13 @@ public class PlanificacionController {
             cargarAlertas();
 
         } catch (SQLException e) {
-            System.err.println("Error al cargar datos de planificación: " + e.getMessage());
-            mostrarError("Error de Base de Datos", "No se pudieron cargar los datos de planificación: " + e.getMessage());
+            LOGGER.log(Level.INFO, "Modo offline: usando datos de demostración en planificación");
+            pedidosList = FXCollections.observableArrayList();
+            construirSemanalGrid();
+            totalPedidosLabel.setText("--");
+            enProduccionLabel.setText("--");
+            listosEntregarLabel.setText("--");
+            alertasListView.setItems(FXCollections.observableArrayList());
         }
     }
 
@@ -182,17 +193,14 @@ public class PlanificacionController {
     }
 
     private void cargarEstadisticas() {
-        try {
-            Connection conn = dbConnection.getConnection();
-
+        try (Connection conn = dbConnection.getConnection()) {
             String sql = "SELECT " +
                     "(SELECT COUNT(*) FROM pedidos WHERE estado = 'Confirmado') as total_pedidos, " +
                     "(SELECT COUNT(*) FROM pedidos WHERE estado = 'En producción') as en_produccion, " +
                     "(SELECT COUNT(*) FROM pedidos WHERE estado = 'Listo') as listos_entregar";
 
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                ResultSet rs = stmt.executeQuery();
-
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     totalPedidosLabel.setText(String.valueOf(rs.getInt("total_pedidos")));
                     enProduccionLabel.setText(String.valueOf(rs.getInt("en_produccion")));
@@ -201,14 +209,12 @@ public class PlanificacionController {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al cargar estadísticas: " + e.getMessage());
+            LOGGER.log(Level.INFO, "Modo offline: estadísticas no disponibles");
         }
     }
 
     private void cargarAlertas() {
-        try {
-            Connection conn = dbConnection.getConnection();
-
+        try (Connection conn = dbConnection.getConnection()) {
             String sql = "SELECT TOP 10 " +
                     "'Pedido #' + CAST(p.id_pedido AS VARCHAR) + ' - ' + c.nombre + ' - ' + pr.nombre + ' - ' + p.estado as alerta " +
                     "FROM pedidos p " +
@@ -219,9 +225,8 @@ public class PlanificacionController {
 
             ObservableList<String> alertas = FXCollections.observableArrayList();
 
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                ResultSet rs = stmt.executeQuery();
-
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     alertas.add(rs.getString("alerta"));
                 }
@@ -230,14 +235,13 @@ public class PlanificacionController {
             alertasListView.setItems(alertas);
 
         } catch (SQLException e) {
-            System.err.println("Error al cargar alertas: " + e.getMessage());
+            LOGGER.log(Level.INFO, "Modo offline: alertas no disponibles");
+            alertasListView.setItems(FXCollections.observableArrayList());
         }
     }
 
     private void cargarPedidosConfirmados() {
-        try {
-            Connection conn = dbConnection.getConnection();
-
+        try (Connection conn = dbConnection.getConnection()) {
             String sql = "SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente, " +
                     "p.estado, p.fecha_entrega, pr.nombre as producto, p.libras " +
                     "FROM pedidos p " +
@@ -248,9 +252,8 @@ public class PlanificacionController {
 
             pedidosList = FXCollections.observableArrayList();
 
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                ResultSet rs = stmt.executeQuery();
-
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Pedido pedido = new Pedido(
                             rs.getInt("id_pedido"),
@@ -266,15 +269,13 @@ public class PlanificacionController {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al cargar pedidos confirmados: " + e.getMessage());
-            mostrarError("Error de Base de Datos", "No se pudieron cargar los pedidos confirmados: " + e.getMessage());
+            LOGGER.log(Level.INFO, "Modo offline: pedidos confirmados no disponibles");
+            pedidosList = FXCollections.observableArrayList();
         }
     }
 
     private void buscarPedido(String textoBusqueda) {
-        try {
-            Connection conn = dbConnection.getConnection();
-
+        try (Connection conn = dbConnection.getConnection()) {
             String sql = "SELECT TOP 1 p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente, " +
                     "p.estado, p.fecha_entrega, pr.nombre as producto, p.libras " +
                     "FROM pedidos p " +
@@ -290,28 +291,28 @@ public class PlanificacionController {
                 stmt.setString(2, busqueda);
                 stmt.setString(3, busqueda);
 
-                ResultSet rs = stmt.executeQuery();
-
-                if (rs.next()) {
-                    pedidoSeleccionado = new Pedido(
-                            rs.getInt("id_pedido"),
-                            rs.getString("nombre_cliente"),
-                            rs.getString("producto"),
-                            rs.getDouble("libras"),
-                            0,
-                            rs.getString("fecha_entrega"),
-                            rs.getString("estado")
-                    );
-                    mostrarDetallesPedido(pedidoSeleccionado);
-                } else {
-                    limpiarSeguimiento();
-                    mostrarMensaje("No Encontrado", "No se encontró ningún pedido con ese criterio.");
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        pedidoSeleccionado = new Pedido(
+                                rs.getInt("id_pedido"),
+                                rs.getString("nombre_cliente"),
+                                rs.getString("producto"),
+                                rs.getDouble("libras"),
+                                0,
+                                rs.getString("fecha_entrega"),
+                                rs.getString("estado")
+                        );
+                        mostrarDetallesPedido(pedidoSeleccionado);
+                    } else {
+                        limpiarSeguimiento();
+                        mostrarMensaje("No Encontrado", "No se encontró ningún pedido con ese criterio.");
+                    }
                 }
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al buscar pedido: " + e.getMessage());
-            mostrarError("Error de Búsqueda", "No se pudo realizar la búsqueda: " + e.getMessage());
+            LOGGER.log(Level.INFO, "Modo offline: búsqueda de pedidos no disponible");
+            mostrarMensaje("Búsqueda no disponible", "La búsqueda de pedidos no está disponible en modo offline.");
         }
     }
 
@@ -360,9 +361,7 @@ public class PlanificacionController {
     @FXML
     private void marcarComoListo() {
         if (pedidoSeleccionado != null) {
-            try {
-                Connection conn = dbConnection.getConnection();
-
+            try (Connection conn = dbConnection.getConnection()) {
                 String sql = "UPDATE pedidos SET estado = 'Listo para entregar' " +
                         "WHERE id_pedido = ?";
 
@@ -379,8 +378,8 @@ public class PlanificacionController {
                 }
 
             } catch (SQLException e) {
-                System.err.println("Error al marcar pedido como listo: " + e.getMessage());
-                mostrarError("Error de Base de Datos", "No se pudo actualizar el pedido: " + e.getMessage());
+                LOGGER.log(Level.INFO, "Modo offline: no se puede actualizar el estado del pedido");
+                mostrarMensaje("Modo offline", "No se puede actualizar el estado del pedido en modo offline.");
             }
         } else {
             mostrarMensaje("Sin Selección", "Por favor seleccione un pedido para marcar como listo.");

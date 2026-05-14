@@ -47,6 +47,13 @@ public class MantenimientoController {
     @FXML
     public void initialize() {
         dbConnection = DatabaseConnection.getInstance();
+
+        SessionManager session = SessionManager.getInstance();
+        if (!session.isAdmin() && !session.isAreaLimpieza()) {
+            mostrarError("Acceso Denegado", "Solo administradores y personal de limpieza pueden acceder a esta sección.");
+            return;
+        }
+
         configurarTabla();
         cargarMaquinas();
         cargarAlertas();

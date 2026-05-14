@@ -316,8 +316,32 @@ public class ClientesController {
 
             ClienteModalController controller = loader.getController();
 
-            // Pasar null porque ClienteModalController espera su propio tipo de Cliente
-            controller.setCliente(null);
+            com.example.demo.model.Cliente modelCliente = null;
+            if (cliente != null) {
+                String sql = "SELECT id_cliente, nombre, apellido, telefono, email, direccion, rnc, usuario, contrasena FROM clientes WHERE id_cliente = ?";
+                try (Connection conn = dbConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    stmt.setInt(1, cliente.getId());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            modelCliente = new com.example.demo.model.Cliente(
+                                rs.getInt("id_cliente"),
+                                rs.getString("nombre"),
+                                rs.getString("apellido"),
+                                rs.getString("telefono"),
+                                rs.getString("email"),
+                                rs.getString("direccion"),
+                                rs.getString("rnc"),
+                                rs.getString("usuario"),
+                                rs.getString("contrasena")
+                            );
+                        }
+                    }
+                } catch (SQLException e) {
+                    LOGGER.log(Level.WARNING, "Error al obtener datos completos del cliente: {0}", e.getMessage());
+                }
+            }
+            controller.setCliente(modelCliente);
 
             Stage stage = new Stage();
             Scene scene = new Scene(root, 500, 600);

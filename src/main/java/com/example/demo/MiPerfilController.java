@@ -305,6 +305,24 @@ public class MiPerfilController {
         }
     }
 
+    @FXML
+    private void limpiarCampos(ActionEvent event) {
+        cargarDatosUsuario();
+        limpiarCamposContrasena();
+    }
+
+    @FXML
+    private void volverAlMenu(ActionEvent event) {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/demo/MenuPrincipal.fxml"));
+            javafx.scene.Parent root = loader.load();
+            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            stage.getScene().setRoot(root);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al volver al menú: {0}", e.getMessage());
+        }
+    }
+
     private void limpiarCamposContrasena() {
         contrasenaActualField.clear();
         nuevaContrasenaField.clear();

@@ -1,69 +1,58 @@
 package com.example.demo;
 
+import com.example.demo.dao.MantenimientoDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MantenimientoModalController {
 
-    public enum Maquina {
-        TALADRO, SIERRA, COMPRESOR, CINTA_TRANSPORTADORA, HORNO, NEVERA, OTRO
-    }
+    private static final Logger LOGGER = Logger.getLogger(MantenimientoModalController.class.getName());
 
     @FXML private Label tituloLabel;
-    @FXML private Label fechaLabel;
-    @FXML private ComboBox<Maquina> maquinaComboBox;
-    @FXML private TextArea descripcionTextArea;
-    @FXML private TextField tecnicoField;
+    @FXML private ComboBox<String> maquinaComboBox;
     @FXML private DatePicker fechaMantenimientoPicker;
+    @FXML private ComboBox<String> tipoComboBox;
+    @FXML private TextArea descripcionTextArea;
+    @FXML private DatePicker proximoMantenimientoPicker;
+    @FXML private TextField precioTotalField;
+    @FXML private Button limpiarButton;
     @FXML private Button cancelarButton;
     @FXML private Button guardarButton;
 
-    private Maquina maquina;
+    private MantenimientoDAO mantenimientoDAO;
 
     @FXML
     public void initialize() {
-        if (fechaMantenimientoPicker != null) {
-            fechaMantenimientoPicker.setValue(LocalDate.now());
-        }
+        mantenimientoDAO = new MantenimientoDAO();
 
-        if (fechaLabel != null) {
-            fechaLabel.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-        }
+        // Initialize maquina combobox
+        maquinaComboBox.getItems().addAll("Taladro", "Sierra", "Compresor", "Cinta Transportadora", "Horno", "Nevera", "Batidora", "Amasadora", "Otro");
+        maquinaComboBox.getSelectionModel().selectFirst();
 
-        if (maquinaComboBox != null) {
-            maquinaComboBox.getItems().setAll(Maquina.values());
-            maquinaComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-                this.maquina = newVal;
-                validarCampos();
-            });
-        }
+        // Initialize tipo combobox
+        tipoComboBox.getItems().addAll("Preventivo", "Correctivo", "Predictivo", "Emergencia", "Otro");
+        tipoComboBox.getSelectionModel().selectFirst();
 
-        if (tecnicoField != null) {
-            tecnicoField.textProperty().addListener((obs, oldVal, newVal) -> validarCampos());
-        }
-        if (descripcionTextArea != null) {
-            descripcionTextArea.textProperty().addListener((obs, oldVal, newVal) -> validarCampos());
-        }
+        // Initialize date pickers
+        fechaMantenimientoPicker.setValue(LocalDate.now());
+        proximoMantenimientoPicker.setValue(LocalDate.now().plusMonths(1));
 
-        if (guardarButton != null) {
-            guardarButton.setDisable(true);
-        }
+        // Add validation listeners
+        maquinaComboBox.valueProperty().addListener((obs, old, val) -> validarCampos());
+        fechaMantenimientoPicker.valueProperty().addListener((obs, old, val) -> validarCampos());
+        tipoComboBox.valueProperty().addListener((obs, old, val) -> validarCampos());
+        descripcionTextArea.textProperty().addListener((obs, old, val) -> validarCampos());
+
+        validarCampos();
     }
 
     public void setMaquina(String maquina) {
-        try {
-            this.maquina = Maquina.valueOf(maquina);
-            if (maquinaComboBox != null) {
-                maquinaComboBox.getSelectionModel().select(this.maquina);
-            }
-        } catch (IllegalArgumentException e) {
-            this.maquina = Maquina.OTRO;
-        }
+        maquinaComboBox.getSelectionModel().select(maquina);
         validarCampos();
     }
 
@@ -75,22 +64,37 @@ public class MantenimientoModalController {
         }
 
         try {
-            String maquinaStr = maquina != null ? maquina.name() : "";
-            String descripcion = descripcionTextArea != null ? descripcionTextArea.getText() : "";
-            String tecnico = tecnicoField != null ? tecnicoField.getText() : "";
-            LocalDate fecha = fechaMantenimientoPicker != null ? fechaMantenimientoPicker.getValue() : LocalDate.now();
+            String equipo = maquinaComboBox.getValue();
+            String tipo = tipoComboBox.getValue();
+            String descripcion = descripcionTextArea.getText() != null ? descripcionTextArea.getText().trim() : "";
+            String precioTexto = precioTotalField.getText() != null ? precioTotalField.getText().trim() : "";
 
-            System.out.println("Guardando mantenimiento:");
-            System.out.println("Máquina: " + maquinaStr);
-            System.out.println("Descripción: " + descripcion);
-            System.out.println("Técnico: " + tecnico);
-            System.out.println("Fecha: " + fecha);
+            // Build full description including tipo and precio
+            StringBuilder descripcionCompleta = new StringBuilder("Tipo: ").append(tipo);
+            if (!descripcion.isEmpty()) {
+                descripcionCompleta.append(". ").append(descripcion);
+            }
+            if (!precioTexto.isEmpty()) {
+                descripcionCompleta.append(". Costo: $").append(precioTexto);
+            }
 
-            mostrarMensaje("Éxito", "El registro de mantenimiento ha sido guardado correctamente.");
-            cerrarModal();
+            String tecnico = SessionManager.getInstance().getUsuarioActual();
+            LocalDate fecha = fechaMantenimientoPicker.getValue();
+            LocalDate proximo = proximoMantenimientoPicker.getValue();
+
+            boolean guardado = mantenimientoDAO.registrarMantenimiento(
+                    equipo, descripcionCompleta.toString(), tecnico, fecha, proximo
+            );
+
+            if (guardado) {
+                mostrarMensaje("\u00c9xito", "El registro de mantenimiento ha sido guardado correctamente.");
+                cerrarModal();
+            } else {
+                mostrarError("Error", "No se pudo guardar el registro de mantenimiento. Intente nuevamente.");
+            }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error al guardar mantenimiento", e);
             mostrarError("Error", "No se pudo guardar el registro: " + e.getMessage());
         }
     }
@@ -100,17 +104,25 @@ public class MantenimientoModalController {
         cerrarModal();
     }
 
+    @FXML
+    private void limpiarCampos(ActionEvent event) {
+        maquinaComboBox.getSelectionModel().clearSelection();
+        fechaMantenimientoPicker.setValue(null);
+        tipoComboBox.getSelectionModel().clearSelection();
+        descripcionTextArea.clear();
+        proximoMantenimientoPicker.setValue(null);
+        precioTotalField.clear();
+    }
+
     private boolean validarCamposObligatorios() {
-        return maquina != null &&
-                tecnicoField != null && !tecnicoField.getText().trim().isEmpty() &&
-                descripcionTextArea != null && !descripcionTextArea.getText().trim().isEmpty() &&
-                fechaMantenimientoPicker != null && fechaMantenimientoPicker.getValue() != null;
+        return maquinaComboBox.getValue() != null &&
+                fechaMantenimientoPicker.getValue() != null &&
+                tipoComboBox.getValue() != null &&
+                descripcionTextArea.getText() != null && !descripcionTextArea.getText().trim().isEmpty();
     }
 
     private void validarCampos() {
-        if (guardarButton != null) {
-            guardarButton.setDisable(!validarCamposObligatorios());
-        }
+        guardarButton.setDisable(!validarCamposObligatorios());
     }
 
     private void cerrarModal() {

@@ -167,11 +167,12 @@ public class MenuPrincipalController {
 
     @FXML
     private void cerrarSesion(ActionEvent event) {
+        SessionManager.getInstance().cerrarSesion();
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml"));
             Stage stage = (Stage) sectionsContainer.getScene().getWindow();
             stage.getScene().setRoot(root);
-            stage.setTitle("Pastelería Rosato - Iniciar Sesión");
+            stage.setTitle("🍰 Pastelería Rosato - Iniciar Sesión");
         } catch (IOException e) {
             e.printStackTrace();
         }

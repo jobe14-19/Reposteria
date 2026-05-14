@@ -26,6 +26,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.IOException;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class DashboardAdminController {
 
@@ -112,8 +119,15 @@ public class DashboardAdminController {
             cargarAlertas(conn);
             cargarActividades(conn);
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
-            mostrarError("Error", "No se pudieron cargar los datos.");
+            LOGGER.log(Level.INFO, "Modo offline: usando datos de demostración");
+            pedidosHoyLabel.setText("--");
+            ingresosMesLabel.setText("--");
+            saldoPendienteLabel.setText("--");
+            mantenimientoLabel.setText("--");
+            salesChart.setData(FXCollections.observableArrayList());
+            productsChart.setData(FXCollections.observableArrayList());
+            alertasTable.setItems(FXCollections.observableArrayList());
+            actividadesTable.setItems(FXCollections.observableArrayList());
         }
     }
 
@@ -226,14 +240,15 @@ public class DashboardAdminController {
     }
 
     @FXML private void mostrarDashboard(ActionEvent event) { cargarDatosAdministrador(); actualizarTimestamp(); }
-    @FXML private void mostrarClientes(ActionEvent event) { mostrarMensaje("Gestión de Clientes", "Módulo en desarrollo"); }
-    @FXML private void mostrarPedidos(ActionEvent event) { mostrarMensaje("Gestión de Pedidos", "Módulo en desarrollo"); }
-    @FXML private void mostrarProduccion(ActionEvent event) { mostrarMensaje("Gestión de Producción", "Módulo en desarrollo"); }
-    @FXML private void mostrarInventario(ActionEvent event) { mostrarMensaje("Gestión de Inventario", "Módulo en desarrollo"); }
-    @FXML private void mostrarEntregas(ActionEvent event) { mostrarMensaje("Gestión de Entregas", "Módulo en desarrollo"); }
-    @FXML private void mostrarMantenimiento(ActionEvent event) { mostrarMensaje("Gestión de Mantenimiento", "Módulo en desarrollo"); }
-    @FXML private void mostrarPersonal(ActionEvent event) { mostrarMensaje("Gestión de Personal", "Módulo en desarrollo"); }
-    @FXML private void mostrarHigiene(ActionEvent event) { mostrarMensaje("Gestión de Higiene", "Módulo en desarrollo"); }
+    @FXML private void mostrarClientes(ActionEvent event) { navegarAVista("Clientes.fxml", "Gestión de Clientes"); }
+    @FXML private void mostrarPedidos(ActionEvent event) { navegarAVista("Pedidos.fxml", "Gestión de Pedidos"); }
+    @FXML private void mostrarProduccion(ActionEvent event) { navegarAVista("Planificacion.fxml", "Gestión de Producción"); }
+    @FXML private void mostrarInventario(ActionEvent event) { navegarAVista("Inventario.fxml", "Gestión de Inventario"); }
+    @FXML private void mostrarEntregas(ActionEvent event) { navegarAVista("Entregas.fxml", "Gestión de Entregas"); }
+    @FXML private void mostrarMantenimiento(ActionEvent event) { navegarAVista("Mantenimiento.fxml", "Gestión de Mantenimiento"); }
+    @FXML private void mostrarPersonal(ActionEvent event) { navegarAVista("Personal.fxml", "Gestión de Personal"); }
+    @FXML private void mostrarHigiene(ActionEvent event) { navegarAVista("Limpieza.fxml", "Gestión de Higiene"); }
+    @FXML private void mostrarProductos(ActionEvent event) { mostrarMensaje("Gestión de Productos", "Módulo en desarrollo"); }
     @FXML private void mostrarChefsBox(ActionEvent event) { mostrarMensaje("Chef's Box", "Módulo en desarrollo"); }
     @FXML private void mostrarReportes(ActionEvent event) { mostrarMensaje("Gestión de Reportes", "Módulo en desarrollo"); }
     @FXML private void mostrarConfiguracion(ActionEvent event) { mostrarMensaje("Configuración del Sistema", "Módulo en desarrollo"); }
@@ -274,6 +289,45 @@ public class DashboardAdminController {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
             mostrarError("Error", "No se pudo abrir la ventana de logs");
+        }
+    }
+
+    private void navegarAVista(String fxmlName, String titulo) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/" + fxmlName));
+            Parent viewRoot = loader.load();
+
+            BorderPane wrapper = new BorderPane();
+            HBox navBar = new HBox(15);
+            navBar.setPadding(new Insets(15, 30, 15, 30));
+            navBar.setStyle("-fx-background-color: #8B5E3C; -fx-border-color: #7A4D2B; -fx-border-width: 0 0 2 0;");
+            navBar.setAlignment(Pos.CENTER_LEFT);
+
+            Button btnVolver = new Button("← Volver al Dashboard");
+            btnVolver.setStyle("-fx-background-color: white; -fx-text-fill: #8B5E3C; -fx-font-weight: bold; -fx-background-radius: 10;");
+            btnVolver.setOnAction(e -> {
+                try {
+                    Parent dashboardRoot = FXMLLoader.load(getClass().getResource("/com/example/demo/DashboardAdmin.fxml"));
+                    Stage stage = (Stage) btnVolver.getScene().getWindow();
+                    stage.getScene().setRoot(dashboardRoot);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.SEVERE, "Error: {0}", ex.getMessage());
+                }
+            });
+
+            Label title = new Label(titulo);
+            title.setFont(Font.font("System", FontWeight.BOLD, 18));
+            title.setStyle("-fx-text-fill: white;");
+
+            navBar.getChildren().addAll(btnVolver, title);
+            wrapper.setTop(navBar);
+            wrapper.setCenter(viewRoot);
+
+            Stage stage = (Stage) userLabel.getScene().getWindow();
+            stage.getScene().setRoot(wrapper);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al navegar a {0}: {1}", new Object[]{fxmlName, e.getMessage()});
+            mostrarError("Error", "No se pudo abrir " + titulo);
         }
     }
 
