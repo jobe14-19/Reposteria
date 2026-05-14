@@ -24,9 +24,7 @@ public class LoginController {
 
     private static final String ERROR_STYLE = "-fx-text-fill: #E74C3C; -fx-font-weight: bold;";
 
-    private static final String VALID_USERNAME = "AnelizEr";
-    private static final String VALID_PASSWORD = "12345678";
-    private static final String VALID_PROFILE = "ADMIN";
+    private DatabaseConnection dbConnection;
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -43,8 +41,6 @@ public class LoginController {
     @FXML
     public void initialize() {
         sessionManager = SessionManager.getInstance();
-        usuarioDAO = new UsuarioDAO();
-        clienteDAO = new ClienteDAO();
         configurarEventos();
         cargarCredencialesGuardadas();
     }
@@ -77,56 +73,31 @@ public class LoginController {
             return;
         }
 
-        // 1. Intentar como Usuario (Admin/Empleado)
-        Optional<DatabaseConnection.Usuario> userOpt = usuarioDAO.validarCredenciales(username, password);
-        
-        if (userOpt.isPresent()) {
-            DatabaseConnection.Usuario user = userOpt.get();
-            String area = "";
-            if (SessionManager.PERFIL_EMPLEADO.equals(user.getPerfil())) {
-                area = usuarioDAO.obtenerAreaEmpleado(user.getId());
-            }
-            sessionManager.iniciarSesion(user.getId(), user.getNombre(), user.getPerfil(), area);
+        if (validarCredenciales(username, password)) {
+            sessionManager.iniciarSesion(1, username, VALID_PROFILE);
             redirigirAlDashboard();
-            return;
+        } else {
+            mostrarError("Usuario o contraseña incorrectos");
         }
+    }
 
-        // 2. Intentar como Cliente
-        Optional<DatabaseConnection.Usuario> clienteOpt = clienteDAO.validarCredenciales(username, password);
-        if (clienteOpt.isPresent()) {
-            DatabaseConnection.Usuario cliente = clienteOpt.get();
-            sessionManager.iniciarSesion(cliente.getId(), cliente.getNombre(), cliente.getPerfil(), "");
-            redirigirAlDashboard();
-            return;
-        }
-
-        mostrarError("Usuario o contraseña incorrectos");
+    private boolean validarCredenciales(String username, String password) {
+        return VALID_USERNAME.equals(username) && VALID_PASSWORD.equals(password);
     }
 
     private void redirigirAlDashboard() {
         try {
-            String perfil = sessionManager.getPerfilActual();
-            String fxml = obtenerFxmlPorPerfil(perfil);
-            
-            // Si es ADMIN, lo llevamos al Menu Principal que tiene acceso a todo
-            // Para otros roles, también podemos llevarlos al Menu Principal pero filtrado,
-            // o directamente a su Dashboard. El usuario pidió que si es cliente solo vea lo relevante.
-            
-            // Decisión: Todos van al MenuPrincipal, pero el MenuPrincipal se filtrará.
-            // Excepto si queremos una experiencia más directa.
-            // El usuario dijo "si yo entro con un usuario de tipo cliente solo dejes acceder a l informacion que es relevante para un cliente"
-            
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MenuPrincipal.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) loginButton.getScene().getWindow();
             Scene scene = new Scene(root, 1280, 720);
             stage.setScene(scene);
-            stage.setTitle("🍰 Pastelería Rosato - Menú Principal");
+            stage.setTitle("🍰 Pastelería Rosato - " + obtenerTituloPorPerfil(perfil));
             stage.show();
 
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar el menú principal: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error al cargar el dashboard: {0}", e.getMessage());
             mostrarError("Error al cargar la interfaz principal");
         }
     }
@@ -138,6 +109,16 @@ public class LoginController {
             return "DashboardEmpleado.fxml";
         } else {
             return "DashboardAdmin.fxml";
+        }
+    }
+
+    private String obtenerTituloPorPerfil(String perfil) {
+        if (SessionManager.PERFIL_CLIENTE.equals(perfil)) {
+            return "Panel Cliente";
+        } else if (SessionManager.PERFIL_EMPLEADO.equals(perfil)) {
+            return "Panel Empleado";
+        } else {
+            return "Panel Administrador";
         }
     }
 

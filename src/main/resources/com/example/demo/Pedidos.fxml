@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import java.net.URL?>
 
 <VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.PedidosController">
     <stylesheets>
@@ -31,7 +30,7 @@
                 <Label text="🔍 Búsqueda" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
                 <HBox spacing="10" alignment="CENTER">
                     <TextField fx:id="buscarField" promptText="Buscar por cliente, producto o ID" styleClass="form-field" prefWidth="300"/>
-                    <Button fx:id="buscarButton" text="🔍 Buscar" onAction="#buscarPedidosAction" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+                    <Button fx:id="buscarButton" text="🔍 Buscar" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
                 </HBox>
             </VBox>
 

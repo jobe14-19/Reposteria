@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
@@ -19,7 +20,7 @@
     </fx:define>
 
     <!-- Title -->
-    <Label fx:id="tituloLabel" text="🚚 Registrar Entrega y Cobro" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+    <Label fx:id="tituloLabel" text="Registrar Entrega y Cobro" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
 
     <!-- Order Details -->
     <VBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #F8F9FA; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 15;">
@@ -45,7 +46,7 @@
 
     <!-- Delivery Type -->
     <VBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="🚚 Tipo de Entrega" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+        <Label text="Tipo de Entrega" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
 
         <HBox spacing="20" alignment="CENTER_LEFT">
             <RadioButton fx:id="localRadioButton" text="🏪 Recogida en Local" toggleGroup="$tipoEntregaGroup" selected="true" style="-fx-font-size: 14px; -fx-text-fill: #333333;"/>

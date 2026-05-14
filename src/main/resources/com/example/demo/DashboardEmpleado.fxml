@@ -14,16 +14,16 @@
     <top>
         <VBox>
             <HBox styleClass="nav-bar" alignment="CENTER_LEFT">
-                <Label text="🍰 Panel de Empleado" styleClass="nav-logo"/>
+                <Label text="Panel de Empleado" styleClass="nav-logo"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <HBox spacing="5" alignment="CENTER">
-                    <Button fx:id="btnDashboard" text="🏠 Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
-                    <Button fx:id="btnProduccion" text="👩‍🍳 Producción" onAction="#mostrarProduccion" styleClass="nav-button"/>
-                    <Button fx:id="btnEntregas" text="🚚 Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
-                    <Button fx:id="btnInventario" text="📦 Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
-                    <Button fx:id="btnHigiene" text="🧼 Higiene" onAction="#mostrarHigiene" styleClass="nav-button"/>
-                    <Button fx:id="btnPerfil" text="👤 Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
+                    <Button text="🏠 Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
+                    <Button text="👩‍🍳 Producción" onAction="#mostrarProduccion" styleClass="nav-button"/>
+                    <Button text="🚚 Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
+                    <Button text="📦 Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
+                    <Button text="🧼 Higiene" onAction="#mostrarHigiene" styleClass="nav-button"/>
+                    <Button text="👤 Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
                 </HBox>
 
                 <Region HBox.hgrow="ALWAYS"/>
@@ -48,7 +48,7 @@
                     
                     <HBox spacing="20" alignment="CENTER">
                         <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="📋" style="-fx-font-size: 40px;"/>
+                            <Label text="Pedidos" style="-fx-font-size: 40px;"/>
                             <Label text="Total Pendientes" styleClass="kpi-label"/>
                             <Label fx:id="pendientesHoyLabel" text="0" styleClass="kpi-value"/>
                         </VBox>

@@ -92,11 +92,6 @@ public class DashboardClienteController {
     }
 
     private void cargarDatosCliente() {
-        if (!sessionManager.isLoggedIn()) {
-            LOGGER.log(Level.WARNING, "Intento de cargar datos sin sesión activa");
-            return;
-        }
-
         String username = sessionManager.getUsuarioActual();
 
         try (Connection conn = dbConnection.getConnection()) {
@@ -107,7 +102,32 @@ public class DashboardClienteController {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar datos del cliente: {0}", e.getMessage());
             mostrarError("Error de conexión", "No se pudieron cargar tus datos. Intenta nuevamente.");
+            
+            // En modo offline, cargar datos de ejemplo
+            cargarDatosOffline(username);
         }
+    }
+    
+    private void cargarDatosOffline(String username) {
+        // Cargar KPIs de ejemplo
+        totalPedidosLabel.setText("5");
+        totalGastadoLabel.setText("$125.50");
+        puntosLabel.setText("12");
+        proxPedidoLabel.setText("2026-05-15");
+        
+        // Cargar pedidos recientes de ejemplo
+        ObservableList<Pedido> pedidos = FXCollections.observableArrayList();
+        pedidos.add(new Pedido(1, "Pastel de Chocolate", "2.5", "2026-05-15", "$45.00", "Confirmado"));
+        pedidos.add(new Pedido(2, "Tres Leches", "1.8", "2026-05-12", "$32.40", "Entregado"));
+        pedidos.add(new Pedido(3, "Cheesecake", "1.2", "2026-05-10", "$28.00", "Entregado"));
+        pedidosTable.setItems(pedidos);
+        
+        // Cargar sugerencias
+        sugerenciaProductoLabel.setText("Pastel de Chocolate");
+        sugerenciaDescLabel.setText("Basado en tu historial, te recomendamos: Pastel de Chocolate");
+        
+        // Cargar promociones
+        cargarPromociones();
     }
 
     private void cargarKPIs(Connection conn, String username) throws SQLException {

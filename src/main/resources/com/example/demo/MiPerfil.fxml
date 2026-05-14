@@ -18,7 +18,7 @@
     <!-- Header -->
     <VBox style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">
         <padding><Insets top="20" right="20" bottom="15" left="20"/></padding>
-        <Label text="👤 Mi Perfil" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+        <Label text="Mi Perfil" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
     </VBox>
 
     <!-- Main Content -->
