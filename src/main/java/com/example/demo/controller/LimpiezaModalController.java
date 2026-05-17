@@ -74,6 +74,11 @@ public class LimpiezaModalController {
             return;
         }
 
+        if (responsablesListView.getSelectionModel().getSelectedItems().isEmpty()) {
+            mostrarError("Campo Requerido", "Por favor seleccione al menos un responsable.");
+            return;
+        }
+
         try {
             String area = areaComboBox.getValue();
             String tipo = tipoComboBox.getValue();

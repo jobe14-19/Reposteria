@@ -79,7 +79,7 @@ WHERE p.id_pedido = $P{idPedido}]]></queryString>
         </band>
     </columnHeader>
     <detail>
-        <band height="200" splitAllowed="true">
+        <band height="200">
             <frame>
                 <reportElement x="0" y="0" width="267" height="160"/>
                 <staticText>

@@ -142,6 +142,18 @@ public class ClienteModalController {
             return;
         }
 
+        String email = obtenerTexto(emailField);
+        if (!email.isEmpty() && !EMAIL_PATTERN.matcher(email).matches()) {
+            mostrarError("Email Inválido", "Por favor ingrese un correo electrónico válido.");
+            return;
+        }
+
+        String telefono = obtenerTexto(telefonoField);
+        if (!telefono.isEmpty() && !PHONE_PATTERN.matcher(telefono).matches()) {
+            mostrarError("Teléfono Inválido", "Por favor ingrese un número de teléfono válido (10 dígitos).");
+            return;
+        }
+
         try (Connection conn = dbConnection.getConnection()) {
             if (esEdicion) {
                 actualizarCliente(conn);

@@ -347,6 +347,24 @@ public class CompraModalController {
             return;
         }
 
+        String proveedor = proveedorComboBox.getSelectionModel().getSelectedItem();
+        if (proveedor == null || proveedor.trim().isEmpty()) {
+            mostrarError("Campo Requerido", "Por favor seleccione un proveedor.");
+            return;
+        }
+
+        String totalTexto = obtenerTextoODefault(totalField, "");
+        if (totalTexto.isEmpty()) {
+            mostrarError("Campo Requerido", "Por favor ingrese el total de la compra.");
+            return;
+        }
+        try {
+            Double.parseDouble(totalTexto);
+        } catch (NumberFormatException e) {
+            mostrarError("Valor Inválido", "El total debe ser un valor numérico válido.");
+            return;
+        }
+
         Connection conn = null;
         try {
             conn = dbConnection.getConnection();

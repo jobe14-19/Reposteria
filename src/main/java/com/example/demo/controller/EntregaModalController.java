@@ -323,6 +323,9 @@ public class EntregaModalController {
         }
 
         String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
+        if (metodo == null) {
+            return false;
+        }
 
         // Validate reference for non-cash payments
         if (!PAGO_EFECTIVO.equals(metodo)) {
