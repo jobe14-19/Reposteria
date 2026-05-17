@@ -6,7 +6,7 @@
 <?import javafx.geometry.Insets?>
 <?import java.net.URL?>
 
-<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.ClienteModalController">
+<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.ClienteModalController">
     <stylesheets>
         <URL value="@styles.css"/>
     </stylesheets>

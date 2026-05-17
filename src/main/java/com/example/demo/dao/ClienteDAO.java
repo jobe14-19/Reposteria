@@ -1,7 +1,7 @@
 package com.example.demo.dao;
 
-import com.example.demo.DatabaseConnection;
-import com.example.demo.SessionManager;
+import com.example.demo.util.DatabaseConnection;
+import com.example.demo.service.SessionManager;
 import com.example.demo.model.Cliente;
 
 import java.sql.Connection;

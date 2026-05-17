@@ -5,7 +5,7 @@
 <?import javafx.geometry.Insets?>
 <?import java.net.URL?>
 
-<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.PersonalController">
+<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.PersonalController">
     <stylesheets>
         <URL value="@styles.css"/>
     </stylesheets>
@@ -19,7 +19,7 @@
         <HBox alignment="CENTER_LEFT" spacing="15">
             <Label text="👥 Gestión de Personal" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="contratarButton" text="➕ Contratar Empleado" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            <Button fx:id="contratarButton" text="➕ Contratar Empleado" onAction="#contratar" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
         </HBox>
     </VBox>
 

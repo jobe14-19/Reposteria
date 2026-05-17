@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="20" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.ReportesController"
+      style="-fx-background-color: white; -fx-padding: 20;">
+    <children>
+        <Label text="Gestión de Reportes" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+
+        <VBox spacing="8">
+            <Label text="Seleccionar Reporte:" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+            <ComboBox fx:id="reporteComboBox" prefHeight="35" prefWidth="400"/>
+        </VBox>
+
+        <VBox spacing="8" fx:id="parametrosPanel">
+            <Label fx:id="parametrosLabel" text="Parámetros:" style="-fx-font-size: 12px; -fx-font-style: italic;"/>
+            <HBox spacing="10" visible="false" fx:id="paramRow1">
+                <Label fx:id="lblParam1" text="ID Pedido:" visible="false" prefWidth="120"/>
+                <TextField fx:id="parametroField1" visible="false" prefWidth="200"/>
+                <ComboBox fx:id="parametroCombo" visible="false" prefWidth="250"/>
+            </HBox>
+            <HBox spacing="10" visible="false" fx:id="paramRow2">
+                <Label fx:id="lblParam2" text="" visible="false" prefWidth="120"/>
+                <TextField fx:id="parametroField2" visible="false" prefWidth="200"/>
+            </HBox>
+        </VBox>
+
+        <HBox spacing="15">
+            <Button fx:id="vistaPreviaButton" text="Vista Previa" onAction="#vistaPrevia"
+                    style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 8;"/>
+            <Button fx:id="exportarPdfButton" text="Exportar PDF" onAction="#exportarPdf"
+                    style="-fx-background-color: #CC0000; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 8;"/>
+            <Button fx:id="exportarXlsxButton" text="Exportar Excel" onAction="#exportarXlsx"
+                    style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 8;"/>
+            <Button text="Cerrar" onAction="#cerrar"
+                    style="-fx-background-color: #666666; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 25; -fx-background-radius: 8;"/>
+        </HBox>
+
+        <Label fx:id="statusLabel" text="Listo" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+    </children>
+</VBox>

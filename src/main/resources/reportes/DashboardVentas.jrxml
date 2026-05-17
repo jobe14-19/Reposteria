@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="DashboardVentas" pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="782" leftMargin="30" rightMargin="30" topMargin="30" bottomMargin="30"
+              language="java">
+    <queryString><![CDATA[SELECT MONTH(p.fecha_pedido) as mes, YEAR(p.fecha_pedido) as anio,
+       COUNT(*) as total_pedidos, SUM(p.total) as ventas_totales,
+       SUM(ISNULL(p.adelanto, 0)) as adelantos, AVG(p.total) as promedio_venta
+FROM pedidos p
+WHERE p.estado IN ('Entregado', 'Confirmado', 'En produccion')
+GROUP BY YEAR(p.fecha_pedido), MONTH(p.fecha_pedido)
+ORDER BY anio DESC, mes DESC]]></queryString>
+    <field name="mes" class="java.lang.Integer"/>
+    <field name="anio" class="java.lang.Integer"/>
+    <field name="total_pedidos" class="java.lang.Integer"/>
+    <field name="ventas_totales" class="java.math.BigDecimal"/>
+    <field name="adelantos" class="java.math.BigDecimal"/>
+    <field name="promedio_venta" class="java.math.BigDecimal"/>
+    <title>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="0" width="782" height="35"/>
+                <textElement textAlignment="Center">
+                    <font size="20" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Dashboard de Ventas - Repostería Rosato]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="35" width="782" height="20"/>
+                <textElement textAlignment="Center">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Generado: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="25">
+            <staticText>
+                <reportElement x="0" y="0" width="100" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Periodo]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="100" y="0" width="130" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Total Pedidos]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="230" y="0" width="160" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Ventas Totales]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="390" y="0" width="140" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Adelantos]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="530" y="0" width="140" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Promedio Venta]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="670" y="0" width="112" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Saldo Pend.]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement x="0" y="0" width="100" height="20"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[new java.text.DateFormatSymbols().getMonths()[$F{mes}-1] + " " + $F{anio}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="100" y="0" width="130" height="20"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{total_pedidos}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="230" y="0" width="160" height="20"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["RD$ " + $F{ventas_totales}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="390" y="0" width="140" height="20"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["RD$ " + $F{adelantos}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="530" y="0" width="140" height="20"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["RD$ " + new java.text.DecimalFormat("#,##0.00").format($F{promedio_venta})]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="670" y="0" width="112" height="20"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["RD$ " + ($F{ventas_totales} != null ? $F{ventas_totales}.subtract($F{adelantos} != null ? $F{adelantos} : java.math.BigDecimal.ZERO) : java.math.BigDecimal.ZERO)]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>

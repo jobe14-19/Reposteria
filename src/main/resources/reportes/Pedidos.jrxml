@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="Pedidos" pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="782" leftMargin="30" rightMargin="30" topMargin="30" bottomMargin="30"
+              language="java">
+    <parameter name="fechaDesde" class="java.util.Date"/>
+    <parameter name="fechaHasta" class="java.util.Date"/>
+    <parameter name="estado" class="java.lang.String"/>
+    <queryString><![CDATA[SELECT p.id_pedido, c.nombre + ' ' + ISNULL(c.apellido, '') as cliente,
+       p.fecha_pedido, p.fecha_entrega, p.total, p.adelanto, p.estado, p.prioridad
+FROM pedidos p JOIN clientes c ON p.id_cliente = c.id_cliente
+WHERE ($P{fechaDesde} IS NULL OR p.fecha_pedido >= $P{fechaDesde})
+  AND ($P{fechaHasta} IS NULL OR p.fecha_pedido <= $P{fechaHasta})
+  AND ($P{estado} IS NULL OR $P{estado} = '' OR p.estado = $P{estado})
+ORDER BY p.fecha_pedido DESC]]></queryString>
+    <field name="id_pedido" class="java.lang.Integer"/>
+    <field name="cliente" class="java.lang.String"/>
+    <field name="fecha_pedido" class="java.sql.Timestamp"/>
+    <field name="fecha_entrega" class="java.sql.Timestamp"/>
+    <field name="total" class="java.math.BigDecimal"/>
+    <field name="adelanto" class="java.math.BigDecimal"/>
+    <field name="estado" class="java.lang.String"/>
+    <field name="prioridad" class="java.lang.String"/>
+    <title>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="0" width="782" height="35"/>
+                <textElement textAlignment="Center">
+                    <font size="20" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Reporte de Pedidos - Repostería Rosato]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="35" width="782" height="20"/>
+                <textElement textAlignment="Center">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Generado: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="25">
+            <staticText>
+                <reportElement x="0" y="0" width="60" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[ID]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="60" y="0" width="160" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Cliente]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="220" y="0" width="100" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Fecha Pedido]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="320" y="0" width="100" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Fecha Entrega]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="420" y="0" width="100" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Total]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="520" y="0" width="80" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Adelanto]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="600" y="0" width="80" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Prioridad]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="680" y="0" width="102" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Estado]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement x="0" y="0" width="60" height="20"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{id_pedido}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="60" y="0" width="160" height="20"/>
+                <textFieldExpression><![CDATA[$F{cliente}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="220" y="0" width="100" height="20"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{fecha_pedido} != null ? new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{fecha_pedido}) : ""]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="320" y="0" width="100" height="20"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{fecha_entrega} != null ? new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{fecha_entrega}) : ""]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="420" y="0" width="100" height="20"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["RD$ " + $F{total}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="520" y="0" width="80" height="20"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["RD$ " + $F{adelanto}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="600" y="0" width="80" height="20"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{prioridad}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="680" y="0" width="102" height="20"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{estado}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>
