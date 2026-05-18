@@ -19,8 +19,8 @@
         <!-- Logo and Title -->
         <VBox alignment="CENTER" spacing="10">
             <Label text="🍰" styleClass="pastel-logo"/>
-            <Label text="Pastelería Rosato" styleClass="title-label"/>
-            <Label text="El Hub de Pastelería como Servicio (PaaS)" styleClass="subtitle-label"/>
+            <Label text="Repostería Rosato" styleClass="title-label"/>
+            <Label text="El Hub de Repostería como Servicio (PaaS)" styleClass="subtitle-label"/>
         </VBox>
         
         <!-- Form Fields -->

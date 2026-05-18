@@ -119,7 +119,7 @@ public class LoginController {
             Stage stage = (Stage) loginButton.getScene().getWindow();
             Scene scene = new Scene(root, 1280, 720);
             stage.setScene(scene);
-            stage.setTitle("🍰 Pastelería Rosato - " + obtenerTituloPorPerfil(perfil));
+            stage.setTitle("🍰 Repostería Rosato - " + obtenerTituloPorPerfil(perfil));
             stage.show();
 
         } catch (IOException e) {
@@ -152,7 +152,7 @@ public class LoginController {
             Stage stage = (Stage) loginButton.getScene().getWindow();
             Scene scene = new Scene(root, 1000, 700);
             stage.setScene(scene);
-            stage.setTitle("🍰 Pastelería Rosato - Registro de Cliente");
+            stage.setTitle("🍰 Repostería Rosato - Registro de Cliente");
             stage.show();
 
         } catch (IOException e) {

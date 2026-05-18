@@ -420,7 +420,7 @@ public class PlanificacionController {
             Stage stage = (Stage) cerrarSesionButton.getScene().getWindow();
             Scene scene = new Scene(root, 1280, 720);
             stage.setScene(scene);
-            stage.setTitle("🍰 Pastelería Rosato - Sistema de Gestión");
+            stage.setTitle("🍰 Repostería Rosato - Sistema de Gestión");
             stage.show();
 
         } catch (Exception e) {

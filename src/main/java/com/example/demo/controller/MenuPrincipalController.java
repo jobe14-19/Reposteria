@@ -193,7 +193,7 @@ public class MenuPrincipalController {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml"));
             Stage stage = (Stage) sectionsContainer.getScene().getWindow();
             stage.getScene().setRoot(root);
-            stage.setTitle("🍰 Pastelería Rosato - Iniciar Sesión");
+            stage.setTitle("🍰 Repostería Rosato - Iniciar Sesión");
         } catch (IOException e) {
             e.printStackTrace();
         }

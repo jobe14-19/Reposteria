@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
@@ -14,7 +15,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -142,8 +142,12 @@ public class CompraModalController {
                 precioUnitarioField.setText(String.format("%.2f", newSelection.getPrecioUnitario()));
                 descuentoField.setText(String.valueOf(newSelection.getDescuento()));
                 nuevoProductoSeleccionado = newSelection.getNombre();
-                actualizarSubtotal();
+                actualizarSubtotalLabel();
             }
+        });
+
+        productosTable.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            if (productosList.isEmpty()) e.consume();
         });
 
         accionesColumn.setCellFactory(param -> new TableCell<ProductoCompra, Void>() {
@@ -211,6 +215,10 @@ public class CompraModalController {
     }
 
     private void actualizarSubtotal() {
+        actualizarSubtotalLabel();
+    }
+
+    private void actualizarSubtotalLabel() {
         try {
             double cantidad = Double.parseDouble(obtenerTextoODefault(cantidadField, "0"));
             double precioUnitario = Double.parseDouble(obtenerTextoODefault(precioUnitarioField, "0"));
@@ -218,10 +226,6 @@ public class CompraModalController {
 
             double subtotal = (cantidad * precioUnitario) - descuento;
             subtotalItemLabel.setText(String.format("$%.2f", subtotal));
-
-            if (nuevoProductoSeleccionado != null) {
-                actualizarOAgregarProducto(cantidad, precioUnitario, descuento, subtotal);
-            }
 
         } catch (NumberFormatException e) {
             LOGGER.log(Level.WARNING, "Error en formato de números: {0}", e.getMessage());
@@ -233,37 +237,6 @@ public class CompraModalController {
         return (text == null || text.trim().isEmpty()) ? defaultValue : text;
     }
 
-    private void actualizarOAgregarProducto(double cantidad, double precioUnitario, double descuento, double subtotal) {
-        Optional<ProductoCompra> productoExistente = productosList.stream()
-                .filter(p -> p.getNombre().equals(nuevoProductoSeleccionado))
-                .findFirst();
-
-        if (productoExistente.isPresent()) {
-            ProductoCompra producto = productoExistente.get();
-            ProductoCompra productoActualizado = new ProductoCompra(
-                    producto.getNombre(),
-                    cantidad,
-                    precioUnitario,
-                    descuento,
-                    subtotal
-            );
-            int index = productosList.indexOf(producto);
-            productosList.set(index, productoActualizado);
-        } else {
-            ProductoCompra nuevoProducto = new ProductoCompra(
-                    nuevoProductoSeleccionado,
-                    cantidad,
-                    precioUnitario,
-                    descuento,
-                    subtotal
-            );
-            productosList.add(nuevoProducto);
-        }
-
-        productosTable.refresh();
-        recalcularTotalGeneral();
-    }
-
     @FXML
     private void agregarProducto(ActionEvent event) {
         String producto = productoComboBox.getSelectionModel().getSelectedItem();
@@ -273,40 +246,34 @@ public class CompraModalController {
             return;
         }
 
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_OBTENER_PRECIO_PRODUCTO)) {
-
-            stmt.setString(1, producto);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    double precioUnitario = rs.getDouble("precio_unitario");
-
-                    ProductoCompra nuevoProducto = new ProductoCompra(
-                            producto,
-                            1.0,
-                            precioUnitario,
-                            0.0,
-                            precioUnitario
-                    );
-
-                    productosList.add(nuevoProducto);
-
-                    productoComboBox.getSelectionModel().select(producto);
-                    nuevoProductoSeleccionado = producto;
-
-                    cantidadField.setText("1");
-                    precioUnitarioField.setText(String.format("%.2f", precioUnitario));
-                    descuentoField.setText("0");
-                    actualizarSubtotal();
-                    recalcularTotalGeneral();
-                }
-            }
-
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al agregar producto: {0}", e.getMessage());
-            mostrarError("Error de Base de Datos", "No se pudo agregar el producto: " + e.getMessage());
+        String cantidadTexto = obtenerTextoODefault(cantidadField, "");
+        if (cantidadTexto.isEmpty()) {
+            mostrarError("Cantidad Requerida", "Por favor ingrese una cantidad.");
+            return;
         }
+
+        double cantidad, precioUnitario, descuento;
+        try {
+            cantidad = Double.parseDouble(cantidadTexto);
+            precioUnitario = Double.parseDouble(obtenerTextoODefault(precioUnitarioField, "0"));
+            descuento = Double.parseDouble(obtenerTextoODefault(descuentoField, "0"));
+        } catch (NumberFormatException e) {
+            mostrarError("Valor Inválido", "Por favor ingrese valores numéricos válidos.");
+            return;
+        }
+
+        double subtotal = (cantidad * precioUnitario) - descuento;
+
+        int selectedIndex = productosTable.getSelectionModel().getSelectedIndex();
+        if (selectedIndex >= 0) {
+            productosList.set(selectedIndex, new ProductoCompra(producto, cantidad, precioUnitario, descuento, subtotal));
+            productosTable.getSelectionModel().clearSelection();
+        } else {
+            productosList.add(new ProductoCompra(producto, cantidad, precioUnitario, descuento, subtotal));
+        }
+
+        nuevoProductoSeleccionado = producto;
+        recalcularTotalGeneral();
     }
 
     private void eliminarProducto(ProductoCompra producto) {

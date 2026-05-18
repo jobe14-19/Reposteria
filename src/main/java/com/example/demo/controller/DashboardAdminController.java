@@ -237,7 +237,7 @@ public class DashboardAdminController {
         try {
             Stage stage = (Stage) userLabel.getScene().getWindow();
             stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml")), 1280, 720));
-            stage.setTitle("🍰 Pastelería Rosato - Sistema de Gestión");
+            stage.setTitle("🍰 Repostería Rosato - Sistema de Gestión");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error: {0}", e.getMessage());
         }
@@ -274,7 +274,7 @@ public class DashboardAdminController {
         try {
             Stage stage = new Stage();
             stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/MiPerfil.fxml")), 800, 600));
-            stage.setTitle("🍰 Pastelería Rosato - Mi Perfil");
+            stage.setTitle("🍰 Repostería Rosato - Mi Perfil");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
         } catch (Exception e) {

@@ -194,16 +194,28 @@ public class DashboardEmpleadoController {
         if (!sessionManager.isLoggedIn()) return;
         try (Connection conn = dbConnection.getConnection()) {
             cargarKPIs(conn);
-            cargarProduccion(conn);
-            cargarStockCritico(conn);
-            cargarEntregasHoy(conn);
         } catch (SQLException e) {
-            LOGGER.log(Level.INFO, "Modo offline: usando datos de demostración");
+            LOGGER.log(Level.INFO, "KPI no disponibles: {0}", e.getMessage());
             pendientesHoyLabel.setText("--");
             urgentesHoyLabel.setText("--");
             paraHoyLabel.setText("--");
+        }
+        try (Connection conn = dbConnection.getConnection()) {
+            cargarProduccion(conn);
+        } catch (SQLException e) {
+            LOGGER.log(Level.INFO, "Producción no disponible: {0}", e.getMessage());
             produccionTable.setItems(FXCollections.observableArrayList());
+        }
+        try (Connection conn = dbConnection.getConnection()) {
+            cargarStockCritico(conn);
+        } catch (SQLException e) {
+            LOGGER.log(Level.INFO, "Stock crítico no disponible: {0}", e.getMessage());
             stockCriticoTable.setItems(FXCollections.observableArrayList());
+        }
+        try (Connection conn = dbConnection.getConnection()) {
+            cargarEntregasHoy(conn);
+        } catch (SQLException e) {
+            LOGGER.log(Level.INFO, "Entregas no disponibles: {0}", e.getMessage());
             entregasTable.setItems(FXCollections.observableArrayList());
         }
     }
@@ -320,7 +332,7 @@ public class DashboardEmpleadoController {
         try {
             Stage stage = (Stage) userLabel.getScene().getWindow();
             stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml")), 1280, 720));
-            stage.setTitle("🍰 Pastelería Rosato - Sistema de Gestión");
+            stage.setTitle("🍰 Repostería Rosato - Sistema de Gestión");
         } catch (Exception ex) { LOGGER.log(Level.SEVERE, "Error: {0}", ex.getMessage()); }
     }
 
@@ -335,7 +347,7 @@ public class DashboardEmpleadoController {
         try {
             Stage stage = new Stage();
             stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/MiPerfil.fxml")), 800, 600));
-            stage.setTitle("🍰 Pastelería Rosato - Mi Perfil");
+            stage.setTitle("🍰 Repostería Rosato - Mi Perfil");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
         } catch (Exception ex) { mostrarError("Error", "No se pudo abrir perfil"); }

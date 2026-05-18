@@ -20,7 +20,7 @@ public class Main extends Application {
             Parent root = loader.load();
             
             Scene scene = new Scene(root, 1000, 700);
-            stage.setTitle("🍰 Pastelería Rosato - Iniciar Sesión");
+            stage.setTitle("🍰 Repostería Rosato - Iniciar Sesión");
             stage.setScene(scene);
             stage.setResizable(false);
             stage.show();

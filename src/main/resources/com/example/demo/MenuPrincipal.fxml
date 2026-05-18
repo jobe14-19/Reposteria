@@ -15,7 +15,7 @@
             <padding>
                 <Insets top="20" bottom="20" left="40" right="40"/>
             </padding>
-            <Label text="🍰 Pastelería Rosato - Menú Principal" styleClass="nav-logo" style="-fx-font-size: 28px;"/>
+            <Label text="🍰 Repostería Rosato - Menú Principal" styleClass="nav-logo" style="-fx-font-size: 28px;"/>
             <Label text="Selecciona un módulo para comenzar" styleClass="subtitle-label" style="-fx-text-fill: white;"/>
         </VBox>
     </top>

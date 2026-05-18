@@ -14,7 +14,7 @@
     <top>
         <VBox>
             <HBox styleClass="nav-bar" alignment="CENTER_LEFT">
-                <Label text="Pastelería Rosato" styleClass="nav-logo"/>
+                <Label text="Repostería Rosato" styleClass="nav-logo"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <HBox spacing="5" alignment="CENTER">

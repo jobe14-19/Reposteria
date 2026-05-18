@@ -251,7 +251,7 @@ public class DashboardClienteController {
             Stage stage = (Stage) userLabel.getScene().getWindow();
             Scene scene = new Scene(root, 1280, 720);
             stage.setScene(scene);
-            stage.setTitle("🍰 Pastelería Rosato - Sistema de Gestión");
+            stage.setTitle("🍰 Repostería Rosato - Sistema de Gestión");
             stage.show();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al regresar al login: {0}", e.getMessage());
@@ -273,7 +273,7 @@ public class DashboardClienteController {
             Stage stage = new Stage();
             Scene scene = new Scene(root, 1000, 600);
             stage.setScene(scene);
-            stage.setTitle("🍰 Pastelería Rosato - Mis Pedidos");
+            stage.setTitle("🍰 Repostería Rosato - Mis Pedidos");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
         } catch (Exception e) {
@@ -291,7 +291,7 @@ public class DashboardClienteController {
             Stage stage = new Stage();
             Scene scene = new Scene(root, 800, 600);
             stage.setScene(scene);
-            stage.setTitle("🍰 Pastelería Rosato - Mi Perfil");
+            stage.setTitle("🍰 Repostería Rosato - Mi Perfil");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
         } catch (Exception e) {

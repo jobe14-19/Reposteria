@@ -123,7 +123,7 @@ public class RegistroClienteController {
             Stage stage = (Stage) registerButton.getScene().getWindow();
             Scene scene = new Scene(root, 1000, 700);
             stage.setScene(scene);
-            stage.setTitle("Pastelería Rosato - Iniciar Sesión");
+            stage.setTitle("Repostería Rosato - Iniciar Sesión");
             stage.show();
 
         } catch (IOException e) {
