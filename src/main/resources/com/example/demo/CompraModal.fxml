@@ -120,7 +120,7 @@
                     <TextField fx:id="impuestosField" promptText="0.00" styleClass="form-field" prefWidth="140"
                                GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                    <Label text="Alquiler:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <Label text="Monto:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                     <TextField fx:id="alquilerField" promptText="0.00" styleClass="form-field" prefWidth="140"
                                GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 

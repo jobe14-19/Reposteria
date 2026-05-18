@@ -398,7 +398,7 @@ public class CompraModalController {
 
         try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_COMPRA, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, idProveedor);
-            stmt.setString(2, sessionManager.getUsuarioActual());
+            stmt.setInt(2, sessionManager.getIdUsuarioActual());
             stmt.setDouble(3, total);
             stmt.executeUpdate();
 

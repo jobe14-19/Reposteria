@@ -20,7 +20,6 @@ public class DatabaseConnection {
 
     // Singleton instance
     private static DatabaseConnection instance;
-    private Connection connection;
 
     // Database connection parameters
     private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
@@ -84,18 +83,16 @@ public class DatabaseConnection {
                 "Configure una base de datos o desactive el modo offline en DatabaseConnection.java"
             );
         }
-        if (connection == null || connection.isClosed()) {
-            try {
-                connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                LOGGER.log(Level.INFO, "Conexi\u00f3n a la base de datos establecida correctamente");
-            } catch (SQLException e) {
-                String error = "Error al establecer la conexi\u00f3n a la base de datos: " + e.getMessage();
-                LOGGER.log(Level.SEVERE, error);
-                logError(error);
-                throw new SQLException(error, e);
-            }
+        try {
+            Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            LOGGER.log(Level.INFO, "Conexi\u00f3n a la base de datos establecida correctamente");
+            return conn;
+        } catch (SQLException e) {
+            String error = "Error al establecer la conexi\u00f3n a la base de datos: " + e.getMessage();
+            LOGGER.log(Level.SEVERE, error);
+            logError(error);
+            throw new SQLException(error, e);
         }
-        return connection;
     }
 
     // Close specific connection
@@ -107,20 +104,6 @@ public class DatabaseConnection {
             }
         } catch (SQLException e) {
             String error = "Error al cerrar la conexi\u00f3n espec\u00edfica: " + e.getMessage();
-            LOGGER.log(Level.WARNING, error);
-            logError(error);
-        }
-    }
-
-    // Close database connection (singleton)
-    public void closeConnection() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                LOGGER.log(Level.INFO, "Conexi\u00f3n a la base de datos cerrada correctamente");
-            }
-        } catch (SQLException e) {
-            String error = "Error al cerrar la conexi\u00f3n a la base de datos: " + e.getMessage();
             LOGGER.log(Level.WARNING, error);
             logError(error);
         }
@@ -421,12 +404,9 @@ public class DatabaseConnection {
         if (OFFLINE_MODE) {
             return false;
         }
-        try {
-            return connection != null && !connection.isClosed() && connection.isValid(CONNECTION_TIMEOUT_SECONDS);
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            return conn.isValid(CONNECTION_TIMEOUT_SECONDS);
         } catch (SQLException e) {
-            String error = "Error al verificar el estado de la conexi\u00f3n: " + e.getMessage();
-            LOGGER.log(Level.WARNING, error);
-            logError(error);
             return false;
         }
     }
