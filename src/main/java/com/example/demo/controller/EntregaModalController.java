@@ -146,8 +146,26 @@ public class EntregaModalController {
             EntregasController.PedidoPendiente pedido = pedidoMap.get(selected);
             if (pedido != null) {
                 setPedido(pedido);
+                return;
             }
         }
+        limpiarDetalles();
+    }
+
+    private void limpiarDetalles() {
+        pedidoActual = null;
+        pedidoIdLabel.setText("-");
+        clienteLabel.setText("-");
+        totalLabel.setText("-");
+        adelantoLabel.setText("-");
+        saldoLabel.setText("-");
+        localRadioButton.setSelected(true);
+        direccionField.clear();
+        distanciaField.clear();
+        costoDeliveryField.clear();
+        montoCobrarField.clear();
+        metodoPagoComboBox.getSelectionModel().selectFirst();
+        referenciaField.clear();
     }
 
     private void setupEventHandlers() {
@@ -302,19 +320,7 @@ public class EntregaModalController {
     @FXML
     private void limpiarCampos(ActionEvent event) {
         pedidoComboBox.getSelectionModel().clearSelection();
-        pedidoIdLabel.setText("-");
-        clienteLabel.setText("-");
-        totalLabel.setText("-");
-        adelantoLabel.setText("-");
-        saldoLabel.setText("-");
-        localRadioButton.setSelected(true);
-        direccionField.clear();
-        distanciaField.clear();
-        costoDeliveryField.clear();
-        montoCobrarField.clear();
-        metodoPagoComboBox.getSelectionModel().selectFirst();
-        referenciaField.clear();
-        pedidoActual = null;
+        limpiarDetalles();
     }
 
     private boolean sonCamposValidos() {

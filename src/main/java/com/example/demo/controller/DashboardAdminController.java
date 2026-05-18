@@ -162,16 +162,17 @@ public class DashboardAdminController {
             salesChart.setData(FXCollections.observableArrayList(salesSeries));
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+            salesChart.setData(FXCollections.observableArrayList());
         }
     }
 
     private void cargarGraficoProductos(Connection conn) {
-        ObservableList<BarChart.Data<String, Number>> productsData = FXCollections.observableArrayList();
+        ObservableList<XYChart.Data<String, Number>> productsData = FXCollections.observableArrayList();
         try (PreparedStatement stmt = conn.prepareStatement(SQL_PRODUCTOS_MAS_VENDIDOS); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 int unidades = rs.getInt("unidades_vendidas");
                 if (unidades > 0) {
-                    productsData.add(new BarChart.Data<>(rs.getString("producto"), unidades));
+                    productsData.add(new XYChart.Data<>(rs.getString("producto"), unidades));
                 }
             }
             XYChart.Series<String, Number> productsSeries = new XYChart.Series<>();
@@ -179,6 +180,7 @@ public class DashboardAdminController {
             productsChart.setData(FXCollections.observableArrayList(productsSeries));
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+            productsChart.setData(FXCollections.observableArrayList());
         }
     }
 

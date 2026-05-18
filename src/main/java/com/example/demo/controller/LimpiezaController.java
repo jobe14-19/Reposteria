@@ -83,7 +83,7 @@ public class LimpiezaController {
                 mostrarMensaje("Error", "No se pudo generar el reporte: " + ex.getMessage());
             }
         });
-        actualizarMaterialesButton.setOnAction(e -> mostrarMensaje("Materiales", "Inventario de materiales actualizado"));
+        actualizarMaterialesButton.setOnAction(e -> abrirGestionMateriales());
     }
 
     private void cargarDatosLimpieza() {
@@ -135,6 +135,21 @@ public class LimpiezaController {
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error al abrir modal: {0}", e.getMessage());
             mostrarError("Error", "No se pudo abrir el modal de limpieza");
+        }
+    }
+
+    private void abrirGestionMateriales() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MaterialModal.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Gestión de Materiales de Limpieza");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error al abrir gestión de materiales: {0}", e.getMessage());
+            mostrarError("Error", "No se pudo abrir la gestión de materiales");
         }
     }
 
