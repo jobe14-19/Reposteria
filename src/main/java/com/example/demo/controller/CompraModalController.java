@@ -135,6 +135,17 @@ public class CompraModalController {
         descuentoColumn.setCellValueFactory(new PropertyValueFactory<>("descuento"));
         subtotalColumn.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
 
+        productosTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                productoComboBox.getSelectionModel().select(newSelection.getNombre());
+                cantidadField.setText(String.valueOf(newSelection.getCantidad()));
+                precioUnitarioField.setText(String.format("%.2f", newSelection.getPrecioUnitario()));
+                descuentoField.setText(String.valueOf(newSelection.getDescuento()));
+                nuevoProductoSeleccionado = newSelection.getNombre();
+                actualizarSubtotal();
+            }
+        });
+
         accionesColumn.setCellFactory(param -> new TableCell<ProductoCompra, Void>() {
             private final Button eliminarButton = crearBotonEliminar();
             private final HBox hbox = new HBox(5);
