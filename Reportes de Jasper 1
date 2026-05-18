@@ -1,0 +1,177 @@
+<!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
+<jasperReport name="Reporte_Factura_Dinamico" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="15f561db-20ea-413e-aa5d-1c09d6bf6131">
+	<parameter name="ID_FACTURA" class="java.lang.Integer"/>
+	<query language="sql"><![CDATA[SELECT 
+    f.id_factura,
+    f.fecha_venta,
+    p.fecha_entrega,
+    p.estado,
+    c.nombre_cliente,
+    df.producto_nombre,
+    df.cantidad,
+    df.precio_unitario,
+    (df.cantidad * df.precio_unitario) AS subtotal,
+    f.total_pago
+FROM Facturas f
+INNER JOIN Pedidos p ON f.id_pedido = p.id_pedido
+INNER JOIN Clientes c ON p.id_cliente = c.id_cliente
+INNER JOIN DetalleFactura df ON f.id_factura = df.id_factura
+WHERE f.id_factura = $P{ID_FACTURA}
+ORDER BY f.id_factura DESC]]></query>
+	<field name="id_factura" class="java.lang.Integer"/>
+	<field name="fecha_venta" class="java.sql.Date"/>
+	<field name="fecha_entrega" class="java.sql.Date"/>
+	<field name="estado" class="java.lang.String"/>
+	<field name="nombre_cliente" class="java.lang.String"/>
+	<field name="producto_nombre" class="java.lang.String"/>
+	<field name="cantidad" class="java.lang.Integer"/>
+	<field name="precio_unitario" class="java.math.BigDecimal"/>
+	<field name="subtotal" class="java.math.BigDecimal"/>
+	<field name="total_pago" class="java.math.BigDecimal"/>
+	<background height="140" splitType="Stretch">
+		<element kind="rectangle" uuid="997f440b-4273-46df-ae1f-30387737b9f8" x="-5" y="0" width="345" height="30" forecolor="#FFE7ED" backcolor="#FFE7ED"/>
+	</background>
+	<title height="100" splitType="Stretch">
+		<element kind="staticText" uuid="b1234567-c123-d123-e123-f123456789ab" x="0" y="5" width="340" height="28" forecolor="#5D4037" fontName="Arial" fontSize="20.0" bold="true">
+			<text><![CDATA[REPOSTERÍA ROSATO]]></text>
+		</element>
+		<element kind="staticText" uuid="c2345678-d234-e234-f234-a123456789bc" x="0" y="33" width="340" height="15" forecolor="#5D4037" fontName="Arial" fontSize="10.0" italic="true">
+			<text><![CDATA[Fabricación y venta de productos de pastelería]]></text>
+		</element>
+		<element kind="staticText" uuid="d1234567-e123-f123-a123-b123456789cd" x="0" y="50" width="340" height="35" forecolor="#5D4037" fontName="Arial" fontSize="9.0">
+			<text><![CDATA[Calle Dionisio Delgallido #2 Primer nivel, Guayabal, Punal.
+Tel: (829) 889-0270 ]]></text>
+		</element>
+		<element kind="rectangle" uuid="f2a3b4c5-d6e7-48a9-b0c1-d2e3f4a5b6c7" x="360" y="0" width="195" height="85" forecolor="#5D4037" backcolor="#FFF5F7"/>
+		<element kind="staticText" uuid="f3a4b5c6-d7e8-49a0-b1c2-d3e4f5a6b7c8" x="360" y="10" width="195" height="20" forecolor="#5D4037" fontName="Arial" fontSize="12.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[ORDEN DE PRODUCCION]]></text>
+		</element>
+		<element kind="staticText" uuid="f4a5b6c7-d8e9-4a01-b2c3-d4e5f6a7b8c9" x="365" y="35" width="80" height="20" forecolor="#5D4037" fontName="Arial" fontSize="11.0" bold="true" hTextAlign="Right">
+			<text><![CDATA[No. Orden:]]></text>
+		</element>
+		<element kind="textField" uuid="b6789012-c678-d678-e678-f12345678901" x="450" y="35" width="100" height="20" forecolor="#5D4037" fontName="Arial" fontSize="11.0" bold="true">
+			<expression><![CDATA[String.format("%06d", $F{id_factura})]]></expression>
+		</element>
+		<element kind="staticText" uuid="f5a6b7c8-d9e0-4b12-b3c4-d5e6f7a8b9c0" x="365" y="58" width="80" height="15" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Right">
+			<text><![CDATA[Estado:]]></text>
+		</element>
+		<element kind="textField" uuid="f6a7b8c9-e0f1-4c23-b4d5-e6f7a8b9c0d1" x="450" y="58" width="100" height="15" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true">
+			<expression><![CDATA[$F{estado}]]></expression>
+		</element>
+	</title>
+	<pageHeader height="115" splitType="Stretch">
+		<element kind="rectangle" uuid="e1112223-a333-b444-c555-d66677778888" x="0" y="0" width="555" height="105" forecolor="#5D4037" backcolor="#FFFFFF"/>
+		<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982a1" x="0" y="26" width="555" height="1" forecolor="#5D4037"/>
+		<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982a2" x="0" y="52" width="555" height="1" forecolor="#5D4037"/>
+		<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982a3" x="0" y="78" width="555" height="1" forecolor="#5D4037"/>
+		<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982a4" x="340" y="0" width="1" height="105" forecolor="#5D4037"/>
+		<element kind="staticText" uuid="e4567890-f456-a456-b456-c123456789de" x="8" y="5" width="62" height="16" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true">
+			<text><![CDATA[Señor/a:]]></text>
+		</element>
+		<element kind="textField" uuid="f5678901-a567-b567-c567-d123456789ef" x="75" y="5" width="255" height="16" fontName="Arial" fontSize="9.0" vTextAlign="Middle">
+			<expression><![CDATA[$F{nombre_cliente}]]></expression>
+		</element>
+		<element kind="staticText" uuid="c3334444-d555-e666-f777-c88899990000" x="348" y="5" width="82" height="16" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true">
+			<text><![CDATA[Fecha Emisión:]]></text>
+		</element>
+		<element kind="textField" uuid="c4445555-d666-e777-f888-d99900001111" x="435" y="5" width="112" height="16" fontName="Arial" fontSize="9.0" pattern="dd/MM/yyyy" vTextAlign="Middle">
+			<expression><![CDATA[$F{fecha_venta}]]></expression>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982a5" x="8" y="31" width="62" height="16" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true">
+			<text><![CDATA[Dirección:]]></text>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982a7" x="348" y="31" width="82" height="16" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true">
+			<text><![CDATA[Fecha Entrega:]]></text>
+		</element>
+		<element kind="textField" uuid="c4445555-d666-e777-f888-d99900002222" x="435" y="31" width="112" height="16" fontName="Arial" fontSize="9.0" pattern="dd/MM/yyyy" vTextAlign="Middle">
+			<expression><![CDATA[$F{fecha_entrega}]]></expression>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982a9" x="8" y="57" width="62" height="16" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true">
+			<text><![CDATA[Sucursal:]]></text>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982ab" x="348" y="57" width="82" height="16" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true">
+			<text><![CDATA[Vendedor:]]></text>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982ac" x="435" y="57" width="112" height="16" fontName="Arial" fontSize="9.0" vTextAlign="Middle">
+			<text><![CDATA[SISTEMA ROSATO]]></text>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982ad" x="8" y="83" width="62" height="16" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true">
+			<text><![CDATA[Condiciones:]]></text>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982af" x="348" y="83" width="82" height="16" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true">
+			<text><![CDATA[Tipo de Venta:]]></text>
+		</element>
+	</pageHeader>
+	<columnHeader height="30" splitType="Stretch">
+		<element kind="rectangle" uuid="c7890123-d789-e789-f789-a12345678902" x="0" y="0" width="555" height="30" forecolor="#5D4037" backcolor="#FFE7ED"/>
+		<element kind="staticText" uuid="e9012345-f901-a901-b901-c12345678904" x="0" y="5" width="70" height="20" forecolor="#5D4037" fontName="Arial" fontSize="10.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Cantidad]]></text>
+		</element>
+		<element kind="staticText" uuid="d8901234-e890-f890-a890-b12345678903" x="75" y="5" width="280" height="20" forecolor="#5D4037" fontName="Arial" fontSize="10.0" bold="true" vTextAlign="Middle">
+			<text><![CDATA[Descripción del Producto / Especificación]]></text>
+		</element>
+		<element kind="staticText" uuid="f0123456-a012-b012-c012-d12345678905" x="360" y="5" width="90" height="20" forecolor="#5D4037" fontName="Arial" fontSize="10.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+			<text><![CDATA[P. Unitario]]></text>
+		</element>
+		<element kind="staticText" uuid="a1234567-b123-c123-d123-e12345678906" x="455" y="5" width="95" height="20" forecolor="#5D4037" fontName="Arial" fontSize="10.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+			<text><![CDATA[Total]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982b1" x="0" y="0" width="1" height="25" forecolor="#5D4037"/>
+			<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982b2" x="70" y="0" width="1" height="25" forecolor="#5D4037"/>
+			<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982b3" x="355" y="0" width="1" height="25" forecolor="#5D4037"/>
+			<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982b4" x="450" y="0" width="1" height="25" forecolor="#5D4037"/>
+			<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982b5" x="555" y="0" width="1" height="25" forecolor="#5D4037"/>
+			<element kind="textField" uuid="c3456789-d345-e345-f345-a12345678908" x="0" y="2" width="70" height="20" fontName="Arial" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{cantidad}]]></expression>
+			</element>
+			<element kind="textField" uuid="b2345678-c234-d234-e234-f12345678907" x="78" y="2" width="272" height="20" fontName="Arial" fontSize="9.0" vTextAlign="Middle">
+				<expression><![CDATA[$F{producto_nombre}]]></expression>
+			</element>
+			<element kind="textField" uuid="d4567890-e456-f456-a456-b12345678909" x="360" y="2" width="85" height="20" fontName="Arial" fontSize="9.0" pattern="RD$ #,##0.00" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{precio_unitario}]]></expression>
+			</element>
+			<element kind="textField" uuid="e5678901-f567-a567-b567-c12345678910" x="455" y="2" width="92" height="20" fontName="Arial" fontSize="9.0" pattern="RD$ #,##0.00" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{subtotal}]]></expression>
+			</element>
+			<element kind="line" uuid="f6789012-a678-b678-c678-d12345678911" x="0" y="24" width="555" height="1" forecolor="#5D4037"/>
+		</band>
+	</detail>
+	<summary height="120" splitType="Stretch">
+		<element kind="rectangle" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982b6" x="0" y="10" width="340" height="95" forecolor="#5D4037" backcolor="#FFFFFF"/>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982b7" x="8" y="15" width="100" height="14" forecolor="#5D4037" fontName="Arial" fontSize="8.0" bold="true">
+			<text><![CDATA[Persona que retira:]]></text>
+		</element>
+		<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982b8" x="8" y="70" width="160" height="1" forecolor="#5D4037"/>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982b9" x="8" y="74" width="160" height="12" forecolor="#5D4037" fontName="Arial" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[Firma / Conformidad]]></text>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982ba" x="180" y="15" width="150" height="35" forecolor="#5D4037" fontName="Arial" fontSize="8.0" italic="true">
+			<text><![CDATA[Nota: Revise su producto antes de salir de la repostería. No aceptamos devoluciones en productos personalizados.]]></text>
+		</element>
+		<element kind="rectangle" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982bb" x="355" y="10" width="200" height="95" forecolor="#5D4037" backcolor="#FFF5F7"/>
+		<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982bc" x="355" y="32" width="200" height="1" forecolor="#5D4037"/>
+		<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982bd" x="355" y="55" width="200" height="1" forecolor="#5D4037"/>
+		<element kind="line" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982be" x="450" y="10" width="1" height="95" forecolor="#5D4037"/>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982bf" x="360" y="15" width="85" height="14" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Right">
+			<text><![CDATA[NETO:]]></text>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982c0" x="360" y="38" width="85" height="14" forecolor="#5D4037" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Right">
+			<text><![CDATA[ITBIS (18%):]]></text>
+		</element>
+		<element kind="staticText" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982c1" x="360" y="68" width="85" height="20" forecolor="#5D4037" fontName="Arial" fontSize="11.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+			<text><![CDATA[TOTAL:]]></text>
+		</element>
+		<element kind="textField" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982c2" x="455" y="15" width="95" height="14" fontName="Arial" fontSize="9.0" pattern="RD$ #,##0.00" hTextAlign="Right">
+			<expression><![CDATA[$F{total_pago}.multiply(new java.math.BigDecimal("0.82"))]]></expression>
+		</element>
+		<element kind="textField" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982c3" x="455" y="38" width="95" height="14" fontName="Arial" fontSize="9.0" pattern="RD$ #,##0.00" hTextAlign="Right">
+			<expression><![CDATA[$F{total_pago}.multiply(new java.math.BigDecimal("0.18"))]]></expression>
+		</element>
+		<element kind="textField" uuid="ad1a51fb-0ba2-4a0b-8d19-4bc783f982c4" x="455" y="68" width="95" height="20" forecolor="#5D4037" fontName="Arial" fontSize="11.0" pattern="RD$ #,##0.00" bold="true" hTextAlign="Right" vTextAlign="Middle">
+			<expression><![CDATA[$F{total_pago}]]></expression>
+		</element>
+	</summary>
+</jasperReport>
