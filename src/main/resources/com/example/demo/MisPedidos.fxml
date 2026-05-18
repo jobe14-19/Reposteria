@@ -7,7 +7,7 @@
 
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.demo.MisPedidosController"
+      fx:controller="com.example.demo.controller.MisPedidosController"
       spacing="20" alignment="TOP_CENTER" style="-fx-background-color: #FAFAFA;">
       
     <stylesheets>
@@ -41,7 +41,7 @@
                 </VBox>
                 <VBox spacing="5" alignment="CENTER_LEFT">
                     <Label text="💰 Saldo Pendiente:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                    <Label fx:id="saldoPendienteLabel" text="&#36;0.00" style="-fx-font-size: 16px; -fx-text-fill: #E74C3C;"/>
+                    <Label fx:id="saldoPendienteLabel" text="0.00" style="-fx-font-size: 16px; -fx-text-fill: #E74C3C;"/>
                 </VBox>
             </HBox>
 

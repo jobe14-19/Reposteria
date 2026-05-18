@@ -5,7 +5,7 @@
 <?import javafx.geometry.Insets?>
 <?import java.net.URL?>
 
-<StackPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.LoginController">
+<StackPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.LoginController">
     <stylesheets>
         <URL value="@styles.css"/>
     </stylesheets>

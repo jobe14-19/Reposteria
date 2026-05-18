@@ -1,6 +1,6 @@
 package com.example.demo.dao;
 
-import com.example.demo.DatabaseConnection;
+import com.example.demo.util.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -39,7 +39,8 @@ public class UsuarioDAO {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al validar credenciales: {0}", e.getMessage());
+            LOGGER.log(Level.INFO, "Modo offline: validando usuario localmente");
+            return dbConnection.getUsuarioPorCredenciales(usuario, contrasena);
         }
 
         return Optional.empty();

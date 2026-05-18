@@ -1,6 +1,6 @@
 package com.example.demo.dao;
 
-import com.example.demo.DatabaseConnection;
+import com.example.demo.util.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

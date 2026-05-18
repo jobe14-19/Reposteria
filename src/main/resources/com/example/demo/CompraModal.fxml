@@ -6,7 +6,7 @@
 <?import java.net.URL?>
 
 <ScrollPane fitToWidth="true" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.demo.CompraModalController" styleClass="scroll-pane">
+            fx:controller="com.example.demo.controller.CompraModalController" styleClass="scroll-pane">
     <stylesheets>
         <URL value="@styles.css"/>
     </stylesheets>
@@ -71,7 +71,7 @@
                     <TableColumn fx:id="unidadColumn" text="Unidad" prefWidth="80"/>
                     <TableColumn fx:id="precioUnitarioColumn" text="Precio Unit." prefWidth="100"/>
                     <TableColumn fx:id="descuentoColumn" text="Descuento" prefWidth="90"/>
-                    <TableColumn fx:id="subtotalItemColumn" text="Subtotal" prefWidth="100"/>
+                    <TableColumn fx:id="subtotalColumn" text="Subtotal" prefWidth="100"/>
                     <TableColumn fx:id="accionesColumn" text="" prefWidth="60"/>
                 </columns>
                 <placeholder>
@@ -120,7 +120,7 @@
                     <TextField fx:id="impuestosField" promptText="0.00" styleClass="form-field" prefWidth="140"
                                GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                    <Label text="Alquiler:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <Label text="Monto:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                     <TextField fx:id="alquilerField" promptText="0.00" styleClass="form-field" prefWidth="140"
                                GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
@@ -167,10 +167,12 @@
 
         <!-- ===== ACTION BUTTONS ===== -->
         <HBox alignment="CENTER_RIGHT" spacing="12">
+            <Button fx:id="limpiarButton" text="Limpiar"
+                    style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#limpiarCampos"/>
             <Button fx:id="cancelarButton" text="Cancelar"
-                    style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                    style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#cancelarResultado"/>
             <Button fx:id="guardarResultado" text="💾 Registrar Compra"
-                    style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                    style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#guardarResultado"/>
         </HBox>
     </VBox>
 </ScrollPane>
