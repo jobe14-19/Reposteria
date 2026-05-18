@@ -35,6 +35,7 @@ public class PlanificacionController {
     @FXML private Label listosEntregarLabel;
     @FXML private ListView<String> alertasListView;
     @FXML private TextField buscarPedidoField;
+    @FXML private Button buscarPedidoButton;
     @FXML private Button verDetallesButton;
     @FXML private Label pedidoIdLabel;
     @FXML private Label clienteLabel;
@@ -87,6 +88,7 @@ public class PlanificacionController {
             }
         });
 
+        buscarPedidoButton.setOnAction(event -> buscarPedido(buscarPedidoField.getText()));
         verDetallesButton.setOnAction(event -> verDetallesPedido());
         actualizarButton.setOnAction(event -> actualizarEstadoPedido());
         marcarListoButton.setOnAction(event -> marcarComoListo());
@@ -119,7 +121,7 @@ public class PlanificacionController {
                     "FROM pedidos p " +
                     "INNER JOIN clientes c ON p.id_cliente = c.id_cliente " +
                     "INNER JOIN productos pr ON p.id_producto = pr.id_producto " +
-                    "WHERE p.estado IN ('Confirmado', 'En producción') " +
+                    "WHERE p.estado IN ('Confirmado', 'En producción', 'Listo') " +
                     "AND p.fecha_entrega >= DATEADD(DAY, -DATEPART(WEEKDAY, GETDATE()), GETDATE()) " +
                     "AND p.fecha_entrega <= DATEADD(DAY, 6 - DATEPART(WEEKDAY, GETDATE()), GETDATE()) " +
                     "ORDER BY p.fecha_entrega";
@@ -364,7 +366,7 @@ public class PlanificacionController {
     private void marcarComoListo() {
         if (pedidoSeleccionado != null) {
             try (Connection conn = dbConnection.getConnection()) {
-                String sql = "UPDATE pedidos SET estado = 'Listo para entregar' " +
+                String sql = "UPDATE pedidos SET estado = 'Listo' " +
                         "WHERE id_pedido = ?";
 
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -372,7 +374,7 @@ public class PlanificacionController {
                     int filasAfectadas = stmt.executeUpdate();
 
                     if (filasAfectadas > 0) {
-                        mostrarMensaje("Pedido Actualizado", "El pedido ha sido marcado como listo para entregar.");
+                        mostrarMensaje("Pedido Actualizado", "El pedido ha sido marcado como listo para entregar. Consulte la planificación semanal para ver el estado actualizado.");
                         cargarPedidosConfirmados();
                     } else {
                         mostrarError("Error al Actualizar", "No se pudo actualizar el estado del pedido.");
