@@ -1,0 +1,128 @@
+<!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
+<jasperReport name="Reporte_Inventario" language="java" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5c000afe-9c6a-4063-babd-098f7a4f81b9">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Reposteria.jrdax"/>
+	<style name="TituloEmpresa" fontName="Times New Roman" fontSize="22.0" bold="true"/>
+	<style name="SubtituloRojo" forecolor="#8B4513" fontName="Arial" fontSize="12.0" bold="true"/>
+	<style name="TextoItalica" fontName="Arial" fontSize="9.0" italic="true"/>
+	<style name="TextoDireccion" fontName="Arial" fontSize="8.0"/>
+	<style name="TituloReporte" forecolor="#8B4513" fontName="Arial" fontSize="14.0" bold="true"/>
+	<style name="EncabezadoCol" forecolor="#8B4513" fontName="Arial" fontSize="9.0" bold="true"/>
+	<style name="TextoNormal" fontName="Arial" fontSize="9.0"/>
+	<style name="TextoPie" fontName="Arial" fontSize="8.0" italic="true"/>
+	<style name="TextoPieNormal" fontName="Arial" fontSize="8.0"/>
+	<field name="id_inventario" class="java.lang.Integer"/>
+	<field name="ingrediente" class="java.lang.String"/>
+	<field name="stock_actual" class="java.math.BigDecimal"/>
+	<field name="stock_minimo" class="java.math.BigDecimal"/>
+	<field name="unidad" class="java.lang.String"/>
+	<title height="130" splitType="Stretch">
+		<element kind="rectangle" uuid="dc125585-0c1a-439e-b5ed-17385d9e2743" x="0" y="0" width="555" height="3" forecolor="#8B4513" backcolor="#8B4513">
+			<pen lineWidth="0.0"/>
+		</element>
+		<element kind="staticText" uuid="74492314-b774-48c9-b8ca-5cb441724a0f" x="0" y="10" width="555" height="30" fontName="Times New Roman" fontSize="22.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[REPOSTERÍA ROSATO]]></text>
+		</element>
+		<element kind="staticText" uuid="b8c4b3e3-eeea-462a-81fe-28984e091677" x="0" y="40" width="555" height="18" forecolor="#8B4513" fontName="Arial" fontSize="11.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[INVENTARIO DE INGREDIENTES]]></text>
+		</element>
+		<element kind="staticText" uuid="7be01b93-96d8-4c9e-bfd7-7a34186f0aa8" x="0" y="62" width="555" height="14" fontName="Arial" fontSize="8.0" italic="true" hTextAlign="Center">
+			<text><![CDATA[Fabricación y venta de productos de pastelería]]></text>
+		</element>
+		<element kind="staticText" uuid="441f353c-b1ed-4a44-affc-158f18abe2a1" x="0" y="76" width="555" height="14" fontName="Arial" fontSize="8.0" hTextAlign="Center">
+			<text><![CDATA[Calle Dionisio Delgallido #2 Primer nivel, Guayabal, Punta. Tel: (829) 889-0270]]></text>
+		</element>
+		<element kind="textField" uuid="5f34fd15-0050-4cd2-a9d7-886c57464e1a" x="0" y="93" width="555" height="14" fontName="Arial" fontSize="8.0" italic="true" hTextAlign="Center">
+			<expression><![CDATA["Generado el: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></expression>
+		</element>
+		<element kind="line" uuid="eeb34f5d-2883-417c-a02d-73471ceaa78a" x="0" y="115" width="555" height="1" forecolor="#8B4513">
+			<pen lineWidth="1.5"/>
+		</element>
+		<element kind="line" uuid="aaea7f22-953c-45a7-9361-7386050620c9" x="0" y="118" width="555" height="1" forecolor="#8B4513">
+			<pen lineWidth="0.5"/>
+		</element>
+	</title>
+	<columnHeader height="28" splitType="Stretch">
+		<element kind="rectangle" uuid="d3c58995-1929-445e-a653-6e1ec6f510ce" x="0" y="0" width="555" height="28" forecolor="#8B4513" backcolor="#FFE4E1">
+			<pen lineWidth="0.8" lineColor="#8B4513"/>
+		</element>
+		<element kind="staticText" uuid="fb287132-9488-48ba-bd19-1470ee5700a5" x="0" y="4" width="80" height="20" forecolor="#8B4513" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[CANTIDAD]]></text>
+		</element>
+		<element kind="line" uuid="502f7959-e689-4257-bb3d-f6c66cadf46f" x="80" y="0" width="1" height="28" forecolor="#8B4513">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="staticText" uuid="29fa558e-4dde-4761-9b3f-d8fae81a0f43" x="81" y="4" width="209" height="20" forecolor="#8B4513" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[INGREDIENTE]]></text>
+		</element>
+		<element kind="line" uuid="6795971a-81cb-43b6-a3f9-3c7861c24001" x="290" y="0" width="1" height="28" forecolor="#8B4513">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="staticText" uuid="6fa14c57-934a-4422-94bc-519a74d1571a" x="291" y="4" width="79" height="20" forecolor="#8B4513" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[UNIDAD]]></text>
+		</element>
+		<element kind="line" uuid="b0afe8a0-770c-449a-906c-4a4afcd10989" x="370" y="0" width="1" height="28" forecolor="#8B4513">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="staticText" uuid="a87b4bcf-9eb6-4c93-aab9-d07019d54c4d" x="371" y="4" width="89" height="20" forecolor="#8B4513" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[STOCK MÍN.]]></text>
+		</element>
+		<element kind="line" uuid="f16fe4ef-9cdb-4128-a625-2201dde6ea29" x="460" y="0" width="1" height="28" forecolor="#8B4513">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="staticText" uuid="7d73c9f0-dcb6-4b3d-ae73-8e10a6b04f54" x="461" y="4" width="94" height="20" forecolor="#8B4513" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[ESTADO]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<element kind="textField" uuid="39964766-9c4b-462c-a069-63654c8d1dbf" x="0" y="1" width="80" height="20" fontName="Arial" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{stock_actual}]]></expression>
+			</element>
+			<element kind="textField" uuid="11259117-512e-42cc-87e0-66f1481a9637" x="81" y="1" width="209" height="20" fontName="Arial" fontSize="9.0" vTextAlign="Middle">
+				<expression><![CDATA[$F{ingrediente}]]></expression>
+			</element>
+			<element kind="textField" uuid="2428e4f7-2a14-465f-9f8f-5e89fec23b6f" x="291" y="1" width="79" height="20" fontName="Arial" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{unidad}]]></expression>
+			</element>
+			<element kind="textField" uuid="aec2af2c-bd8d-41b3-8663-f4711ef08faa" x="371" y="1" width="89" height="20" fontName="Arial" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{stock_minimo}]]></expression>
+			</element>
+			<element kind="rectangle" uuid="4f216985-0747-4cac-82a3-cf24b4039a79" x="461" y="2" width="94" height="18" forecolor="#FFCCCC" backcolor="#FFCCCC">
+				<printWhenExpression><![CDATA[$F{stock_actual}.doubleValue() < $F{stock_minimo}.doubleValue()]]></printWhenExpression>
+				<pen lineWidth="0.0"/>
+			</element>
+			<element kind="rectangle" uuid="95de8791-1d7e-4209-bdd3-1e02acbf5ded" x="461" y="2" width="94" height="18" forecolor="#CCFFCC" backcolor="#CCFFCC">
+				<printWhenExpression><![CDATA[$F{stock_actual}.doubleValue() >= $F{stock_minimo}.doubleValue()]]></printWhenExpression>
+				<pen lineWidth="0.0"/>
+			</element>
+			<element kind="textField" uuid="649530b4-e169-4b7c-bc53-946915bb511b" x="461" y="2" width="94" height="18" forecolor="#CC0000" fontName="Arial" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+				<printWhenExpression><![CDATA[$F{stock_actual}.doubleValue() < $F{stock_minimo}.doubleValue()]]></printWhenExpression>
+				<expression><![CDATA["¡ALERTA!"]]></expression>
+			</element>
+			<element kind="textField" uuid="706128ee-99fc-4a1e-a5f7-ce47482d1066" x="461" y="2" width="94" height="18" forecolor="#006600" fontName="Arial" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+				<printWhenExpression><![CDATA[$F{stock_actual}.doubleValue() >= $F{stock_minimo}.doubleValue()]]></printWhenExpression>
+				<expression><![CDATA["OK"]]></expression>
+			</element>
+			<element kind="line" uuid="0d9bb76c-c696-4d7c-96b8-8a56c9b482c1" x="0" y="21" width="555" height="1" forecolor="#DDDDDD">
+				<pen lineWidth="0.5"/>
+			</element>
+		</band>
+	</detail>
+	<pageFooter height="55" splitType="Stretch">
+		<element kind="line" uuid="ee9e9deb-fe49-41b8-99a0-b7482ea47698" x="0" y="3" width="555" height="1" forecolor="#8B4513">
+			<pen lineWidth="1.5"/>
+		</element>
+		<element kind="line" uuid="fa080d39-442a-442d-ad2d-a97f3a969cf9" x="0" y="6" width="555" height="1" forecolor="#8B4513">
+			<pen lineWidth="0.5"/>
+		</element>
+		<element kind="staticText" uuid="d09444f4-ad66-4263-843e-e395a235cf54" x="0" y="12" width="555" height="14" fontName="Arial" fontSize="8.0" italic="true" hTextAlign="Center">
+			<text><![CDATA[Nota: Revise su inventario antes de cada producción. No aceptamos devoluciones en productos.]]></text>
+		</element>
+		<element kind="textField" uuid="54db98ff-d504-4f12-b6fe-9128a340f43d" x="0" y="30" width="280" height="14" fontName="Arial" fontSize="8.0">
+			<expression><![CDATA["Total de ingredientes: " + $V{REPORT_COUNT}]]></expression>
+		</element>
+		<element kind="textField" uuid="dd8ddfc0-f293-4325-b62b-499631b1dac1" x="460" y="30" width="95" height="14" fontName="Arial" fontSize="8.0" hTextAlign="Right">
+			<expression><![CDATA["Pág. " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+	</pageFooter>
+</jasperReport>
