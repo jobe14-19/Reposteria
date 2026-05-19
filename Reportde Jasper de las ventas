@@ -1,0 +1,84 @@
+<!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
+<jasperReport name="Reporte_Ventas_Rosato" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0fa12345-c123-4444-b123-d123456789de">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="fechaInicio" class="java.sql.Date"/>
+	<parameter name="fechaFin" class="java.sql.Date"/>
+	<query language="SQL"><![CDATA[SELECT 
+			f.id_factura,
+			f.fecha_venta,
+			c.nombre_cliente,
+			c.rnc_cedula,
+			f.total_pago
+		FROM Facturas f
+		INNER JOIN Clientes c ON f.id_cliente = c.id_cliente
+		WHERE f.fecha_venta BETWEEN $P{fechaInicio} AND $P{fechaFin}
+		ORDER BY f.fecha_venta ASC]]></query>
+	<field name="id_factura" class="java.lang.Integer"/>
+	<field name="fecha_venta" class="java.sql.Date"/>
+	<field name="nombre_cliente" class="java.lang.String"/>
+	<field name="rnc_cedula" class="java.lang.String"/>
+	<field name="total_pago" class="java.math.BigDecimal"/>
+	<variable name="totalGeneralVentas" calculation="Sum" class="java.math.BigDecimal">
+		<expression><![CDATA[$F{total_pago}]]></expression>
+	</variable>
+	<background splitType="Stretch"/>
+	<title height="90" splitType="Stretch">
+		<element kind="staticText" uuid="1fa12345-e123-4b12-c123-d12345678901" x="0" y="5" width="555" height="26" forecolor="#5C3A21" fontName="Arial" fontSize="18.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[REPOSTERÍA ROSATO]]></text>
+		</element>
+		<element kind="staticText" uuid="2fa12345-e123-4b12-c123-d12345678902" x="0" y="31" width="555" height="16" forecolor="#8C6239" fontName="Arial" fontSize="11.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[REPORTE DE VENTAS POR FECHAS]]></text>
+		</element>
+		<element kind="textField" uuid="3fa12345-e123-4b12-c123-d12345678903" x="0" y="55" width="555" height="20" forecolor="#666666" fontName="Arial" fontSize="10.0" italic="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA["Período: " + new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{fechaInicio}) + " al " + new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{fechaFin})]]></expression>
+		</element>
+		<element kind="line" uuid="4fa12345-e123-4b12-c123-d12345678904" x="0" y="80" width="555" height="1" forecolor="#5C3A21"/>
+	</title>
+	<columnHeader height="25" splitType="Stretch">
+		<element kind="rectangle" uuid="5fa12345-c123-4b12-c123-d12345678901" x="0" y="0" width="555" height="25" forecolor="#5C3A21" backcolor="#FFF0F5"/>
+		<element kind="staticText" uuid="6fa12345-c123-4b12-c123-d12345678902" x="5" y="0" width="75" height="25" forecolor="#5C3A21" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[FACTURA]]></text>
+		</element>
+		<element kind="staticText" uuid="7fa12345-c123-4b12-c123-d12345678903" x="85" y="0" width="90" height="25" forecolor="#5C3A21" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[FECHA VENTA]]></text>
+		</element>
+		<element kind="staticText" uuid="8fa12345-c123-4b12-c123-d12345678904" x="180" y="0" width="180" height="25" forecolor="#5C3A21" fontName="Arial" fontSize="9.0" bold="true" vTextAlign="Middle">
+			<text><![CDATA[CLIENTE]]></text>
+		</element>
+		<element kind="staticText" uuid="9fa12345-c123-4b12-c123-d12345678905" x="365" y="0" width="100" height="25" forecolor="#5C3A21" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[RNC / CÉDULA]]></text>
+		</element>
+		<element kind="staticText" uuid="afa12345-c123-4b12-c123-d12345678906" x="470" y="0" width="80" height="25" forecolor="#5C3A21" fontName="Arial" fontSize="9.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+			<text><![CDATA[MONTO TOTAL]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<element kind="textField" uuid="bfa12345-e123-4b12-c123-d12345678901" x="5" y="1" width="75" height="20" fontName="Arial" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[String.format("%06d", $F{id_factura})]]></expression>
+			</element>
+			<element kind="textField" uuid="cfa12345-e123-4b12-c123-d12345678902" x="85" y="1" width="90" height="20" fontName="Arial" fontSize="9.0" pattern="dd/MM/yyyy" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{fecha_venta}]]></expression>
+			</element>
+			<element kind="textField" uuid="dfa12345-e123-4b12-c123-d12345678903" x="180" y="1" width="180" height="20" fontName="Arial" fontSize="9.0" vTextAlign="Middle">
+				<expression><![CDATA[$F{nombre_cliente} != null ? $F{nombre_cliente}.toUpperCase() : "PÚBLICO GENERAL"]]></expression>
+			</element>
+			<element kind="textField" uuid="efa12345-e123-4b12-c123-d12345678904" x="365" y="1" width="100" height="20" fontName="Arial" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{rnc_cedula} != null ? $F{rnc_cedula} : "PÚBLICO GENERAL"]]></expression>
+			</element>
+			<element kind="textField" uuid="ffa12345-e123-4b12-c123-d12345678905" x="470" y="1" width="80" height="20" fontName="Arial" fontSize="9.0" pattern="RD$ #,##0.00" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{total_pago}]]></expression>
+			</element>
+			<element kind="line" uuid="0ba12345-e123-4b12-c123-d12345678906" x="0" y="21" width="555" height="1" forecolor="#F0F0F0"/>
+		</band>
+	</detail>
+	<summary height="50" splitType="Stretch">
+		<element kind="rectangle" uuid="1ba12345-e123-4b12-c123-d12345678901" x="300" y="10" width="255" height="30" forecolor="#5C3A21" backcolor="#FAFAFA"/>
+		<element kind="staticText" uuid="2ba12345-e123-4b12-c123-d12345678902" x="305" y="15" width="135" height="20" forecolor="#5C3A21" fontName="Arial" fontSize="10.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+			<text><![CDATA[TOTAL VENTAS PERÍODO:]]></text>
+		</element>
+		<element kind="textField" uuid="3ba12345-e123-4b12-c123-d12345678903" x="445" y="15" width="105" height="20" forecolor="#5C3A21" fontName="Arial" fontSize="10.0" pattern="RD$ #,##0.00" bold="true" hTextAlign="Right" vTextAlign="Middle">
+			<expression><![CDATA[$V{totalGeneralVentas} != null ? $V{totalGeneralVentas} : java.math.BigDecimal.ZERO]]></expression>
+		</element>
+	</summary>
+</jasperReport>
