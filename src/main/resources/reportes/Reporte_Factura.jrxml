@@ -1,0 +1,377 @@
+﻿<!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+               name="Reporte_Factura_Dinamico" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" >
+	<parameter name="ID_FACTURA" class="java.lang.Integer"/>
+<queryString language="sql"><![CDATA[SELECT 
+    p.id_pedido as id_factura,
+    CAST(p.fecha_pedido AS DATE) as fecha_venta,
+    CAST(p.fecha_entrega AS DATE) as fecha_entrega,
+    p.estado,
+    c.nombre + ' ' + c.apellido as nombre_cliente,
+    pr.nombre as producto_nombre,
+    p.libras as cantidad,
+    CASE WHEN p.libras > 0 THEN p.total / p.libras ELSE 0 END as precio_unitario,
+    p.total as subtotal,
+    p.total as total_pago
+FROM pedidos p
+INNER JOIN clientes c ON p.id_cliente = c.id_cliente
+INNER JOIN productos pr ON p.id_producto = pr.id_producto
+WHERE p.id_pedido = $P{ID_FACTURA}
+ORDER BY p.id_pedido DESC]]></queryString>
+	<field name="id_factura" class="java.lang.Integer"/>
+	<field name="fecha_venta" class="java.sql.Date"/>
+	<field name="fecha_entrega" class="java.sql.Date"/>
+	<field name="estado" class="java.lang.String"/>
+	<field name="nombre_cliente" class="java.lang.String"/>
+	<field name="producto_nombre" class="java.lang.String"/>
+	<field name="cantidad" class="java.math.BigDecimal"/>
+	<field name="precio_unitario" class="java.math.BigDecimal"/>
+	<field name="subtotal" class="java.math.BigDecimal"/>
+	<field name="total_pago" class="java.math.BigDecimal"/>
+	<background>
+		<band height="140">
+			<rectangle>
+    <reportElement x="-5" y="0" width="345" height="30" forecolor="#FFE7ED" backcolor="#FFE7ED"/>
+</rectangle>
+		</band>
+	</background>
+	<title>
+		<band height="100" splitType="Stretch">
+		<staticText>
+        <reportElement x="0" y="5" width="340" height="28" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="20.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[REPOSTERÍA ROSATO]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="0" y="33" width="340" height="15" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="10.0" isItalic="true"/>
+        </textElement>
+        <text><![CDATA[Fabricación y venta de productos de pastelería]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="0" y="50" width="340" height="35" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <text><![CDATA[Calle Dionisio Delgallido #2 Primer nivel, Guayabal, Punal.
+Tel: (829) 889-0270 ]]></text>
+    </staticText>
+		<rectangle>
+    <reportElement x="360" y="0" width="195" height="85" forecolor="#5D4037" backcolor="#FFF5F7"/>
+</rectangle>
+		<staticText>
+        <reportElement x="360" y="10" width="195" height="20" forecolor="#5D4037"/>
+        <textElement textAlignment="Center">
+            <font fontName="Arial" size="12.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[ORDEN DE PRODUCCION]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="365" y="35" width="80" height="20" forecolor="#5D4037"/>
+        <textElement textAlignment="Right">
+            <font fontName="Arial" size="11.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[No. Orden:]]></text>
+    </staticText>
+		<textField>
+        <reportElement x="450" y="35" width="100" height="20" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="11.0" isBold="true"/>
+        </textElement>
+        <textFieldExpression><![CDATA[String.format("%06d", $F{id_factura})]]></textFieldExpression>
+    </textField>
+		<staticText>
+        <reportElement x="365" y="58" width="80" height="15" forecolor="#5D4037"/>
+        <textElement textAlignment="Right">
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Estado:]]></text>
+    </staticText>
+		<textField>
+        <reportElement x="450" y="58" width="100" height="15" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{estado}]]></textFieldExpression>
+    </textField>
+	</band>
+	</title>
+	<pageHeader>
+		<band height="115" splitType="Stretch">
+		<rectangle>
+    <reportElement x="0" y="0" width="555" height="105" forecolor="#5D4037" backcolor="#FFFFFF"/>
+</rectangle>
+		<line>
+    <reportElement x="0" y="26" width="555" height="1" forecolor="#5D4037"/>
+</line>
+		<line>
+    <reportElement x="0" y="52" width="555" height="1" forecolor="#5D4037"/>
+</line>
+		<line>
+    <reportElement x="0" y="78" width="555" height="1" forecolor="#5D4037"/>
+</line>
+		<line>
+    <reportElement x="340" y="0" width="1" height="105" forecolor="#5D4037"/>
+</line>
+		<staticText>
+        <reportElement x="8" y="5" width="62" height="16" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Señor/a:]]></text>
+    </staticText>
+		<textField>
+        <reportElement x="75" y="5" width="255" height="16"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{nombre_cliente}]]></textFieldExpression>
+    </textField>
+		<staticText>
+        <reportElement x="348" y="5" width="82" height="16" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Fecha Emisión:]]></text>
+    </staticText>
+		<textField pattern="dd/MM/yyyy">
+        <reportElement x="435" y="5" width="112" height="16"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{fecha_venta}]]></textFieldExpression>
+    </textField>
+		<staticText>
+        <reportElement x="8" y="31" width="62" height="16" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Dirección:]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="348" y="31" width="82" height="16" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Fecha Entrega:]]></text>
+    </staticText>
+		<textField pattern="dd/MM/yyyy">
+        <reportElement x="435" y="31" width="112" height="16"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{fecha_entrega}]]></textFieldExpression>
+    </textField>
+		<staticText>
+        <reportElement x="8" y="57" width="62" height="16" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Sucursal:]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="348" y="57" width="82" height="16" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Vendedor:]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="435" y="57" width="112" height="16"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <text><![CDATA[SISTEMA ROSATO]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="8" y="83" width="62" height="16" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Condiciones:]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="348" y="83" width="82" height="16" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Tipo de Venta:]]></text>
+    </staticText>
+	</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+		<rectangle>
+    <reportElement x="0" y="0" width="555" height="30" forecolor="#5D4037" backcolor="#FFE7ED"/>
+</rectangle>
+		<staticText>
+        <reportElement x="0" y="5" width="70" height="20" forecolor="#5D4037"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle">
+            <font fontName="Arial" size="10.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Cantidad]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="75" y="5" width="280" height="20" forecolor="#5D4037"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="10.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Descripción del Producto / Especificación]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="360" y="5" width="90" height="20" forecolor="#5D4037"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="10.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[P. Unitario]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="455" y="5" width="95" height="20" forecolor="#5D4037"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="10.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Total]]></text>
+    </staticText>
+	</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<line>
+    <reportElement x="0" y="0" width="1" height="25" forecolor="#5D4037"/>
+</line>
+			<line>
+    <reportElement x="70" y="0" width="1" height="25" forecolor="#5D4037"/>
+</line>
+			<line>
+    <reportElement x="355" y="0" width="1" height="25" forecolor="#5D4037"/>
+</line>
+			<line>
+    <reportElement x="450" y="0" width="1" height="25" forecolor="#5D4037"/>
+</line>
+			<line>
+    <reportElement x="555" y="0" width="1" height="25" forecolor="#5D4037"/>
+</line>
+			<textField>
+        <reportElement x="0" y="2" width="70" height="20"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+    </textField>
+			<textField>
+        <reportElement x="78" y="2" width="272" height="20"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{producto_nombre}]]></textFieldExpression>
+    </textField>
+			<textField pattern="RD$ #,##0.00">
+        <reportElement x="360" y="2" width="85" height="20"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{precio_unitario}]]></textFieldExpression>
+    </textField>
+			<textField pattern="RD$ #,##0.00">
+        <reportElement x="455" y="2" width="92" height="20"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
+    </textField>
+			<line>
+    <reportElement x="0" y="24" width="555" height="1" forecolor="#5D4037"/>
+</line>
+		</band>
+	</detail>
+	<summary>
+		<band height="120" splitType="Stretch">
+		<rectangle>
+    <reportElement x="0" y="10" width="340" height="95" forecolor="#5D4037" backcolor="#FFFFFF"/>
+</rectangle>
+		<staticText>
+        <reportElement x="8" y="15" width="100" height="14" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="8.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Persona que retira:]]></text>
+    </staticText>
+		<line>
+    <reportElement x="8" y="70" width="160" height="1" forecolor="#5D4037"/>
+</line>
+		<staticText>
+        <reportElement x="8" y="74" width="160" height="12" forecolor="#5D4037"/>
+        <textElement textAlignment="Center">
+            <font fontName="Arial" size="8.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[Firma / Conformidad]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="180" y="15" width="150" height="35" forecolor="#5D4037"/>
+        <textElement>
+            <font fontName="Arial" size="8.0" isItalic="true"/>
+        </textElement>
+        <text><![CDATA[Nota: Revise su producto antes de salir de la repostería. No aceptamos devoluciones en productos personalizados.]]></text>
+    </staticText>
+		<rectangle>
+    <reportElement x="355" y="10" width="200" height="95" forecolor="#5D4037" backcolor="#FFF5F7"/>
+</rectangle>
+		<line>
+    <reportElement x="355" y="32" width="200" height="1" forecolor="#5D4037"/>
+</line>
+		<line>
+    <reportElement x="355" y="55" width="200" height="1" forecolor="#5D4037"/>
+</line>
+		<line>
+    <reportElement x="450" y="10" width="1" height="95" forecolor="#5D4037"/>
+</line>
+		<staticText>
+        <reportElement x="360" y="15" width="85" height="14" forecolor="#5D4037"/>
+        <textElement textAlignment="Right">
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[NETO:]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="360" y="38" width="85" height="14" forecolor="#5D4037"/>
+        <textElement textAlignment="Right">
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[ITBIS (18%):]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="360" y="68" width="85" height="20" forecolor="#5D4037"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="11.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[TOTAL:]]></text>
+    </staticText>
+		<textField pattern="RD$ #,##0.00">
+        <reportElement x="455" y="15" width="95" height="14"/>
+        <textElement textAlignment="Right">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{total_pago}.multiply(new java.math.BigDecimal("0.82"))]]></textFieldExpression>
+    </textField>
+		<textField pattern="RD$ #,##0.00">
+        <reportElement x="455" y="38" width="95" height="14"/>
+        <textElement textAlignment="Right">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{total_pago}.multiply(new java.math.BigDecimal("0.18"))]]></textFieldExpression>
+    </textField>
+		<textField pattern="RD$ #,##0.00">
+        <reportElement x="455" y="68" width="95" height="20" forecolor="#5D4037"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="11.0" isBold="true"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{total_pago}]]></textFieldExpression>
+    </textField>
+	</band>
+	</summary>
+</jasperReport>

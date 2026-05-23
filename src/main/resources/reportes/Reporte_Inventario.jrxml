@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="Reporte_Inventario" pageWidth="612" pageHeight="792"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="Reposteria.jrdax"/>
+
+    <!-- ============================================= -->
+    <!-- ESTILOS                                       -->
+    <!-- ============================================= -->
+    <style name="TituloEmpresa"    fontName="Times New Roman" fontSize="22" isBold="true"/>
+    <style name="SubtituloRojo"    fontName="Arial"           fontSize="12" isBold="true"   forecolor="#8B4513"/>
+    <style name="TextoItalica"     fontName="Arial"           fontSize="9"  isItalic="true"/>
+    <style name="TextoDireccion"   fontName="Arial"           fontSize="8"/>
+    <style name="TituloReporte"    fontName="Arial"           fontSize="14" isBold="true"   forecolor="#8B4513"/>
+    <style name="EncabezadoCol"    fontName="Arial"           fontSize="9"  isBold="true"   forecolor="#8B4513"/>
+    <style name="TextoNormal"      fontName="Arial"           fontSize="9"/>
+    <style name="TextoPie"         fontName="Arial"           fontSize="8"  isItalic="true"/>
+    <style name="TextoPieNormal"   fontName="Arial"           fontSize="8"/>
+
+    <queryString language="SQL"><![CDATA[
+        SELECT i.id_ingrediente as id_inventario, i.nombre as ingrediente,
+               i.stock_actual, i.stock_minimo, i.unidad
+        FROM ingredientes i
+        ORDER BY i.nombre
+    ]]></queryString>
+
+    <!-- ============================================= -->
+    <!-- CAMPOS DE LA BASE DE DATOS                    -->
+    <!-- ============================================= -->
+    <field name="id_inventario" class="java.lang.Integer"/>
+    <field name="ingrediente"   class="java.lang.String"/>
+    <field name="stock_actual"  class="java.math.BigDecimal"/>
+    <field name="stock_minimo"  class="java.math.BigDecimal"/>
+    <field name="unidad"        class="java.lang.String"/>
+
+    <!-- ============================================= -->
+    <!-- TÍTULO PRINCIPAL                              -->
+    <!-- ============================================= -->
+    <title>
+        <band height="130" splitType="Stretch">
+
+            <!-- Línea superior marrón -->
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="3" backcolor="#8B4513" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+
+            <!-- REPOSTERÍA ROSATO -->
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="30" style="TituloEmpresa"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Times New Roman" size="22" isBold="true"/>
+                </textElement>
+                <text><![CDATA[REPOSTERÍA ROSATO]]></text>
+            </staticText>
+
+            <!-- Subtítulo rojo/marrón -->
+            <staticText>
+                <reportElement x="0" y="40" width="555" height="18" forecolor="#8B4513"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[INVENTARIO DE INGREDIENTES]]></text>
+            </staticText>
+
+            <!-- Dirección -->
+            <staticText>
+                <reportElement x="0" y="62" width="555" height="14"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Fabricación y venta de productos de pastelería]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="0" y="76" width="555" height="14"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <text><![CDATA[Calle Dionisio Delgallido #2 Primer nivel, Guayabal, Punta. Tel: (829) 889-0270]]></text>
+            </staticText>
+
+            <!-- Período / fecha generación -->
+            <textField>
+                <reportElement x="0" y="93" width="555" height="14"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isItalic="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Generado el: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+
+            <!-- Línea inferior marrón -->
+            <line>
+                <reportElement x="0" y="115" width="555" height="1" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="1.5"/></graphicElement>
+            </line>
+            <line>
+                <reportElement x="0" y="118" width="555" height="1" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement>
+            </line>
+        </band>
+    </title>
+
+    <!-- ============================================= -->
+    <!-- ENCABEZADO DE COLUMNAS (fondo rosado claro)  -->
+    <!-- ============================================= -->
+    <columnHeader>
+        <band height="28" splitType="Stretch">
+
+            <!-- Fondo rosado general -->
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="28" backcolor="#FFE4E1" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="0.8" lineColor="#8B4513"/></graphicElement>
+            </rectangle>
+
+            <!-- CANTIDAD -->
+            <staticText>
+                <reportElement x="0" y="4" width="80" height="20" forecolor="#8B4513"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[CANTIDAD]]></text>
+            </staticText>
+
+            <!-- separador vertical -->
+            <line>
+                <reportElement x="80" y="0" width="1" height="28" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement>
+            </line>
+
+            <!-- INGREDIENTE -->
+            <staticText>
+                <reportElement x="81" y="4" width="209" height="20" forecolor="#8B4513"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[INGREDIENTE]]></text>
+            </staticText>
+
+            <line>
+                <reportElement x="290" y="0" width="1" height="28" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement>
+            </line>
+
+            <!-- UNIDAD -->
+            <staticText>
+                <reportElement x="291" y="4" width="79" height="20" forecolor="#8B4513"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[UNIDAD]]></text>
+            </staticText>
+
+            <line>
+                <reportElement x="370" y="0" width="1" height="28" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement>
+            </line>
+
+            <!-- STOCK MÍN -->
+            <staticText>
+                <reportElement x="371" y="4" width="89" height="20" forecolor="#8B4513"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[STOCK MÍN.]]></text>
+            </staticText>
+
+            <line>
+                <reportElement x="460" y="0" width="1" height="28" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement>
+            </line>
+
+            <!-- ESTADO -->
+            <staticText>
+                <reportElement x="461" y="4" width="94" height="20" forecolor="#8B4513"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[ESTADO]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- ============================================= -->
+    <!-- DETALLE DEL INVENTARIO                        -->
+    <!-- ============================================= -->
+    <detail>
+        <band height="22" splitType="Stretch">
+
+            <!-- stock_actual -->
+            <textField>
+                <reportElement x="0" y="1" width="80" height="20">
+                    <printWhenExpression><![CDATA[true]]></printWhenExpression>
+                </reportElement>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{stock_actual}]]></textFieldExpression>
+            </textField>
+
+            <!-- ingrediente -->
+            <textField>
+                <reportElement x="81" y="1" width="209" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{ingrediente}]]></textFieldExpression>
+            </textField>
+
+            <!-- unidad -->
+            <textField>
+                <reportElement x="291" y="1" width="79" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{unidad}]]></textFieldExpression>
+            </textField>
+
+            <!-- stock_minimo -->
+            <textField>
+                <reportElement x="371" y="1" width="89" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{stock_minimo}]]></textFieldExpression>
+            </textField>
+
+            <!-- ESTADO: OK (verde) o ¡ALERTA! (rojo) -->
+            <!-- Fondo rojo cuando está en alerta -->
+            <rectangle>
+                <reportElement x="461" y="2" width="94" height="18" backcolor="#FFCCCC" forecolor="#FFCCCC">
+                    <printWhenExpression><![CDATA[$F{stock_actual}.doubleValue() < $F{stock_minimo}.doubleValue()]]></printWhenExpression>
+                </reportElement>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+            <!-- Fondo verde cuando está OK -->
+            <rectangle>
+                <reportElement x="461" y="2" width="94" height="18" backcolor="#CCFFCC" forecolor="#CCFFCC">
+                    <printWhenExpression><![CDATA[$F{stock_actual}.doubleValue() >= $F{stock_minimo}.doubleValue()]]></printWhenExpression>
+                </reportElement>
+                <graphicElement><pen lineWidth="0"/></graphicElement>
+            </rectangle>
+
+            <!-- Texto ALERTA -->
+            <textField>
+                <reportElement x="461" y="2" width="94" height="18" forecolor="#CC0000">
+                    <printWhenExpression><![CDATA[$F{stock_actual}.doubleValue() < $F{stock_minimo}.doubleValue()]]></printWhenExpression>
+                </reportElement>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["¡ALERTA!"]]></textFieldExpression>
+            </textField>
+
+            <!-- Texto OK -->
+            <textField>
+                <reportElement x="461" y="2" width="94" height="18" forecolor="#006600">
+                    <printWhenExpression><![CDATA[$F{stock_actual}.doubleValue() >= $F{stock_minimo}.doubleValue()]]></printWhenExpression>
+                </reportElement>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["OK"]]></textFieldExpression>
+            </textField>
+
+            <!-- Línea separadora entre filas -->
+            <line>
+                <reportElement x="0" y="21" width="555" height="1" forecolor="#DDDDDD"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement>
+            </line>
+        </band>
+    </detail>
+
+    <!-- ============================================= -->
+    <!-- PIE DE PÁGINA                                 -->
+    <!-- ============================================= -->
+    <pageFooter>
+        <band height="55" splitType="Stretch">
+
+            <!-- Doble línea marrón -->
+            <line>
+                <reportElement x="0" y="3" width="555" height="1" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="1.5"/></graphicElement>
+            </line>
+            <line>
+                <reportElement x="0" y="6" width="555" height="1" forecolor="#8B4513"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement>
+            </line>
+
+            <staticText>
+                <reportElement x="0" y="12" width="555" height="14"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Nota: Revise su inventario antes de cada producción. No aceptamos devoluciones en productos.]]></text>
+            </staticText>
+
+            <!-- Total ingredientes -->
+            <textField>
+                <reportElement x="0" y="30" width="280" height="14"/>
+                <textElement>
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Total de ingredientes: " + $V{REPORT_COUNT}]]></textFieldExpression>
+            </textField>
+
+            <!-- Número de página -->
+            <textField>
+                <reportElement x="460" y="30" width="95" height="14"/>
+                <textElement textAlignment="Right">
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Pág. " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+</jasperReport>

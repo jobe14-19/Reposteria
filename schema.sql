@@ -1,16 +1,17 @@
 -- ============================================
--- SCRIPT PARA CREAR LA BASE DE DATOS Reposteria
+-- SCRIPT PARA CREAR/ACTUALIZAR LA BD Reposteria
+-- ============================================
+-- ADVERTENCIA: Este script NO borra la BD existente.
+-- Todas las tablas usan IF NOT EXISTS para ser
+-- ejecutado múltiples veces sin perder datos.
+-- Si necesitas reiniciar desde cero, borra la BD
+-- manualmente: DROP DATABASE Reposteria;
 -- ============================================
 
--- Eliminar BD existente para refrescar esquemas y datos
-IF EXISTS (SELECT name FROM sys.databases WHERE name = 'Reposteria')
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'Reposteria')
 BEGIN
-    ALTER DATABASE Reposteria SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE Reposteria;
+    CREATE DATABASE Reposteria;
 END
-GO
-
-CREATE DATABASE Reposteria;
 GO
 
 USE Reposteria;
@@ -28,7 +29,7 @@ CREATE TABLE usuarios (
     usuario NVARCHAR(50) NOT NULL UNIQUE,
     contrasena NVARCHAR(100) NOT NULL,
     nombre NVARCHAR(100) NOT NULL,
-    perfil NVARCHAR(20) NOT NULL CHECK (perfil IN ('ADMIN', 'EMPLEADO', 'CLIENTE')),
+    perfil NVARCHAR(20) NOT NULL CHECK (perfil IN ('ADMIN', 'RECEPCION', 'PLANIFICADOR', 'ALMACEN', 'PRODUCCION', 'DECORACION', 'CONTABILIDAD', 'REPARTIDOR', 'RRHH', 'AUDITOR', 'CLIENTE')),
     estado NVARCHAR(10) DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Inactivo')),
     fecha_registro DATETIME DEFAULT GETDATE()
 );
@@ -209,7 +210,8 @@ CREATE TABLE ingredientes (
     unidad NVARCHAR(20),
     stock_actual DECIMAL(12,2) DEFAULT 0,
     stock_minimo DECIMAL(12,2) DEFAULT 0,
-    fecha_registro DATETIME DEFAULT GETDATE()
+    fecha_registro DATETIME DEFAULT GETDATE(),
+    estado NVARCHAR(10) DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Inactivo'))
 );
 END
 GO
@@ -323,7 +325,36 @@ CREATE TABLE entregas (
 END
 GO
 
--- 20. Actividad (auditoría)
+-- 20. Chef's Box (cajas especiales del chef)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[chefs_box]') AND type in (N'U'))
+BEGIN
+CREATE TABLE chefs_box (
+    id_chef_box INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100) NOT NULL,
+    descripcion NVARCHAR(500),
+    precio DECIMAL(12,2) DEFAULT 0,
+    disponible BIT DEFAULT 1,
+    fecha_creacion DATETIME DEFAULT GETDATE(),
+    fecha_modificacion DATETIME,
+    estado NVARCHAR(10) DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Inactivo'))
+);
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[chef_box_productos]') AND type in (N'U'))
+BEGIN
+CREATE TABLE chef_box_productos (
+    id_chef_box INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INT DEFAULT 1,
+    PRIMARY KEY (id_chef_box, id_producto),
+    FOREIGN KEY (id_chef_box) REFERENCES chefs_box(id_chef_box),
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+);
+END
+GO
+
+-- 21. Actividad (auditoría)
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[actividad]') AND type in (N'U'))
 BEGIN
 CREATE TABLE actividad (
@@ -358,11 +389,75 @@ BEGIN
 END
 GO
 
--- Usuario empleado
-IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'empleado')
+-- Usuario recepcion
+IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'recepcion')
 BEGIN
     INSERT INTO usuarios (usuario, contrasena, nombre, perfil, estado)
-    VALUES ('empleado', 'emp123', N'Empleado', 'EMPLEADO', 'Activo');
+    VALUES ('recepcion', 'rec123', N'Recepción', 'RECEPCION', 'Activo');
+END
+GO
+
+-- Usuario planificador
+IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'planificador')
+BEGIN
+    INSERT INTO usuarios (usuario, contrasena, nombre, perfil, estado)
+    VALUES ('planificador', 'plan123', N'Planificador', 'PLANIFICADOR', 'Activo');
+END
+GO
+
+-- Usuario almacen
+IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'almacen')
+BEGIN
+    INSERT INTO usuarios (usuario, contrasena, nombre, perfil, estado)
+    VALUES ('almacen', 'alm123', N'Almacén', 'ALMACEN', 'Activo');
+END
+GO
+
+-- Usuario produccion
+IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'produccion')
+BEGIN
+    INSERT INTO usuarios (usuario, contrasena, nombre, perfil, estado)
+    VALUES ('produccion', 'prod123', N'Producción', 'PRODUCCION', 'Activo');
+END
+GO
+
+-- Usuario decoracion
+IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'decoracion')
+BEGIN
+    INSERT INTO usuarios (usuario, contrasena, nombre, perfil, estado)
+    VALUES ('decoracion', 'dec123', N'Decoración', 'DECORACION', 'Activo');
+END
+GO
+
+-- Usuario contabilidad
+IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'contabilidad')
+BEGIN
+    INSERT INTO usuarios (usuario, contrasena, nombre, perfil, estado)
+    VALUES ('contabilidad', 'cont123', N'Contabilidad', 'CONTABILIDAD', 'Activo');
+END
+GO
+
+-- Usuario repartidor
+IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'repartidor')
+BEGIN
+    INSERT INTO usuarios (usuario, contrasena, nombre, perfil, estado)
+    VALUES ('repartidor', 'rep123', N'Repartidor', 'REPARTIDOR', 'Activo');
+END
+GO
+
+-- Usuario rrhh
+IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'rrhh')
+BEGIN
+    INSERT INTO usuarios (usuario, contrasena, nombre, perfil, estado)
+    VALUES ('rrhh', 'rrhh123', N'RRHH', 'RRHH', 'Activo');
+END
+GO
+
+-- Usuario auditor
+IF NOT EXISTS (SELECT 1 FROM usuarios WHERE usuario = 'auditor')
+BEGIN
+    INSERT INTO usuarios (usuario, contrasena, nombre, perfil, estado)
+    VALUES ('auditor', 'aud123', N'Auditor', 'AUDITOR', 'Activo');
 END
 GO
 
@@ -434,12 +529,20 @@ BEGIN
 END
 GO
 
--- Empleados iniciales (ID debe coincidir con usuarios.id_usuario para EMPLEADO)
+-- Empleados iniciales (ID debe coincidir con usuarios.id_usuario)
 IF NOT EXISTS (SELECT 1 FROM empleados WHERE id_empleado = 2)
 BEGIN
     SET IDENTITY_INSERT empleados ON;
     INSERT INTO empleados (id_empleado, nombre, cedula, telefono, area, estado) VALUES
-    (2, N'Empleado Demo', '001-0000000-1', '809-555-2001', N'Producción', 'Activo');
+    (2, N'Recepción Demo', '001-0000000-2', '809-555-2001', N'Ventas', 'Activo'),
+    (3, N'Planificador Demo', '001-0000000-3', '809-555-2002', N'Producción', 'Activo'),
+    (4, N'Almacén Demo', '001-0000000-4', '809-555-2003', N'Administración', 'Activo'),
+    (5, N'Producción Demo', '001-0000000-5', '809-555-2004', N'Producción', 'Activo'),
+    (6, N'Decoración Demo', '001-0000000-6', '809-555-2005', N'Decoración', 'Activo'),
+    (7, N'Contabilidad Demo', '001-0000000-7', '809-555-2006', N'Administración', 'Activo'),
+    (8, N'Repartidor Demo', '001-0000000-8', '809-555-2007', N'Delivery', 'Activo'),
+    (9, N'RRHH Demo', '001-0000000-9', '809-555-2008', N'Administración', 'Activo'),
+    (10, N'Auditor Demo', '001-0000000-0', '809-555-2009', N'Administración', 'Activo');
     SET IDENTITY_INSERT empleados OFF;
 END
 GO
@@ -509,14 +612,14 @@ END
 GO
 
 -- Más empleados
-IF NOT EXISTS (SELECT 1 FROM empleados WHERE id_empleado = 3)
+IF NOT EXISTS (SELECT 1 FROM empleados WHERE id_empleado = 11)
 BEGIN
     SET IDENTITY_INSERT empleados ON;
     INSERT INTO empleados (id_empleado, nombre, cedula, telefono, area, estado) VALUES
-    (3, N'Pedro Pérez', '001-1111111-1', '809-555-2002', N'Decoración', 'Activo'),
-    (4, N'Luisa Gómez', '001-2222222-2', '809-555-2003', N'Delivery', 'Activo'),
-    (5, N'José Hernández', '001-3333333-3', '809-555-2004', N'Limpieza', 'Activo'),
-    (6, N'Carmen Díaz', '001-4444444-4', '809-555-2005', N'Producción', 'Inactivo');
+    (11, N'Pedro Pérez', '001-1111111-1', '809-555-2010', N'Decoración', 'Activo'),
+    (12, N'Luisa Gómez', '001-2222222-2', '809-555-2011', N'Delivery', 'Activo'),
+    (13, N'José Hernández', '001-3333333-3', '809-555-2012', N'Limpieza', 'Activo'),
+    (14, N'Carmen Díaz', '001-4444444-4', '809-555-2013', N'Producción', 'Inactivo');
     SET IDENTITY_INSERT empleados OFF;
 END
 GO
