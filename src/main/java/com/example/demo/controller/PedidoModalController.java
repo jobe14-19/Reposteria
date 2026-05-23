@@ -36,8 +36,11 @@ public class PedidoModalController {
   private static final String SQL_OBTENER_ID_PRODUCTO =
   "SELECT id_producto FROM productos WHERE nombre = ?";
 
- private static final String SQL_OBTENER_PRECIOS_PRODUCTO =
- "SELECT precio_base, costo_disenio FROM productos WHERE nombre = ?";
+  private static final String SQL_INSERTAR_PRODUCTO =
+  "INSERT INTO productos (nombre, precio_base, costo_disenio, estado) VALUES (?, 0, 0, 'Activo')";
+
+  private static final String SQL_OBTENER_PRECIOS_PRODUCTO =
+  "SELECT precio_base, costo_disenio FROM productos WHERE nombre = ?";
 
  private static final String SQL_ACTUALIZAR_PEDIDO =
  "UPDATE pedidos SET id_cliente = ?, fecha_entrega = ?, id_producto = ?, libras = ?, diseno = ?, total = ?, adelanto = ?, observaciones = ? WHERE id_pedido = ?";
@@ -373,25 +376,40 @@ public class PedidoModalController {
  }
  }
 
- private int obtenerIdProducto(String producto) {
- if (producto == null || producto.trim().isEmpty()) {
- return 0;
- }
+  private int obtenerIdProducto(String producto) {
+  if (producto == null || producto.trim().isEmpty()) {
+  return 0;
+  }
 
- try (Connection conn = dbConnection.getConnection();
- PreparedStatement stmt = conn.prepareStatement(SQL_OBTENER_ID_PRODUCTO)) {
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(SQL_OBTENER_ID_PRODUCTO)) {
 
- stmt.setString(1, producto);
+  stmt.setString(1, producto);
 
- try (ResultSet rs = stmt.executeQuery()) {
- return rs.next() ? rs.getInt("id_producto") : 0;
- }
+  try (ResultSet rs = stmt.executeQuery()) {
+  if (rs.next()) return rs.getInt("id_producto");
+  }
 
- } catch (SQLException e) {
- LOGGER.log(Level.WARNING, "Error al obtener ID de producto: {0}", e.getMessage());
- return 0;
- }
- }
+  } catch (SQLException e) {
+  LOGGER.log(Level.WARNING, "Error al obtener ID de producto: {0}", e.getMessage());
+  }
+
+  return crearProducto(producto);
+  }
+
+  private int crearProducto(String nombre) {
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR_PRODUCTO, PreparedStatement.RETURN_GENERATED_KEYS)) {
+  stmt.setString(1, nombre);
+  stmt.executeUpdate();
+  try (ResultSet rs = stmt.getGeneratedKeys()) {
+  if (rs.next()) return rs.getInt(1);
+  }
+  } catch (SQLException e) {
+  LOGGER.log(Level.WARNING, "Error al crear producto automaticamente: {0}", e.getMessage());
+  }
+  return 0;
+  }
 
  private void calcularTotal() {
  String producto = tipoBizcochoComboBox.getSelectionModel().getSelectedItem();
