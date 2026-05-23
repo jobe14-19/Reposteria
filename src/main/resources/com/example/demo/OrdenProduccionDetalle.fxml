@@ -102,7 +102,7 @@
   </VBox>
 
   <!-- Acciones -->
-  <HBox spacing="10" alignment="CENTER_LEFT" wrapWidth="true">
+  <FlowPane spacing="10" alignment="CENTER_LEFT">
    <Label text="Cambiar Estado:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
    <ComboBox fx:id="estadoCombo" prefWidth="160"/>
    <Button fx:id="cambiarEstadoBtn" text="Aplicar" styleClass="btn-primary"/>
@@ -111,7 +111,7 @@
    <Button fx:id="verRecetaBtn" text="Ver Receta" styleClass="btn-secondary"/>
    <Button fx:id="editarBtn" text="Editar" styleClass="btn-secondary"/>
    <Button fx:id="imprimirBtn" text="Imprimir" styleClass="btn-primary"/>
-  </HBox>
+  </FlowPane>
 
   <!-- Ingredientes -->
   <VBox spacing="6">
