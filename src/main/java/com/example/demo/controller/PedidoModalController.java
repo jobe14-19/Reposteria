@@ -30,8 +30,11 @@ public class PedidoModalController {
  private static final String SQL_OBTENER_ID_CLIENTE =
  "SELECT id_cliente FROM clientes WHERE nombre + ' ' + apellido = ?";
 
- private static final String SQL_OBTENER_ID_PRODUCTO =
- "SELECT id_producto FROM productos WHERE nombre = ?";
+  private static final String SQL_CARGAR_PRODUCTOS =
+  "SELECT nombre FROM productos WHERE estado = 'Activo' ORDER BY nombre";
+
+  private static final String SQL_OBTENER_ID_PRODUCTO =
+  "SELECT id_producto FROM productos WHERE nombre = ?";
 
  private static final String SQL_OBTENER_PRECIOS_PRODUCTO =
  "SELECT precio_base, costo_disenio FROM productos WHERE nombre = ?";
@@ -98,15 +101,31 @@ public class PedidoModalController {
  setupSpinnerFactory();
  }
 
- private void initializeCombos() {
- cargarClientes();
- for (String tipo : TIPOS_BIZCOCHO) {
- tipoBizcochoComboBox.getItems().add(tipo);
- }
- tipoBizcochoComboBox.getSelectionModel().selectFirst();
- }
+  private void initializeCombos() {
+  cargarClientes();
+  cargarProductos();
+  }
 
- private void cargarClientes() {
+  private void cargarProductos() {
+  tipoBizcochoComboBox.getItems().clear();
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(SQL_CARGAR_PRODUCTOS);
+  ResultSet rs = stmt.executeQuery()) {
+  while (rs.next()) {
+  tipoBizcochoComboBox.getItems().add(rs.getString("nombre"));
+  }
+  } catch (SQLException e) {
+  LOGGER.log(Level.WARNING, "Error al cargar productos, usando lista por defecto: {0}", e.getMessage());
+  }
+  if (tipoBizcochoComboBox.getItems().isEmpty()) {
+  for (String tipo : TIPOS_BIZCOCHO) {
+  tipoBizcochoComboBox.getItems().add(tipo);
+  }
+  }
+  tipoBizcochoComboBox.getSelectionModel().selectFirst();
+  }
+
+  private void cargarClientes() {
  clienteComboBox.getItems().clear();
 
  try (Connection conn = dbConnection.getConnection();
