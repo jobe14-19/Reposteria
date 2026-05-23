@@ -1,0 +1,303 @@
+/* =========================================================
+   Repostería Rosato — TEMA OSCURO
+   Sobrescribe las variables looked-up del tema claro
+   ========================================================= */
+.root {
+    -bg-primary: #1a1a2e;
+    -accent-primary: #ff6b8a;
+    -text-dark: #e8d5d0;
+    -accent-secondary: #e07a9e;
+    -accent-warm: #c4957a;
+
+    -accent-primary-hover: #ff859f;
+    -accent-primary-pressed: #e05a78;
+    -accent-primary-light: derive(#ff6b8a, 75%);
+    -accent-primary-transparent: rgba(255, 107, 138, 0.15);
+    -accent-primary-glow: rgba(255, 107, 138, 0.35);
+
+    -text-dark-soft: derive(#e8d5d0, -15%);
+    -text-dark-muted: derive(#e8d5d0, -35%);
+    -text-dark-bg: derive(#e8d5d0, -55%);
+
+    -warm-light: derive(#c4957a, 50%);
+    -warm-bg: derive(#c4957a, 35%);
+    -warm-border: derive(#c4957a, 20%);
+
+    -secondary-light: derive(#e07a9e, 50%);
+    -secondary-bg: derive(#e07a9e, 35%);
+
+    -bg-card: #2a2a3e;
+    -bg-input: #33334a;
+    -bg-hover: #2e2e44;
+    -bg-nav: #16162a;
+    -bg-section: #25253a;
+
+    -text-heading: #e8d5d0;
+    -text-body: #c0b0a8;
+    -text-muted: #8a7a75;
+    -text-on-accent: #1a1a2e;
+
+    -border-light: #3a3a50;
+    -border-medium: #4a4a60;
+    -border-focus: #e07a9e;
+
+    -shadow-sm: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0.3, 0, 2);
+    -shadow-md: dropshadow(gaussian, rgba(0,0,0,0.4), 14, 0.4, 0, 4);
+    -shadow-lg: dropshadow(gaussian, rgba(0,0,0,0.5), 22, 0.5, 0, 6);
+    -shadow-xl: dropshadow(gaussian, rgba(0,0,0,0.6), 30, 0.6, 0, 8);
+    -shadow-glow: dropshadow(gaussian, -accent-primary-glow, 14, 0.5, 0, 0);
+}
+
+/* Sidebar dark overrides */
+.sidebar-scroll {
+    -fx-background: #1e1e32;
+    -fx-background-color: #1e1e32;
+    -fx-border-color: #3a3a50;
+}
+
+.sidebar-btn {
+    -fx-text-fill: #b0a098;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: #2e2e44;
+    -fx-text-fill: #e8d5d0;
+}
+
+.sidebar-btn-active {
+    -fx-background-color: #3a2a3e;
+    -fx-text-fill: #ff6b8a;
+    -fx-border-color: #ff6b8a;
+}
+
+.sidebar-btn-active:hover {
+    -fx-background-color: #3a2a3e;
+    -fx-text-fill: #ff6b8a;
+}
+
+.sidebar-section {
+    -fx-text-fill: #7a6a65;
+}
+
+/* Top bar dark */
+.top-bar {
+    -fx-background-color: #16162a;
+}
+
+.sub-bar {
+    -fx-background-color: #1e1e34;
+}
+
+.top-bar-title { -fx-text-fill: #ff6b8a; }
+.top-bar-user { -fx-text-fill: #c0b0a8; }
+.top-bar-perfil { -fx-text-fill: #8a7a75; }
+.sub-bar-breadcrumb { -fx-text-fill: #c0b0a8; }
+
+.sub-bar-logout {
+    -fx-text-fill: #ff6b8a;
+    -fx-border-color: #ff6b8a;
+}
+
+.sub-bar-logout:hover {
+    -fx-background-color: rgba(255, 107, 138, 0.15);
+    -fx-text-fill: #ff859f;
+}
+
+.toggle-sidebar-btn {
+    -fx-text-fill: #c0b0a8;
+}
+
+.toggle-sidebar-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: #ff6b8a;
+}
+
+/* Content area */
+.content-pane {
+    -fx-background-color: #1a1a2e;
+}
+
+/* Utility text classes dark */
+.text-heading { -fx-text-fill: #e8d5d0; }
+.text-heading-sm { -fx-text-fill: #e8d5d0; }
+.text-heading-lg { -fx-text-fill: #e8d5d0; }
+.text-heading-xl { -fx-text-fill: #e8d5d0; }
+.text-muted { -fx-text-fill: #8a7a75; }
+.text-muted-sm { -fx-text-fill: #8a7a75; }
+.text-body { -fx-text-fill: #c0b0a8; }
+.text-accent { -fx-text-fill: #ff6b8a; }
+.text-accent-secondary { -fx-text-fill: #e07a9e; }
+.text-accent-warm { -fx-text-fill: #c4957a; }
+.text-white { -fx-text-fill: #e8d5d0; }
+
+/* Background utilities dark */
+.bg-card { -fx-background-color: #2a2a3e; }
+.bg-input { -fx-background-color: #33334a; }
+.bg-section { -fx-background-color: #25253a; }
+.bg-primary { -fx-background-color: #1a1a2e; }
+.bg-accent { -fx-background-color: #ff6b8a; }
+.bg-accent-light { -fx-background-color: derive(#ff6b8a, 75%); }
+.bg-accent-transparent { -fx-background-color: rgba(255, 107, 138, 0.15); }
+.bg-warm { -fx-background-color: derive(#c4957a, 35%); }
+.bg-warm-light { -fx-background-color: derive(#c4957a, 50%); }
+.bg-secondary-light { -fx-background-color: derive(#e07a9e, 50%); }
+
+/* Modal/Card dark */
+.modal-card {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #3a3a50;
+}
+.card-container {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #3a3a50;
+}
+.card-container-padded {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #3a3a50;
+}
+
+/* Form dark */
+.form-section { }
+.form-label { -fx-text-fill: #e8d5d0; }
+.form-required { -fx-text-fill: #ff6b8a; }
+.form-help { -fx-text-fill: #8a7a75; }
+
+/* Detail view dark */
+.detail-section {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #3a3a50;
+}
+.detail-header {
+    -fx-text-fill: #e8d5d0;
+    -fx-border-color: transparent transparent #3a3a50 transparent;
+}
+.data-label { -fx-text-fill: #8a7a75; }
+.data-value { -fx-text-fill: #c0b0a8; }
+.data-value-heading { -fx-text-fill: #e8d5d0; }
+
+/* Button utilities dark */
+.btn-icon:hover { -fx-background-color: rgba(255, 107, 138, 0.15); }
+.btn-outline {
+    -fx-text-fill: #ff6b8a;
+    -fx-border-color: #ff6b8a;
+}
+.btn-outline:hover { -fx-background-color: rgba(255, 107, 138, 0.15); }
+
+/* Top/sub bar dark */
+.sub-bar-dark { -fx-background-color: #1e1e34; }
+
+/* Border utilities dark */
+.border-light { -fx-border-color: #3a3a50; }
+.border-bottom-light { -fx-border-color: transparent transparent #3a3a50 transparent; }
+.border-card { -fx-border-color: #3a3a50; }
+
+/* Gradient cards dark */
+.gradient-card {
+    -fx-background-color: linear-gradient(to right, #16162a, #2a2a3e);
+}
+.gradient-card-warm {
+    -fx-background-color: linear-gradient(to right, derive(#c4957a, 35%), derive(#c4957a, 20%));
+}
+.gradient-card-accent {
+    -fx-background-color: linear-gradient(to bottom right, #ff6b8a, derive(#ff6b8a, -15%));
+}
+
+/* Form field dark overrides */
+.form-field {
+    -fx-background-color: #33334a;
+    -fx-border-color: #3a3a50;
+    -fx-text-fill: #c0b0a8;
+    -fx-prompt-text-fill: #8a7a75;
+}
+.form-field:focused {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #e07a9e;
+}
+.form-field:hover {
+    -fx-background-color: #3a3a52;
+}
+
+/* Combo/Date picker popup dark */
+.combo-box-popup .list-view {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #3a3a50;
+}
+.date-picker-popup {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #3a3a50;
+}
+
+/* Separator dark */
+.separator-accent .line { -fx-background-color: #e07a9e; }
+
+/* Spinner dark */
+.spinner .text-field {
+    -fx-background-color: #33334a;
+    -fx-text-fill: #c0b0a8;
+}
+
+/* Label dark override */
+.label { -fx-text-fill: #c0b0a8; }
+
+/* Date picker text field dark */
+.date-picker .text-field {
+    -fx-background-color: #33334a;
+    -fx-text-fill: #c0b0a8;
+}
+
+/* Combo box dark */
+.combo-box {
+    -fx-background-color: #33334a;
+}
+
+/* Dashboard KPI cards */
+.kpi-card {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #3a3a50;
+}
+
+.stat-card {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #3a3a50;
+}
+
+.urgent-card {
+    -fx-background-color: #2e1a24;
+    -fx-border-color: #5a2030;
+}
+
+/* Tables */
+.orders-table, .clients-table, .inventory-table,
+.delivery-table, .maintenance-table, .personnel-table,
+.cleaning-table, .client-orders-table, .activity-table,
+.production-table, .alerts-table {
+    -fx-background-color: transparent;
+}
+
+.production-container, .alerts-container,
+.calendar-container, .chart-container {
+    -fx-background-color: #2a2a3e;
+    -fx-border-color: #3a3a50;
+}
+
+/* Welcome pane */
+.welcome-pane { -fx-background-color: #1a1a2e; }
+.welcome-title { -fx-text-fill: #e8d5d0; }
+.welcome-sub { -fx-text-fill: #8a7a75; }
+
+/* Section headers */
+.section-header { -fx-text-fill: #e8d5d0; }
+.section-title { -fx-text-fill: #e8d5d0; }
+
+/* Cards */
+.stat-card:hover { -fx-border-color: #ff6b8a; }
+.kpi-card:hover { -fx-border-color: #ff6b8a; }
+
+/* Separators */
+.separator .line { -fx-background-color: #3a3a50; }
+
+/* Nav admin bar inside dashboards */
+.nav-bar { -fx-background-color: #16162a; }
+.nav-button { -fx-text-fill: rgba(255, 255, 255, 0.6); }
+.nav-button:hover { -fx-background-color: rgba(255, 255, 255, 0.1); -fx-text-fill: white; }
+.nav-button-active { -fx-background-color: rgba(255, 107, 138, 0.2); -fx-text-fill: #ff6b8a; }
