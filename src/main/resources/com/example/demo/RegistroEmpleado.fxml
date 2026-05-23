@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<StackPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.RegistroEmpleadoController">
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
+
+ <VBox styleClass="login-card" maxWidth="550" maxHeight="750" alignment="CENTER" spacing="15">
+ <padding>
+ <Insets top="30" right="40" bottom="30" left="40"/>
+ </padding>
+
+ <VBox alignment="CENTER" spacing="5">
+ <Label text="" styleClass="pastel-logo"/>
+ <Label text="Registro de Empleado" styleClass="title-label"/>
+ <Label text="Complete los datos para crear un nuevo empleado" styleClass="subtitle-label"/>
+ </VBox>
+
+ <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+ <VBox spacing="12">
+ <VBox spacing="3">
+ <Label text="Nombre Completo*" styleClass="checkbox-label"/>
+ <TextField fx:id="nombreField" promptText="Nombre del empleado" styleClass="form-field"/>
+ </VBox>
+
+ <VBox spacing="3">
+ <Label text="Cédula*" styleClass="checkbox-label"/>
+ <TextField fx:id="cedulaField" promptText="Número de cédula" styleClass="form-field"/>
+ </VBox>
+
+ <VBox spacing="3">
+ <Label text="Teléfono*" styleClass="checkbox-label"/>
+ <TextField fx:id="telefonoField" promptText="Número de teléfono" styleClass="form-field"/>
+ </VBox>
+
+ <VBox spacing="3">
+ <Label text="Correo Electrónico" styleClass="checkbox-label"/>
+ <TextField fx:id="emailField" promptText="ejemplo@correo.com" styleClass="form-field"/>
+ </VBox>
+
+ <VBox spacing="3">
+ <Label text="Dirección" styleClass="checkbox-label"/>
+ <TextField fx:id="direccionField" promptText="Dirección del empleado" styleClass="form-field"/>
+ </VBox>
+
+ <VBox spacing="3">
+ <Label text="Cargo*" styleClass="checkbox-label"/>
+ <ComboBox fx:id="cargoComboBox" promptText="Seleccione un cargo" styleClass="form-field" prefWidth="470"/>
+ </VBox>
+
+ <VBox spacing="3">
+ <Label text="Nombre de Usuario*" styleClass="checkbox-label"/>
+ <TextField fx:id="usernameField" promptText="Usuario para iniciar sesión" styleClass="form-field"/>
+ </VBox>
+
+ <VBox spacing="3">
+ <Label text="Contraseña*" styleClass="checkbox-label"/>
+ <PasswordField fx:id="passwordField" styleClass="form-field"/>
+ </VBox>
+
+ <VBox spacing="3">
+ <Label text="Confirmar Contraseña*" styleClass="checkbox-label"/>
+ <PasswordField fx:id="confirmPasswordField" styleClass="form-field"/>
+ </VBox>
+ </VBox>
+ </ScrollPane>
+
+ <Label fx:id="messageLabel" styleClass="error-message" wrapText="true"/>
+
+ <Button text="Limpiar" onAction="#limpiarCampos"
+ style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand; -fx-pref-width: 470;"/>
+ <Button fx:id="registerButton" text="Registrar Empleado" onAction="#handleRegister" styleClass="login-button" prefWidth="470"/>
+
+ <HBox alignment="CENTER" spacing="5">
+ <Label text="¿Ya tienes cuenta?" styleClass="checkbox-label"/>
+ <Label text="Inicia sesión aquí" styleClass="register-link" onMouseClicked="#volverAlLogin"/>
+ </HBox>
+ </VBox>
+</StackPane>

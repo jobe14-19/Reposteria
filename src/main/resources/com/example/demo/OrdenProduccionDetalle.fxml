@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox spacing="12" styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.OrdenProduccionDetalleController">
+ <stylesheets><URL value="@styles.css"/></stylesheets>
+ <padding><Insets top="18" right="22" bottom="18" left="22"/></padding>
+
+ <!-- Header -->
+ <HBox alignment="CENTER_LEFT" spacing="12">
+  <Label fx:id="numOrdenLabel" text="ORD-0000" styleClass="text-heading" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+  <Label fx:id="estadoLabel" text="ACTIVA" styleClass="bg-accent text-white" style="-fx-font-weight: bold; -fx-padding: 4 12; -fx-background-radius: 4;"/>
+  <Label fx:id="pausadoLabel" text="EN CURSO" style="-fx-font-size: 11px;"/>
+  <Region HBox.hgrow="ALWAYS"/>
+  <Label text="Progreso:" styleClass="text-muted"/>
+  <ProgressBar fx:id="progresoBar" prefWidth="200" progress="0.0"/>
+  <Label fx:id="progresoLabel" text="0%" styleClass="text-heading-sm" style="-fx-font-weight: bold;"/>
+ </HBox>
+
+ <Separator/>
+
+ <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background: transparent;">
+ <VBox spacing="12" maxWidth="Infinity">
+
+  <!-- Info Cliente -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 6;">
+   <Label text="Informacion General" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <GridPane hgap="15" vgap="3">
+    <columnConstraints><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="25"/><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="25"/><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="14"/></columnConstraints>
+    <Label text="Cliente:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <Label fx:id="clienteLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="Telefono:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+    <Label fx:id="telefonoLabel" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+    <Label text="Direccion:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+    <Label fx:id="direccionLabel" GridPane.rowIndex="0" GridPane.columnIndex="5"/>
+    <Label text="Categoria:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <Label fx:id="categoriaLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <Label text="Vendedor:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+    <Label fx:id="vendedorLabel" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+    <Label text="Receta:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="4"/>
+    <Label fx:id="recetaLabel" GridPane.rowIndex="1" GridPane.columnIndex="5"/>
+    <Label text="Entrega:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <Label fx:id="fechaLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <Label text="Hora:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+    <Label fx:id="horaLabel" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+    <Label text="Libras:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="4"/>
+    <Label fx:id="librasLabel" GridPane.rowIndex="2" GridPane.columnIndex="5"/>
+   </GridPane>
+  </VBox>
+
+  <!-- Especificaciones -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 6;">
+   <Label text="Especificaciones" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <GridPane hgap="15" vgap="3">
+    <columnConstraints><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="25"/><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="25"/><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="14"/></columnConstraints>
+    <Label text="Base:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <Label fx:id="baseLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="Masa:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+    <Label fx:id="masoLabel" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+    <Label text="Forma:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+    <Label fx:id="formaLabel" GridPane.rowIndex="0" GridPane.columnIndex="5"/>
+    <Label text="Pisos:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <Label fx:id="pisosLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <Label text="Decoracion:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+    <Label fx:id="decoracionLabel" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+    <Label text="Lustres:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="4"/>
+    <Label fx:id="lustresLabel" GridPane.rowIndex="1" GridPane.columnIndex="5"/>
+    <Label text="Camuflajes:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <Label fx:id="camuflajesLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <Label text="Flores:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+    <Label fx:id="floresLabel" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+    <Label text="Adornos:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="4"/>
+    <Label fx:id="adornosLabel" GridPane.rowIndex="2" GridPane.columnIndex="5"/>
+    <Label text="Rellenos:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+    <Label fx:id="rellenosLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+    <Label text="Mensaje:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+    <Label fx:id="mensajeLabel" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+    <Label text="Observaciones:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="4"/>
+    <Label fx:id="observacionesLabel" GridPane.rowIndex="3" GridPane.columnIndex="5"/>
+   </GridPane>
+  </VBox>
+
+  <!-- Costos -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 6;">
+   <Label text="Costos y Totales" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <HBox spacing="20">
+    <Label text="" fx:id="costoEstLabel" style="-fx-text-fill: #555;"/>
+    <Label text="" fx:id="costoRealLabel" style="-fx-text-fill: #555;"/>
+    <Label text="" fx:id="precioLabel" style="-fx-text-fill: #555;"/>
+    <Label text="" fx:id="anticipoLabel" style="-fx-text-fill: #555;"/>
+    <Label text="" fx:id="saldoLabel" style="-fx-text-fill: #f55580; -fx-font-weight: bold;"/>
+   </HBox>
+  </VBox>
+
+  <!-- Fases -->
+  <VBox spacing="8">
+   <Label text="Fases de Produccion" styleClass="text-heading-sm" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+   <VBox fx:id="fasesContainer" spacing="6" maxWidth="Infinity"/>
+  </VBox>
+
+  <!-- Acciones -->
+  <HBox spacing="10" alignment="CENTER_LEFT" wrapWidth="true">
+   <Label text="Cambiar Estado:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+   <ComboBox fx:id="estadoCombo" prefWidth="160"/>
+   <Button fx:id="cambiarEstadoBtn" text="Aplicar" styleClass="btn-primary"/>
+   <Button fx:id="pausarBtn" text="Pausar/Reanudar" styleClass="btn-warning"/>
+   <Button fx:id="descontarStockBtn" text="Descontar Stock" styleClass="btn-info"/>
+   <Button fx:id="verRecetaBtn" text="Ver Receta" styleClass="btn-secondary"/>
+   <Button fx:id="editarBtn" text="Editar" styleClass="btn-secondary"/>
+   <Button fx:id="imprimirBtn" text="Imprimir" styleClass="btn-primary"/>
+  </HBox>
+
+  <!-- Ingredientes -->
+  <VBox spacing="6">
+   <Label text="Ingredientes" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <TableView fx:id="ingredientesTable" prefHeight="120" maxWidth="Infinity">
+    <columns>
+     <TableColumn fx:id="ingNombreCol" text="Ingrediente" prefWidth="250"/>
+     <TableColumn fx:id="ingReqCol" text="Requerido" prefWidth="100"/>
+     <TableColumn fx:id="ingDescCol" text="Descontado" prefWidth="100"/>
+     <TableColumn fx:id="ingUnidadCol" text="Unidad" prefWidth="80"/>
+     <TableColumn fx:id="ingEstadoCol" text="Estado" prefWidth="110"/>
+    </columns>
+    <placeholder><Label text="No hay ingredientes registrados."/></placeholder>
+   </TableView>
+  </VBox>
+
+  <!-- Historial -->
+  <VBox spacing="6">
+   <Label text="Historial de Cambios" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <TableView fx:id="historialTable" prefHeight="150" maxWidth="Infinity">
+    <columns>
+     <TableColumn fx:id="histAccionCol" text="Accion" prefWidth="150"/>
+     <TableColumn fx:id="histDetalleCol" text="Detalle" prefWidth="300"/>
+     <TableColumn fx:id="histUsuarioCol" text="Usuario" prefWidth="120"/>
+     <TableColumn fx:id="histFechaCol" text="Fecha" prefWidth="150"/>
+    </columns>
+    <placeholder><Label text="No hay historial registrado."/></placeholder>
+   </TableView>
+  </VBox>
+
+ </VBox>
+ </ScrollPane>
+
+ <HBox alignment="CENTER_RIGHT">
+  <Button fx:id="cerrarBtn" text="Cerrar" styleClass="btn-secondary" onAction="#cerrar"/>
+ </HBox>
+</VBox>

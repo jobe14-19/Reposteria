@@ -6,137 +6,139 @@
 <?import java.net.URL?>
 
 <BorderPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.DashboardClienteController">
-    <stylesheets>
-        <URL value="@styles.css"/>
-    </stylesheets>
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
 
-    <!-- Navigation Bar -->
-    <top>
-        <VBox>
-            <HBox styleClass="nav-bar" alignment="CENTER_LEFT">
-                <Label text="Repostería Rosato" styleClass="nav-logo"/>
-                <Region HBox.hgrow="ALWAYS"/>
+  <!-- Navigation Bar -->
+  <top>
+  <VBox fx:id="topBar">
+ <HBox styleClass="nav-bar" alignment="CENTER_LEFT">
+ <Label text="Repostería Rosato" styleClass="nav-logo"/>
+ <Region HBox.hgrow="ALWAYS"/>
 
-                <HBox spacing="5" alignment="CENTER">
-                    <Button text="Mi Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
-                    <Button text="Mis Pedidos" onAction="#verMisPedidos" styleClass="nav-button"/>
-                    <Button text="Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
-                    <Button text="Chef's Box" onAction="#verChefsBox" styleClass="nav-button"/>
-                </HBox>
+ <HBox spacing="5" alignment="CENTER">
+ <Button text="Mi Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
+ <Button text="Mis Pedidos" onAction="#verMisPedidos" styleClass="nav-button"/>
+ <Button text="Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
+ <Button text="Chef's Box" onAction="#verChefsBox" styleClass="nav-button"/>
+ </HBox>
 
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Cerrar Sesión" onAction="#cerrarSesion" styleClass="nav-logout"/>
-            </HBox>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button text="Cerrar Sesión" onAction="#cerrarSesion" styleClass="nav-logout"/>
+ </HBox>
 
-            <HBox style="-fx-background-color: #F5F5F5; -fx-padding: 8 20 8 20;" alignment="CENTER_LEFT">
-                <Label fx:id="userLabel" style="-fx-text-fill: #8B5E3C; -fx-font-size: 14px; -fx-font-weight: bold;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lastUpdateLabel" style="-fx-text-fill: #666666; -fx-font-size: 12px;"/>
-            </HBox>
-        </VBox>
-    </top>
+  <HBox style="-fx-padding: 8 20 8 20;" styleClass="bg-input" alignment="CENTER_LEFT">
+  <Label fx:id="userLabel" styleClass="text-heading-sm"/>
+  <Region HBox.hgrow="ALWAYS"/>
+  <Label fx:id="lastUpdateLabel" styleClass="text-muted-sm"/>
+ </HBox>
+ </VBox>
+ </top>
 
-    <center>
-        <ScrollPane fitToWidth="true" style="-fx-background-color: #FAFAFA;">
-            <VBox style="-fx-padding: 25; -fx-spacing: 25;" alignment="TOP_CENTER">
+ <center>
+  <ScrollPane fitToWidth="true" styleClass="scroll-pane bg-primary">
+ <VBox style="-fx-padding: 25; -fx-spacing: 25;" alignment="TOP_CENTER">
 
-                <VBox styleClass="welcome-card" alignment="CENTER_LEFT" spacing="15">
-                    <Label fx:id="welcomeLabel" text="¡Bienvenido de vuelta!" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                    <Label text="Aquí puedes ver el resumen de tus pedidos y gestionar tu cuenta" style="-fx-text-fill: #666666; -fx-font-size: 14px;"/>
-                </VBox>
+ <VBox styleClass="welcome-card" alignment="CENTER_LEFT" spacing="15">
+  <Label fx:id="welcomeLabel" text="¡Bienvenido de vuelta!" styleClass="text-heading-lg"/>
+  <Label text="Aquí puedes ver el resumen de tus pedidos y gestionar tu cuenta" style="-fx-font-size: 14px;" styleClass="text-muted"/>
+ </VBox>
 
-                <VBox spacing="15">
-                    <Label text="Tu Resumen" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+ <VBox spacing="15">
+  <Label text="Tu Resumen" style="-fx-font-size: 16px;" styleClass="text-heading"/>
 
-                    <HBox spacing="20" alignment="CENTER">
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="Total" style="-fx-font-size: 40px;"/>
-                            <Label text="Total Pedidos" styleClass="kpi-label"/>
-                            <Label fx:id="totalPedidosLabel" text="0" styleClass="kpi-value"/>
-                        </VBox>
+   <FlowPane hgap="16" vgap="16" alignment="CENTER">
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128230;" style="-fx-font-size: 28px;"/>
+   <Label text="Total Pedidos" styleClass="kpi-label"/>
+   <Label fx:id="totalPedidosLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128197;" style="-fx-font-size: 28px;"/>
+   <Label text="Próximo Pedido" styleClass="kpi-label"/>
+   <Label fx:id="proxPedidoLabel" text="No programado" styleClass="kpi-value-small"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128293;" style="-fx-font-size: 28px;"/>
+   <Label text="En Proceso" styleClass="kpi-label"/>
+   <Label fx:id="enProcesoLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128142;" style="-fx-font-size: 28px;"/>
+   <Label text="Puntos Fidelidad" styleClass="kpi-label"/>
+   <Label fx:id="puntosLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128176;" style="-fx-font-size: 28px;"/>
+   <Label text="Total Gastado" styleClass="kpi-label"/>
+   <Label fx:id="totalGastadoLabel" text="0.00" styleClass="kpi-value"/>
+   </VBox>
+   </FlowPane>
+ </VBox>
 
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="Fecha" style="-fx-font-size: 40px;"/>
-                            <Label text="Próximo Pedido" styleClass="kpi-label"/>
-                            <Label fx:id="proxPedidoLabel" text="No programado" styleClass="kpi-value-small"/>
-                        </VBox>
+ <VBox spacing="15">
+ <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Mis Últimos 5 Pedidos" style="-fx-font-size: 16px;" styleClass="text-heading"/>
+ <Button text="Ver Todos" onAction="#verMisPedidos" styleClass="view-all-button"/>
+ </HBox>
 
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="Puntos" style="-fx-font-size: 40px;"/>
-                            <Label text="Puntos Fidelidad" styleClass="kpi-label"/>
-                            <Label fx:id="puntosLabel" text="0" styleClass="kpi-value"/>
-                        </VBox>
+ <TableView fx:id="pedidosTable" styleClass="orders-table">
+ <columns>
+ <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+ <TableColumn fx:id="productoColumn" text="Producto" prefWidth="200"/>
+ <TableColumn fx:id="librasColumn" text="Libras" prefWidth="80"/>
+ <TableColumn fx:id="fechaColumn" text="Fecha Entrega" prefWidth="120"/>
+ <TableColumn fx:id="totalColumn" text="Total" prefWidth="100"/>
+ <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="100"/>
+ </columns>
+ </TableView>
+ </VBox>
 
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="Ingresos" style="-fx-font-size: 40px;"/>
-                            <Label text="Total Gastado" styleClass="kpi-label"/>
-                            <Label fx:id="totalGastadoLabel" text="0.00" styleClass="kpi-value"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
+ <VBox spacing="15">
+  <Label text="Próximo Pedido Sugerido" style="-fx-font-size: 16px;" styleClass="text-heading"/>
 
-                <VBox spacing="15">
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <Label text="Mis Últimos 5 Pedidos" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <Button text="Ver Todos" onAction="#verMisPedidos" styleClass="view-all-button"/>
-                    </HBox>
+ <VBox styleClass="suggestion-card" alignment="CENTER_LEFT" spacing="15">
+ <HBox alignment="CENTER_LEFT" spacing="20">
+ <Label text="Pastel" style="-fx-font-size: 50px;"/>
+ <VBox spacing="5">
+ <Label fx:id="sugerenciaProductoLabel" text="Basado en tu historial..." styleClass="suggestion-title"/>
+ <Label fx:id="sugerenciaDescLabel" text="Te recomendamos tu pastel favorito" styleClass="suggestion-desc"/>
+ </VBox>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button text="Pedir Ahora" onAction="#pedirSugerencia" styleClass="suggestion-button"/>
+ </HBox>
+ </VBox>
+ </VBox>
 
-                    <TableView fx:id="pedidosTable" styleClass="orders-table">
-                        <columns>
-                            <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
-                            <TableColumn fx:id="productoColumn" text="Producto" prefWidth="200"/>
-                            <TableColumn fx:id="librasColumn" text="Libras" prefWidth="80"/>
-                            <TableColumn fx:id="fechaColumn" text="Fecha Entrega" prefWidth="120"/>
-                            <TableColumn fx:id="totalColumn" text="Total" prefWidth="100"/>
-                            <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="100"/>
-                        </columns>
-                    </TableView>
-                </VBox>
+ <VBox spacing="15">
+  <Label text="Promociones Activas" style="-fx-font-size: 16px;" styleClass="text-heading"/>
 
-                <VBox spacing="15">
-                    <Label text="Próximo Pedido Sugerido" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+ <HBox spacing="20" alignment="CENTER">
+ <VBox styleClass="promo-card" alignment="CENTER" spacing="10">
+ <Label text="Promo" style="-fx-font-size: 35px;"/>
+ <Label text="10% OFF" styleClass="promo-title"/>
+ <Label text="En tu próximo pedido" styleClass="promo-desc"/>
+ <Label fx:id="promo1Label" text="Código: WELCOME10" styleClass="promo-code"/>
+ </VBox>
 
-                    <VBox styleClass="suggestion-card" alignment="CENTER_LEFT" spacing="15">
-                        <HBox alignment="CENTER_LEFT" spacing="20">
-                            <Label text="Pastel" style="-fx-font-size: 50px;"/>
-                            <VBox spacing="5">
-                                <Label fx:id="sugerenciaProductoLabel" text="Basado en tu historial..." styleClass="suggestion-title"/>
-                                <Label fx:id="sugerenciaDescLabel" text="Te recomendamos tu pastel favorito" styleClass="suggestion-desc"/>
-                            </VBox>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Button text="Pedir Ahora" onAction="#pedirSugerencia" styleClass="suggestion-button"/>
-                        </HBox>
-                    </VBox>
-                </VBox>
+ <VBox styleClass="promo-card" alignment="CENTER" spacing="10">
+ <Label text="Chef" style="-fx-font-size: 35px;"/>
+ <Label text="Chef's Box" styleClass="promo-title"/>
+ <Label text="Suscripción mensual" styleClass="promo-desc"/>
+ <Button text="Ver Planes" onAction="#verChefsBox" styleClass="promo-button"/>
+ </VBox>
 
-                <VBox spacing="15">
-                    <Label text="Promociones Activas" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+ <VBox styleClass="promo-card" alignment="CENTER" spacing="10">
+ <Label text="Pastel" style="-fx-font-size: 35px;"/>
+ <Label text="Cumpleaños" styleClass="promo-title"/>
+ <Label text="Descuento especial" styleClass="promo-desc"/>
+ <Label fx:id="promo3Label" text="Este mes" styleClass="promo-valid"/>
+ </VBox>
+ </HBox>
+ </VBox>
 
-                    <HBox spacing="20" alignment="CENTER">
-                        <VBox styleClass="promo-card" alignment="CENTER" spacing="10">
-                            <Label text="Promo" style="-fx-font-size: 35px;"/>
-                            <Label text="10% OFF" styleClass="promo-title"/>
-                            <Label text="En tu próximo pedido" styleClass="promo-desc"/>
-                            <Label fx:id="promo1Label" text="Código: WELCOME10" styleClass="promo-code"/>
-                        </VBox>
-
-                        <VBox styleClass="promo-card" alignment="CENTER" spacing="10">
-                            <Label text="Chef" style="-fx-font-size: 35px;"/>
-                            <Label text="Chef's Box" styleClass="promo-title"/>
-                            <Label text="Suscripción mensual" styleClass="promo-desc"/>
-                            <Button text="Ver Planes" onAction="#verChefsBox" styleClass="promo-button"/>
-                        </VBox>
-
-                        <VBox styleClass="promo-card" alignment="CENTER" spacing="10">
-                            <Label text="Pastel" style="-fx-font-size: 35px;"/>
-                            <Label text="Cumpleaños" styleClass="promo-title"/>
-                            <Label text="Descuento especial" styleClass="promo-desc"/>
-                            <Label fx:id="promo3Label" text="Este mes" styleClass="promo-valid"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-
-            </VBox>
-        </ScrollPane>
-    </center>
+ </VBox>
+ </ScrollPane>
+ </center>
 </BorderPane>

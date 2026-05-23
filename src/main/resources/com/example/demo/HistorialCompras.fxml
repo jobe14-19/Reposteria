@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.HistorialComprasController">
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
+
+  <VBox styleClass="bg-card border-bottom-light">
+ <padding>
+ <Insets top="20" right="20" bottom="15" left="20"/>
+ </padding>
+ <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Historial de Compras" style="-fx-font-size: 24px;" styleClass="text-heading"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button fx:id="refrescarButton" text="Refrescar" styleClass="btn-primary"/>
+ </HBox>
+ </VBox>
+
+ <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="bg-primary">
+ <VBox style="-fx-padding: 20; -fx-spacing: 20;" maxWidth="Infinity" alignment="TOP_CENTER">
+
+ <VBox spacing="15" maxWidth="Infinity">
+ <HBox alignment="CENTER_LEFT" spacing="10">
+  <Label text="Buscar:" style="-fx-font-size: 13px;" styleClass="text-heading"/>
+ <TextField fx:id="buscarField" promptText="Proveedor, producto o usuario..." styleClass="form-field" prefWidth="200"/>
+ <DatePicker fx:id="fechaDesdePicker" promptText="Desde" styleClass="form-field" prefWidth="140"/>
+ <DatePicker fx:id="fechaHastaPicker" promptText="Hasta" styleClass="form-field" prefWidth="140"/>
+ <Button fx:id="filtrarButton" text="Filtrar" styleClass="btn-secondary"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ </HBox>
+
+ <TableView fx:id="comprasTable" maxWidth="Infinity" prefHeight="350" VBox.vgrow="ALWAYS">
+ <columns>
+ <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+ <TableColumn fx:id="proveedorColumn" text="Proveedor" prefWidth="180"/>
+ <TableColumn fx:id="fechaColumn" text="Fecha" prefWidth="120"/>
+ <TableColumn fx:id="totalColumn" text="Total" prefWidth="110"/>
+ <TableColumn fx:id="productosColumn" text="Productos" prefWidth="80"/>
+ <TableColumn fx:id="usuarioColumn" text="Registrado por" prefWidth="140"/>
+ <TableColumn fx:id="accionesColumn" text="Acciones" prefWidth="120"/>
+ </columns>
+ </TableView>
+
+ <HBox alignment="CENTER" spacing="10">
+ <Button fx:id="anteriorButton" text="Anterior" styleClass="btn-secondary"/>
+  <Label fx:id="paginaLabel" text="Pagina 1 de 1" style="-fx-font-size: 13px;" styleClass="text-heading"/>
+ <Button fx:id="siguienteButton" text="Siguiente" styleClass="btn-secondary"/>
+ <Region HBox.hgrow="ALWAYS"/>
+  <Label fx:id="totalLabel" text="Total: 0 compras" style="-fx-font-size: 13px;" styleClass="text-muted"/>
+ </HBox>
+ </VBox>
+ </VBox>
+ </ScrollPane>
+</VBox>

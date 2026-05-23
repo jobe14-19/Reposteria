@@ -7,111 +7,111 @@
 <?import java.net.URL?>
 
 <VBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.demo.controller.MiPerfilController"
-      spacing="20" alignment="TOP_CENTER" style="-fx-background-color: #FAFAFA;">
-      
-    <stylesheets>
-        <URL value="@styles.css"/>
-    </stylesheets>
+ xmlns:fx="http://javafx.com/fxml/1"
+ fx:controller="com.example.demo.controller.MiPerfilController"
+  spacing="20" alignment="TOP_CENTER" styleClass="bg-primary">
+ 
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
 
-    <!-- Header -->
-    <VBox style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">
-        <padding><Insets top="20" right="20" bottom="15" left="20"/></padding>
-        <Label text="Mi Perfil" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-    </VBox>
+ <!-- Header -->
+  <VBox styleClass="bg-card border-light" style="-fx-border-width: 0 0 1 0;">
+  <padding><Insets top="20" right="20" bottom="15" left="20"/></padding>
+  <Label text="Mi Perfil" style="-fx-font-size: 24px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ </VBox>
 
-    <!-- Main Content -->
-    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
-        <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+ <!-- Main Content -->
+ <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+ <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
 
-            <!-- Profile Card -->
-            <VBox spacing="20" alignment="TOP_CENTER" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 12; -fx-padding: 30;">
+  <!-- Profile Card -->
+  <VBox spacing="20" alignment="TOP_CENTER" styleClass="bg-card border-light" style="-fx-border-width: 1; -fx-border-radius: 12; -fx-padding: 30;">
 
-                <!-- Profile Photo -->
-                <HBox alignment="CENTER" spacing="20">
-                    <VBox alignment="CENTER" spacing="10">
-                        <Label fx:id="initialsLabel" text="AB" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #8B5E3C; -fx-background-radius: 50; -fx-padding: 20 25 20 25;"/>
-                    </VBox>
-                    <VBox spacing="5" alignment="CENTER_LEFT">
-                        <Label fx:id="roleLabel" text="CLIENTE" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C; -fx-background-color: #FFF3E0; -fx-background-radius: 12; -fx-padding: 5 10 5 10;"/>
-                        <Label fx:id="statusLabel" text="Activo" style="-fx-font-size: 12px; -fx-text-fill: #28A745; -fx-font-weight: bold;"/>
-                    </VBox>
-                </HBox>
+ <!-- Profile Photo -->
+ <HBox alignment="CENTER" spacing="20">
+ <VBox alignment="CENTER" spacing="10">
+ <Label fx:id="initialsLabel" text="AB" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #f55580; -fx-background-radius: 50; -fx-padding: 20 25 20 25;"/>
+ </VBox>
+ <VBox spacing="5" alignment="CENTER_LEFT">
+  <Label fx:id="roleLabel" text="CLIENTE" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #fcf4f0; -fx-background-radius: 12; -fx-padding: 5 10 5 10;" styleClass="text-heading"/>
+ <Label fx:id="statusLabel" text="Activo" style="-fx-font-size: 12px; -fx-text-fill: #4caf50; -fx-font-weight: bold;"/>
+ </VBox>
+ </HBox>
 
-                <!-- Profile Fields -->
-                <GridPane hgap="20" vgap="15" alignment="CENTER_LEFT">
-                    <Label text="Nombre:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <TextField fx:id="nombreField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+ <!-- Profile Fields -->
+ <GridPane hgap="20" vgap="15" alignment="CENTER_LEFT">
+  <Label text="Nombre:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <TextField fx:id="nombreField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                    <Label text="Apellido:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <TextField fx:id="apellidoField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+  <Label text="Apellido:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+ <TextField fx:id="apellidoField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                    <Label text="Teléfono:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextField fx:id="telefonoField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+  <Label text="Teléfono:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+ <TextField fx:id="telefonoField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                    <Label text="Email:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <TextField fx:id="emailField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+  <Label text="Email:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+ <TextField fx:id="emailField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                    <Label text="Dirección:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                    <TextField fx:id="direccionField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+  <Label text="Dirección:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+ <TextField fx:id="direccionField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-                    <Label text="Usuario:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                    <TextField fx:id="usuarioField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="5" GridPane.columnIndex="1" editable="false"/>
+  <Label text="Usuario:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+ <TextField fx:id="usuarioField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="5" GridPane.columnIndex="1" editable="false"/>
 
-                    <VBox fx:id="employeeFieldsSection" spacing="15" visible="false" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="2">
-                        <Label text="Área de Trabajo:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <TextField fx:id="areaField" styleClass="form-field" prefWidth="250" editable="false"/>
-                        <Label text="Capacitaciones:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <Label fx:id="capacitacionesLabel" text="0/3 completadas"/>
-                    </VBox>
-                </GridPane>
+ <VBox fx:id="employeeFieldsSection" spacing="15" visible="false" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="2">
+  <Label text="Área de Trabajo:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <TextField fx:id="areaField" styleClass="form-field" prefWidth="250" editable="false"/>
+  <Label text="Capacitaciones:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <Label fx:id="capacitacionesLabel" text="0/3 completadas"/>
+ </VBox>
+ </GridPane>
 
-                <!-- Buttons -->
-                <HBox alignment="CENTER_RIGHT" spacing="10">
-                    <Button text="💾 Guardar Cambios" onAction="#guardarCambios" style="-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
-                </HBox>
-                <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding-top: 10;">
-                    <Button text="Limpiar" onAction="#limpiarCampos"
-                            style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
-                </HBox>
-            </VBox>
+ <!-- Buttons -->
+ <HBox alignment="CENTER_RIGHT" spacing="10">
+ <Button text="Guardar Cambios" onAction="#guardarCambios" style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+ </HBox>
+ <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding-top: 10;">
+ <Button text="Limpiar" onAction="#limpiarCampos"
+ style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+ </HBox>
+ </VBox>
 
-            <!-- Password Change Section -->
-            <VBox spacing="20" alignment="TOP_CENTER" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 12; -fx-padding: 30;">
-                <Label text="🔐 Cambio de Contraseña" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+  <!-- Password Change Section -->
+  <VBox spacing="20" alignment="TOP_CENTER" styleClass="bg-card border-light" style="-fx-border-width: 1; -fx-border-radius: 12; -fx-padding: 30;">
+  <Label text="Cambio de Contraseña" style="-fx-font-size: 18px; -fx-font-weight: bold;" styleClass="text-heading"/>
 
-                <GridPane hgap="20" vgap="15" alignment="CENTER_LEFT">
-                    <Label text="Contraseña Actual:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <PasswordField fx:id="contrasenaActualField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+ <GridPane hgap="20" vgap="15" alignment="CENTER_LEFT">
+  <Label text="Contraseña Actual:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <PasswordField fx:id="contrasenaActualField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                    <Label text="Nueva Contraseña:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <PasswordField fx:id="nuevaContrasenaField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+  <Label text="Nueva Contraseña:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+ <PasswordField fx:id="nuevaContrasenaField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                    <Label text="Confirmar Nueva Contraseña:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <PasswordField fx:id="confirmarContrasenaField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                </GridPane>
+  <Label text="Confirmar Nueva Contraseña:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+ <PasswordField fx:id="confirmarContrasenaField" styleClass="form-field" prefWidth="250" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+ </GridPane>
 
-                <HBox alignment="CENTER_RIGHT" spacing="10">
-                    <Button text="🔄 Actualizar Contraseña" onAction="#actualizarContrasena" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
-                </HBox>
-            </VBox>
+ <HBox alignment="CENTER_RIGHT" spacing="10">
+ <Button text="Actualizar Contraseña" onAction="#actualizarContrasena" style="-fx-background-color: #f0ad4e; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+ </HBox>
+ </VBox>
 
-            <!-- Activity History Section -->
-            <VBox spacing="20" alignment="TOP_CENTER" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 12; -fx-padding: 30;">
-                <HBox alignment="CENTER_LEFT" spacing="15">
-                    <Label text="📅 Historial de Actividad" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="totalActividadLabel" text="0 actividades" style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
-                </HBox>
-                <ListView fx:id="actividadListView" prefHeight="200" style="-fx-background-color: #F8F9FA; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 6;"/>
-            </VBox>
+  <!-- Activity History Section -->
+  <VBox spacing="20" alignment="TOP_CENTER" styleClass="bg-card border-light" style="-fx-border-width: 1; -fx-border-radius: 12; -fx-padding: 30;">
+ <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Historial de Actividad" style="-fx-font-size: 18px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <Region HBox.hgrow="ALWAYS"/>
+  <Label fx:id="totalActividadLabel" text="0 actividades" style="-fx-font-size: 14px;" styleClass="text-muted"/>
+ </HBox>
+  <ListView fx:id="actividadListView" prefHeight="200" styleClass="bg-input border-light" style="-fx-border-width: 1; -fx-border-radius: 6;"/>
+ </VBox>
 
-            <!-- Volver al Menú -->
-            <HBox alignment="CENTER" spacing="10" style="-fx-padding-top: 20;">
-                <Button text="← Volver al Menú" onAction="#volverAlMenu"
-                        style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
-            </HBox>
-        </VBox>
-    </ScrollPane>
+ <!-- Volver al Menú -->
+ <HBox alignment="CENTER" spacing="10" style="-fx-padding-top: 20;">
+ <Button text="← Volver al Menú" onAction="#volverAlMenu"
+ style="-fx-background-color: #f55580; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+ </HBox>
+ </VBox>
+ </ScrollPane>
 </VBox>

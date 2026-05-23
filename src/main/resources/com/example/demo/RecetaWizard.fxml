@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<BorderPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.RecetaWizardController">
+ <stylesheets><URL value="@styles.css"/></stylesheets>
+ <padding><Insets top="20" right="20" bottom="15" left="20"/></padding>
+
+ <top>
+ <VBox spacing="10">
+ <Label fx:id="tituloLabel" text="Nueva Receta" style="-fx-font-size: 22px; -fx-font-weight: bold;" styleClass="text-heading-xl"/>
+ <HBox fx:id="stepperBar" alignment="CENTER" spacing="0" style="-fx-padding: 10 0 15 0;"/>
+ </VBox>
+ </top>
+
+ <center>
+ <ScrollPane fitToWidth="true" fitToHeight="true">
+ <StackPane fx:id="contenidoStack" maxWidth="Infinity">
+ <!-- Step 1: Informacion General -->
+ <VBox fx:id="step1Panel" spacing="15" maxWidth="Infinity" style="-fx-padding: 10;">
+ <Label text="Informacion General" style="-fx-font-size: 17px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <GridPane hgap="15" vgap="12" maxWidth="Infinity">
+ <columnConstraints><ColumnConstraints percentWidth="25"/><ColumnConstraints percentWidth="75"/></columnConstraints>
+ <Label text="Nombre de la Receta:" style="-fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <TextField fx:id="nombreRecetaField" promptText="Ej: Pastel de Chocolate Clasico" maxWidth="Infinity" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+ <Label text="Producto Asociado:" style="-fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+ <ComboBox fx:id="productoComboBox" maxWidth="Infinity" promptText="Seleccione un producto" styleClass="form-field" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+ <Label text="Categoria:" style="-fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+ <ComboBox fx:id="categoriaComboBox" maxWidth="Infinity" promptText="Seleccione categoria" styleClass="form-field" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+ <Label text="Tiempo de Preparacion (min):" style="-fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+ <Spinner fx:id="tiempoSpinner" maxWidth="Infinity" editable="true" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+ <Label text="Cantidad Producida:" style="-fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+ <Spinner fx:id="cantidadSpinner" maxWidth="Infinity" editable="true" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+ <Label text="Descripcion:" style="-fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
+ <TextArea fx:id="descripcionArea" promptText="Describa la receta brevemente..." wrapText="true" prefRowCount="3" maxWidth="Infinity" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+ </GridPane>
+ </VBox>
+
+ <!-- Step 2: Ingredientes -->
+ <VBox fx:id="step2Panel" spacing="15" maxWidth="Infinity" style="-fx-padding: 10;">
+ <Label text="Ingredientes" style="-fx-font-size: 17px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <TableView fx:id="ingredientesTable" prefHeight="300" maxWidth="Infinity" VBox.vgrow="ALWAYS">
+ <columns>
+ <TableColumn fx:id="selColumn" text="Usar" prefWidth="55"/>
+ <TableColumn fx:id="ingNombreColumn" text="Ingrediente" prefWidth="200"/>
+ <TableColumn fx:id="ingCantidadColumn" text="Cantidad" prefWidth="120"/>
+ <TableColumn fx:id="ingUnidadColumn" text="Unidad" prefWidth="90"/>
+ <TableColumn fx:id="stockColumn" text="Stock Disp." prefWidth="100"/>
+ </columns>
+ <placeholder><Label text="No hay ingredientes disponibles." style="-fx-text-fill: #999;"/></placeholder>
+ </TableView>
+ </VBox>
+
+ <!-- Step 3: Procedimiento -->
+ <VBox fx:id="step3Panel" spacing="15" maxWidth="Infinity" style="-fx-padding: 10;">
+ <HBox alignment="CENTER_LEFT" spacing="10">
+ <Label text="Procedimiento Paso a Paso" style="-fx-font-size: 17px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button fx:id="agregarPasoButton" text="+ Agregar Paso" styleClass="btn-success"/>
+ </HBox>
+ <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background: transparent;">
+ <VBox fx:id="pasosContainer" spacing="12" maxWidth="Infinity"/>
+ </ScrollPane>
+ </VBox>
+
+ <!-- Step 4: Costos y Produccion -->
+ <VBox fx:id="step4Panel" spacing="15" maxWidth="Infinity" style="-fx-padding: 10;">
+ <Label text="Costos y Produccion" style="-fx-font-size: 17px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <GridPane hgap="15" vgap="12" maxWidth="Infinity">
+ <columnConstraints><ColumnConstraints percentWidth="30"/><ColumnConstraints percentWidth="30"/><ColumnConstraints percentWidth="40"/></columnConstraints>
+ <Label text="Costo Estimado (USD):" style="-fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <TextField fx:id="costoField" promptText="0.00" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+ <Label text="Las cantidades suman:" style="-fx-text-fill: #999; -fx-font-style: italic;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+ <Label text="Rendimiento (%):" style="-fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+ <Spinner fx:id="rendimientoSpinner" maxWidth="Infinity" editable="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+ <Label text="Porcentaje de producto util" style="-fx-text-fill: #999; -fx-font-style: italic;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+ <Label text="Desperdicio Estimado (%):" style="-fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+ <Spinner fx:id="desperdicioSpinner" maxWidth="Infinity" editable="true" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+ <Label text="Merma esperada del proceso" style="-fx-text-fill: #999; -fx-font-style: italic;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+ </GridPane>
+ <VBox style="-fx-background-color: #FFF8F0; -fx-border-color: #E8D5C0; -fx-border-radius: 8; -fx-padding: 15; -fx-spacing: 8;">
+ <Label text="Resumen de Costos" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading-sm"/>
+ <Label fx:id="costoResumenLabel" text="Costo total estimado: $0.00  |  Costo por unidad: $0.00" style="-fx-font-size: 13px; -fx-text-fill: #555;"/>
+ <Label fx:id="rendimientoResumenLabel" text="Rendimiento: 100%  |  Desperdicio: 0%  |  Produccion util: 100%" style="-fx-font-size: 13px; -fx-text-fill: #555;"/>
+ </VBox>
+ </VBox>
+
+ <!-- Step 5: Confirmacion -->
+ <VBox fx:id="step5Panel" spacing="15" maxWidth="Infinity" style="-fx-padding: 10;">
+ <Label text="Confirmacion Final" style="-fx-font-size: 17px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <Label text="Revise todos los datos antes de guardar la receta." style="-fx-font-style: italic;" styleClass="text-muted-sm"/>
+ <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background: transparent;">
+ <VBox spacing="10" maxWidth="Infinity" style="-fx-border-radius: 10; -fx-padding: 20;" styleClass="bg-card border-light">
+ <Label fx:id="resumenNombreLabel" text="Nombre: -" style="-fx-font-size: 16px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <Separator/>
+ <Label fx:id="resumenProductoLabel" text="Producto: -"/>
+ <Label fx:id="resumenCategoriaLabel" text="Categoria: -"/>
+ <Label fx:id="resumenTiempoLabel" text="Tiempo: -"/>
+ <Label fx:id="resumenCantidadLabel" text="Cantidad: -"/>
+ <Label fx:id="resumenCostoLabel" text="Costo: -"/>
+ <Separator/>
+ <Label fx:id="resumenIngredientesLabel" text="Ingredientes: 0 seleccionados" style="-fx-font-weight: bold;"/>
+ <Label fx:id="resumenPasosLabel" text="Pasos: 0" style="-fx-font-weight: bold;"/>
+ <Label fx:id="erroresLabel" text="" style="-fx-text-fill: #DC3545; -fx-font-weight: bold;"/>
+ </VBox>
+ </ScrollPane>
+ </VBox>
+ </StackPane>
+ </ScrollPane>
+ </center>
+
+ <bottom>
+ <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding: 12 0 0 0;">
+ <Button fx:id="cancelarButton" text="Cancelar" styleClass="btn-secondary" onAction="#cancelar"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button fx:id="atrasButton" text="Atras" styleClass="btn-secondary" onAction="#irAtras"/>
+ <Button fx:id="siguienteButton" text="Siguiente" styleClass="btn-primary" onAction="#irSiguiente"/>
+ <Button fx:id="guardarButton" text="Guardar Receta" styleClass="btn-success" onAction="#guardarReceta"/>
+ </HBox>
+ </bottom>
+</BorderPane>

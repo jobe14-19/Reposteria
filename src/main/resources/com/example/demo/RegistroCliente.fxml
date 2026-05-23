@@ -6,69 +6,69 @@
 <?import java.net.URL?>
 
 <StackPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.RegistroClienteController">
-    <stylesheets>
-        <URL value="@styles.css"/>
-    </stylesheets>
-    
-    <VBox styleClass="login-card" maxWidth="500" maxHeight="700" alignment="CENTER" spacing="20">
-        <padding>
-            <Insets top="40" right="40" bottom="40" left="40"/>
-        </padding>
-        
-        <VBox alignment="CENTER" spacing="10">
-            <Label text="🍰" styleClass="pastel-logo"/>
-            <Label text="Crear Cuenta" styleClass="title-label"/>
-            <Label text="Únete a la familia de Repostería Rosato" styleClass="subtitle-label"/>
-        </VBox>
-        
-        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-            <VBox spacing="15">
-                <VBox spacing="5">
-                    <Label text="Nombre Completo" styleClass="checkbox-label"/>
-                    <TextField fx:id="nombreField" promptText="Ingresa tu nombre" styleClass="form-field"/>
-                </VBox>
-                
-                <VBox spacing="5">
-                    <Label text="Correo Electrónico" styleClass="checkbox-label"/>
-                    <TextField fx:id="emailField" promptText="ejemplo@correo.com" styleClass="form-field"/>
-                </VBox>
-                
-                <VBox spacing="5">
-                    <Label text="Nombre de Usuario" styleClass="checkbox-label"/>
-                    <TextField fx:id="usernameField" promptText="Elige un usuario" styleClass="form-field"/>
-                </VBox>
-                
-                <VBox spacing="5">
-                    <Label text="Teléfono" styleClass="checkbox-label"/>
-                    <TextField fx:id="telefonoField" promptText="Tu número de teléfono" styleClass="form-field"/>
-                </VBox>
-                
-                <VBox spacing="5">
-                    <Label text="Dirección" styleClass="checkbox-label"/>
-                    <TextField fx:id="direccionField" promptText="Tu dirección completa" styleClass="form-field"/>
-                </VBox>
-                
-                <VBox spacing="5">
-                    <Label text="Contraseña" styleClass="checkbox-label"/>
-                    <PasswordField fx:id="passwordField" styleClass="form-field"/>
-                </VBox>
-                
-                <VBox spacing="5">
-                    <Label text="Confirmar Contraseña" styleClass="checkbox-label"/>
-                    <PasswordField fx:id="confirmPasswordField" styleClass="form-field"/>
-                </VBox>
-            </VBox>
-        </ScrollPane>
-        
-        <Label fx:id="messageLabel" styleClass="error-message" wrapText="true"/>
-        
-        <Button text="Limpiar" onAction="#limpiarCampos"
-                style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand; -fx-pref-width: 320;"/>
-        <Button fx:id="registerButton" text="Registrarse" onAction="#handleRegister" styleClass="login-button" prefWidth="320"/>
-        
-        <HBox alignment="CENTER" spacing="5">
-            <Label text="¿Ya tienes cuenta?" styleClass="checkbox-label"/>
-            <Label text="Inicia sesión aquí" styleClass="register-link" onMouseClicked="#volverAlLogin"/>
-        </HBox>
-    </VBox>
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
+ 
+ <VBox styleClass="login-card" maxWidth="500" maxHeight="700" alignment="CENTER" spacing="20">
+ <padding>
+ <Insets top="40" right="40" bottom="40" left="40"/>
+ </padding>
+ 
+ <VBox alignment="CENTER" spacing="10">
+ <Label text="" styleClass="pastel-logo"/>
+ <Label text="Crear Cuenta" styleClass="title-label"/>
+ <Label text="Únete a la familia de Repostería Rosato" styleClass="subtitle-label"/>
+ </VBox>
+ 
+ <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+ <VBox spacing="15">
+ <VBox spacing="5">
+ <Label text="Nombre Completo" styleClass="checkbox-label"/>
+ <TextField fx:id="nombreField" promptText="Ingresa tu nombre" styleClass="form-field"/>
+ </VBox>
+ 
+ <VBox spacing="5">
+ <Label text="Correo Electrónico" styleClass="checkbox-label"/>
+ <TextField fx:id="emailField" promptText="ejemplo@correo.com" styleClass="form-field"/>
+ </VBox>
+ 
+ <VBox spacing="5">
+ <Label text="Nombre de Usuario" styleClass="checkbox-label"/>
+ <TextField fx:id="usernameField" promptText="Elige un usuario" styleClass="form-field"/>
+ </VBox>
+ 
+ <VBox spacing="5">
+ <Label text="Teléfono" styleClass="checkbox-label"/>
+ <TextField fx:id="telefonoField" promptText="Tu número de teléfono" styleClass="form-field"/>
+ </VBox>
+ 
+ <VBox spacing="5">
+ <Label text="Dirección" styleClass="checkbox-label"/>
+ <TextField fx:id="direccionField" promptText="Tu dirección completa" styleClass="form-field"/>
+ </VBox>
+ 
+ <VBox spacing="5">
+ <Label text="Contraseña" styleClass="checkbox-label"/>
+ <PasswordField fx:id="passwordField" styleClass="form-field"/>
+ </VBox>
+ 
+ <VBox spacing="5">
+ <Label text="Confirmar Contraseña" styleClass="checkbox-label"/>
+ <PasswordField fx:id="confirmPasswordField" styleClass="form-field"/>
+ </VBox>
+ </VBox>
+ </ScrollPane>
+ 
+ <Label fx:id="messageLabel" styleClass="error-message" wrapText="true"/>
+ 
+ <Button text="Limpiar" onAction="#limpiarCampos"
+ style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand; -fx-pref-width: 320;"/>
+ <Button fx:id="registerButton" text="Registrarse" onAction="#handleRegister" styleClass="login-button" prefWidth="320"/>
+ 
+ <HBox alignment="CENTER" spacing="5">
+ <Label text="¿Ya tienes cuenta?" styleClass="checkbox-label"/>
+ <Label text="Inicia sesión aquí" styleClass="register-link" onMouseClicked="#volverAlLogin"/>
+ </HBox>
+ </VBox>
 </StackPane>

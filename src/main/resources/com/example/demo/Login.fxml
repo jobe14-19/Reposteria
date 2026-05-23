@@ -6,52 +6,53 @@
 <?import java.net.URL?>
 
 <StackPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.LoginController">
-    <stylesheets>
-        <URL value="@styles.css"/>
-    </stylesheets>
-    
-    <!-- Login Card -->
-    <VBox styleClass="login-card" maxWidth="400" maxHeight="600" alignment="CENTER" spacing="20">
-        <padding>
-            <Insets top="40" right="40" bottom="40" left="40"/>
-        </padding>
-        
-        <!-- Logo and Title -->
-        <VBox alignment="CENTER" spacing="10">
-            <Label text="🍰" styleClass="pastel-logo"/>
-            <Label text="Repostería Rosato" styleClass="title-label"/>
-            <Label text="El Hub de Repostería como Servicio (PaaS)" styleClass="subtitle-label"/>
-        </VBox>
-        
-        <!-- Form Fields -->
-        <VBox spacing="15" alignment="CENTER_LEFT">
-            <VBox spacing="5">
-                <Label text="Usuario" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
-                <TextField fx:id="usernameField" promptText="Ingresa tu usuario" styleClass="form-field" prefWidth="320"/>
-            </VBox>
-            
-            <VBox spacing="5">
-                <Label text="Contraseña" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
-                <PasswordField fx:id="passwordField" styleClass="form-field" prefWidth="320"/>
-            </VBox>
-        </VBox>
-        
-        <!-- Remember Me Checkbox -->
-        <HBox alignment="CENTER_LEFT" spacing="10">
-            <CheckBox fx:id="rememberMeCheckbox"/>
-            <Label text="Recordarme" styleClass="checkbox-label"/>
-        </HBox>
-        
-        <!-- Message Label -->
-        <Label fx:id="messageLabel" styleClass="error-message" wrapText="true" maxWidth="320"/>
-        
-        <!-- Login Button -->
-        <Button fx:id="loginButton" text="Iniciar Sesión" onAction="#handleLogin" styleClass="login-button" prefWidth="320"/>
-        
-        <!-- Links -->
-        <VBox spacing="10" alignment="CENTER">
-            <Label fx:id="forgotPasswordLink" text="¿Olvidaste tu contraseña?" styleClass="link-label" onMouseClicked="#handleForgotPassword"/>
-            <Label fx:id="registerLink" text="Registrarse como nuevo cliente" styleClass="register-link" onMouseClicked="#abrirRegistro"/>
-        </VBox>
-    </VBox>
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
+ 
+ <!-- Login Card -->
+ <VBox styleClass="login-card" maxWidth="400" maxHeight="600" alignment="CENTER" spacing="20">
+ <padding>
+ <Insets top="40" right="40" bottom="40" left="40"/>
+ </padding>
+ 
+ <!-- Logo and Title -->
+ <VBox alignment="CENTER" spacing="10">
+ <Label text="" styleClass="pastel-logo"/>
+ <Label text="Repostería Rosato" styleClass="title-label"/>
+ <Label text="El Hub de Repostería como Servicio (PaaS)" styleClass="subtitle-label"/>
+ </VBox>
+ 
+ <!-- Form Fields -->
+ <VBox spacing="15" alignment="CENTER_LEFT">
+ <VBox spacing="5">
+  <Label text="Usuario" style="-fx-font-size: 12px;" styleClass="text-muted-sm"/>
+ <TextField fx:id="usernameField" promptText="Ingresa tu usuario" styleClass="form-field" prefWidth="320"/>
+ </VBox>
+ 
+ <VBox spacing="5">
+  <Label text="Contraseña" style="-fx-font-size: 12px;" styleClass="text-muted-sm"/>
+ <PasswordField fx:id="passwordField" styleClass="form-field" prefWidth="320"/>
+ </VBox>
+ </VBox>
+ 
+ <!-- Remember Me Checkbox -->
+ <HBox alignment="CENTER_LEFT" spacing="10">
+ <CheckBox fx:id="rememberMeCheckbox"/>
+ <Label text="Recordarme" styleClass="checkbox-label"/>
+ </HBox>
+ 
+ <!-- Message Label -->
+ <Label fx:id="messageLabel" styleClass="error-message" wrapText="true" maxWidth="320"/>
+ 
+ <!-- Login Button -->
+ <Button fx:id="loginButton" text="Iniciar Sesión" onAction="#handleLogin" styleClass="login-button" prefWidth="320"/>
+ 
+ <!-- Links -->
+ <VBox spacing="10" alignment="CENTER">
+ <Label fx:id="forgotPasswordLink" text="¿Olvidaste tu contraseña?" styleClass="link-label" onMouseClicked="#handleForgotPassword"/>
+ <Label fx:id="registerLink" text="Registrarse como nuevo cliente" styleClass="register-link" onMouseClicked="#abrirRegistro"/>
+
+ </VBox>
+ </VBox>
 </StackPane>

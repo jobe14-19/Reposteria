@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<BorderPane styleClass="app-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.AppShellController">
+ <stylesheets><URL value="@styles.css"/></stylesheets>
+
+ <!-- Top: User bar with sidebar toggle -->
+ <top>
+  <VBox>
+   <!-- Top bar: app title + user info + toggle -->
+   <HBox styleClass="top-bar">
+    <Button fx:id="toggleSidebarBtn" text="☰" styleClass="toggle-sidebar-btn"/>
+    <Label text="Reposteria Rosato" styleClass="top-bar-title"/>
+    <Region HBox.hgrow="ALWAYS"/>
+    <Button fx:id="themeToggleBtn" text="☀️" styleClass="toggle-sidebar-btn"/>
+    <Label fx:id="userLabel" styleClass="top-bar-user"/>
+    <Label fx:id="perfilLabel" styleClass="top-bar-perfil"/>
+   </HBox>
+   <!-- Sub bar: breadcrumb + logout -->
+   <HBox styleClass="sub-bar">
+    <Label fx:id="breadcrumbLabel" text="Dashboard" styleClass="sub-bar-breadcrumb"/>
+    <Region HBox.hgrow="ALWAYS"/>
+    <Button text="Cerrar Sesion" onAction="#cerrarSesion" styleClass="sub-bar-logout"/>
+   </HBox>
+  </VBox>
+ </top>
+
+ <!-- Left: Sidebar navigation (collapsible) -->
+ <left>
+  <ScrollPane fx:id="sidebarScroll" styleClass="sidebar-scroll" hbarPolicy="NEVER" prefWidth="220" minWidth="180" maxWidth="220">
+   <VBox fx:id="sidebarContainer" spacing="2" style="-fx-padding: 8 0;" maxWidth="Infinity"/>
+  </ScrollPane>
+ </left>
+
+ <!-- Center: Dynamic content area -->
+ <center>
+  <StackPane fx:id="contentArea" styleClass="content-pane">
+   <!-- Default: welcome message shown when no module is loaded -->
+   <VBox fx:id="welcomePane" styleClass="welcome-pane">
+    <Label text="Bienvenido al Sistema" styleClass="welcome-title"/>
+    <Label text="Seleccione un modulo en el menu lateral para comenzar" styleClass="welcome-sub"/>
+   </VBox>
+  </StackPane>
+ </center>
+</BorderPane>

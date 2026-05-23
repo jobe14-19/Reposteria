@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox spacing="15" styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.ProductoModalController">
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
+
+ <padding>
+ <Insets top="20" right="20" bottom="20" left="20"/>
+ </padding>
+
+  <Label fx:id="tituloLabel" text="Nuevo Producto" style="-fx-font-size: 20px;" styleClass="text-heading"/>
+
+ <GridPane hgap="15" vgap="15" alignment="CENTER_LEFT">
+ <Label text="Nombre:" style="-fx-font-size: 14px;" styleClass="text-heading" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <TextField fx:id="nombreField" promptText="Nombre del producto" styleClass="form-field" prefWidth="300" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+ <Label text="Descripcion:" style="-fx-font-size: 14px;" styleClass="text-heading" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+ <TextArea fx:id="descripcionField" promptText="Descripcion del producto" prefRowCount="3" prefWidth="300" wrapText="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+ <Label text="Precio Base:" style="-fx-font-size: 14px;" styleClass="text-heading" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+ <TextField fx:id="precioBaseField" promptText="0.00" styleClass="form-field" prefWidth="150" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+ <Label text="Precio Unitario:" style="-fx-font-size: 14px;" styleClass="text-heading" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+ <TextField fx:id="precioUnitarioField" promptText="0.00" styleClass="form-field" prefWidth="150" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+ <Label text="Costo Diseno:" style="-fx-font-size: 14px;" styleClass="text-heading" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+ <TextField fx:id="costoDisenioField" promptText="0.00" styleClass="form-field" prefWidth="150" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+ </GridPane>
+
+ <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding-top: 10;">
+ <Button text="Cancelar" onAction="#cancelar" styleClass="btn-secondary"/>
+ <Button fx:id="guardarButton" text="Guardar" onAction="#guardar" styleClass="btn-success"/>
+ </HBox>
+</VBox>

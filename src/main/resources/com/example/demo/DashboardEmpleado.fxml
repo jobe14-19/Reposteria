@@ -7,133 +7,143 @@
 <?import java.net.URL?>
 
 <BorderPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.DashboardEmpleadoController">
-    <stylesheets>
-        <URL value="@styles.css"/>
-    </stylesheets>
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
 
-    <!-- Navigation Bar -->
-    <top>
-        <VBox>
-            <HBox styleClass="nav-bar" alignment="CENTER_LEFT">
-                <Label text="Panel de Empleado" styleClass="nav-logo"/>
-                <Region HBox.hgrow="ALWAYS"/>
+  <!-- Navigation Bar -->
+  <top>
+  <VBox fx:id="topBar">
+ <HBox styleClass="nav-bar" alignment="CENTER_LEFT">
+ <Label text="Panel de Empleado" styleClass="nav-logo"/>
+ <Region HBox.hgrow="ALWAYS"/>
 
-                <HBox spacing="5" alignment="CENTER">
-                    <Button fx:id="btnDashboard" text="🏠 Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
-                    <Button fx:id="btnProduccion" text="👩‍🍳 Producción" onAction="#mostrarProduccion" styleClass="nav-button"/>
-                    <Button fx:id="btnEntregas" text="🚚 Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
-                    <Button fx:id="btnInventario" text="📦 Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
-                    <Button fx:id="btnHigiene" text="🧼 Higiene" onAction="#mostrarHigiene" styleClass="nav-button"/>
-                    <Button fx:id="btnPerfil" text="👤 Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
-                </HBox>
+ <HBox spacing="5" alignment="CENTER">
+ <Button fx:id="btnDashboard" text="Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
+ <Button fx:id="btnProduccion" text="Producción" onAction="#mostrarProduccion" styleClass="nav-button"/>
+ <Button fx:id="btnEntregas" text="Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
+ <Button fx:id="btnInventario" text="Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
+ <Button fx:id="btnHigiene" text="Higiene" onAction="#mostrarHigiene" styleClass="nav-button"/>
+  <Button fx:id="btnPedidos" text="Pedidos" onAction="#mostrarPedidos" styleClass="nav-button"/>
+  <Button fx:id="btnChefsBox" text="Chef's Box" onAction="#mostrarChefsBox" styleClass="nav-button"/>
+  <Button fx:id="btnPerfil" text="Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
+ </HBox>
 
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Cerrar Sesión" onAction="#cerrarSesion" styleClass="nav-logout"/>
-            </HBox>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button text="Cerrar Sesión" onAction="#cerrarSesion" styleClass="nav-logout"/>
+ </HBox>
 
-            <HBox style="-fx-background-color: #F5F5F5; -fx-padding: 8 20 8 20;" alignment="CENTER_LEFT">
-                <Label fx:id="userLabel" style="-fx-text-fill: #8B5E3C; -fx-font-size: 14px; -fx-font-weight: bold;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lastUpdateLabel" style="-fx-text-fill: #666666; -fx-font-size: 12px;"/>
-            </HBox>
-        </VBox>
-    </top>
+  <HBox style="-fx-padding: 8 20 8 20;" styleClass="bg-input" alignment="CENTER_LEFT">
+  <Label fx:id="userLabel" styleClass="text-heading-sm"/>
+  <Region HBox.hgrow="ALWAYS"/>
+  <Label fx:id="lastUpdateLabel" styleClass="text-muted-sm"/>
+ </HBox>
+ </VBox>
+ </top>
 
-    <center>
-        <ScrollPane fitToWidth="true" style="-fx-background-color: #FAFAFA;">
-            <VBox style="-fx-padding: 25; -fx-spacing: 25;" alignment="TOP_CENTER">
+ <center>
+  <ScrollPane fitToWidth="true" styleClass="scroll-pane bg-primary">
+ <VBox style="-fx-padding: 25; -fx-spacing: 25;" alignment="TOP_CENTER">
 
-                <!-- Today's KPIs -->
-                <VBox fx:id="sectionKPIs" spacing="15">
-                    <Label text="Pedidos Pendientes de Hoy" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                    
-                    <HBox spacing="20" alignment="CENTER">
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="Pedidos" style="-fx-font-size: 40px;"/>
-                            <Label text="Total Pendientes" styleClass="kpi-label"/>
-                            <Label fx:id="pendientesHoyLabel" text="0" styleClass="kpi-value"/>
-                        </VBox>
+  <!-- Today's KPIs -->
+  <VBox fx:id="sectionKPIs" spacing="15">
+  <Label text="Resumen del Día" style="-fx-font-size: 16px;" styleClass="text-heading"/>
+  
+   <FlowPane hgap="16" vgap="16" alignment="CENTER">
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128230;" style="-fx-font-size: 28px;"/>
+   <Label text="Pendientes Hoy" styleClass="kpi-label"/>
+   <Label fx:id="pendientesHoyLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="urgent-card" alignment="CENTER" spacing="8">
+   <Label text="&#128308;" style="-fx-font-size: 28px;"/>
+   <Label text="Urgentes" styleClass="kpi-label"/>
+   <Label fx:id="urgentesHoyLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128197;" style="-fx-font-size: 28px;"/>
+   <Label text="Para Hoy" styleClass="kpi-label"/>
+   <Label fx:id="paraHoyLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128293;" style="-fx-font-size: 28px;"/>
+   <Label text="Prod. Activa" styleClass="kpi-label"/>
+   <Label fx:id="prodActivaEmpLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128200;" style="-fx-font-size: 28px;"/>
+   <Label text="Stock Crítico" styleClass="kpi-label"/>
+   <Label fx:id="stockCriticoEmpLabel" text="0" styleClass="kpi-value" style="-fx-text-fill: #d9534f;"/>
+   </VBox>
+   </FlowPane>
 
-                        <VBox styleClass="urgent-card" alignment="CENTER" spacing="10">
-                            <Label text="⚠️" style="-fx-font-size: 40px;"/>
-                            <Label text="Urgentes" styleClass="kpi-label"/>
-                            <Label fx:id="urgentesHoyLabel" text="0" styleClass="kpi-value"/>
-                        </VBox>
+ <VBox styleClass="table-container" spacing="10">
+  <Label text="Lista Rápida de Pedidos" styleClass="text-heading-sm"/>
+ <ListView fx:id="pedidosRapidosList" prefHeight="150" styleClass="orders-list"/>
+ </VBox>
+ </VBox>
 
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="⏰" style="-fx-font-size: 40px;"/>
-                            <Label text="Para Hoy" styleClass="kpi-label"/>
-                            <Label fx:id="paraHoyLabel" text="0" styleClass="kpi-value"/>
-                        </VBox>
-                    </HBox>
+ <!-- Active Production -->
+ <VBox fx:id="sectionProduccion" spacing="15">
+  <Label text="Producción Activa" style="-fx-font-size: 16px;" styleClass="text-heading"/>
 
-                    <VBox styleClass="table-container" spacing="10">
-                        <Label text="Lista Rápida de Pedidos" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <ListView fx:id="pedidosRapidosList" prefHeight="150" styleClass="orders-list"/>
-                    </VBox>
-                </VBox>
+ <TableView fx:id="produccionTable" prefHeight="200" styleClass="production-table">
+ <columns>
+ <TableColumn fx:id="prodIdColumn" text="ID" prefWidth="60"/>
+ <TableColumn fx:id="prodProductoColumn" text="Producto" prefWidth="150"/>
+ <TableColumn fx:id="prodCantidadColumn" text="Cantidad" prefWidth="100"/>
+ <TableColumn fx:id="prodProgresoColumn" text="Progreso" prefWidth="200"/>
+ <TableColumn fx:id="prodEstadoColumn" text="Estado" prefWidth="100"/>
+ </columns>
+ </TableView>
+ </VBox>
 
-                <!-- Active Production -->
-                <VBox fx:id="sectionProduccion" spacing="15">
-                    <Label text="Producción Activa" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
+ <!-- Critical Stock -->
+ <VBox fx:id="sectionStock" spacing="15">
+ <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Stock Crítico" style="-fx-font-size: 16px;" styleClass="text-heading"/>
+ <Button text="Ver Inventario Completo" onAction="#mostrarInventario" styleClass="view-all-button"/>
+ </HBox>
 
-                    <TableView fx:id="produccionTable" prefHeight="200" styleClass="production-table">
-                        <columns>
-                            <TableColumn fx:id="prodIdColumn" text="ID" prefWidth="60"/>
-                            <TableColumn fx:id="prodProductoColumn" text="Producto" prefWidth="150"/>
-                            <TableColumn fx:id="prodCantidadColumn" text="Cantidad" prefWidth="100"/>
-                            <TableColumn fx:id="prodProgresoColumn" text="Progreso" prefWidth="200"/>
-                            <TableColumn fx:id="prodEstadoColumn" text="Estado" prefWidth="100"/>
-                        </columns>
-                    </TableView>
-                </VBox>
+ <TableView fx:id="stockCriticoTable" prefHeight="180" styleClass="alerts-table">
+ <columns>
+ <TableColumn fx:id="alertIngredienteColumn" text="Ingrediente" prefWidth="150"/>
+ <TableColumn fx:id="alertActualColumn" text="Stock Actual" prefWidth="100"/>
+ <TableColumn fx:id="alertMinimoColumn" text="Mínimo" prefWidth="100"/>
+ <TableColumn fx:id="alertDiferenciaColumn" text="Diferencia" prefWidth="100"/>
+ <TableColumn fx:id="alertUrgenciaColumn" text="Urgencia" prefWidth="100"/>
+ </columns>
+ </TableView>
+ </VBox>
 
-                <!-- Critical Stock -->
-                <VBox fx:id="sectionStock" spacing="15">
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <Label text="Stock Crítico" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <Button text="Ver Inventario Completo" onAction="#mostrarInventario" styleClass="view-all-button"/>
-                    </HBox>
+ <!-- Today's Deliveries -->
+ <VBox fx:id="sectionEntregas" spacing="15">
+ <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Entregas Programadas para Hoy" style="-fx-font-size: 16px;" styleClass="text-heading"/>
+ <Button text="Ver Todas las Entregas" onAction="#mostrarEntregas" styleClass="view-all-button"/>
+ </HBox>
 
-                    <TableView fx:id="stockCriticoTable" prefHeight="180" styleClass="alerts-table">
-                        <columns>
-                            <TableColumn fx:id="alertIngredienteColumn" text="Ingrediente" prefWidth="150"/>
-                            <TableColumn fx:id="alertActualColumn" text="Stock Actual" prefWidth="100"/>
-                            <TableColumn fx:id="alertMinimoColumn" text="Mínimo" prefWidth="100"/>
-                            <TableColumn fx:id="alertDiferenciaColumn" text="Diferencia" prefWidth="100"/>
-                            <TableColumn fx:id="alertUrgenciaColumn" text="Urgencia" prefWidth="100"/>
-                        </columns>
-                    </TableView>
-                </VBox>
+ <TableView fx:id="entregasTable" prefHeight="200" styleClass="delivery-table">
+ <columns>
+ <TableColumn fx:id="entHoraColumn" text="Hora" prefWidth="80"/>
+ <TableColumn fx:id="entClienteColumn" text="Cliente" prefWidth="150"/>
+ <TableColumn fx:id="entDireccionColumn" text="Dirección" prefWidth="200"/>
+ <TableColumn fx:id="entProductoColumn" text="Producto" prefWidth="150"/>
+ <TableColumn fx:id="entEstadoColumn" text="Estado" prefWidth="100"/>
+ </columns>
+ </TableView>
+ </VBox>
 
-                <!-- Today's Deliveries -->
-                <VBox fx:id="sectionEntregas" spacing="15">
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <Label text="Entregas Programadas para Hoy" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <Button text="Ver Todas las Entregas" onAction="#mostrarEntregas" styleClass="view-all-button"/>
-                    </HBox>
+ <!-- Calendar -->
+ <VBox fx:id="sectionCalendario" spacing="15">
+  <Label text="Calendario Semanal de Producción" style="-fx-font-size: 16px;" styleClass="text-heading"/>
 
-                    <TableView fx:id="entregasTable" prefHeight="200" styleClass="delivery-table">
-                        <columns>
-                            <TableColumn fx:id="entHoraColumn" text="Hora" prefWidth="80"/>
-                            <TableColumn fx:id="entClienteColumn" text="Cliente" prefWidth="150"/>
-                            <TableColumn fx:id="entDireccionColumn" text="Dirección" prefWidth="200"/>
-                            <TableColumn fx:id="entProductoColumn" text="Producto" prefWidth="150"/>
-                            <TableColumn fx:id="entEstadoColumn" text="Estado" prefWidth="100"/>
-                        </columns>
-                    </TableView>
-                </VBox>
+ <VBox styleClass="calendar-container" spacing="10">
+ <GridPane fx:id="calendarGrid" hgap="10" vgap="10" alignment="CENTER"/>
+ </VBox>
+ </VBox>
 
-                <!-- Calendar -->
-                <VBox fx:id="sectionCalendario" spacing="15">
-                    <Label text="Calendario Semanal de Producción" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-
-                    <VBox styleClass="calendar-container" spacing="10">
-                        <GridPane fx:id="calendarGrid" hgap="10" vgap="10" alignment="CENTER"/>
-                    </VBox>
-                </VBox>
-
-            </VBox>
-        </ScrollPane>
-    </center>
+ </VBox>
+ </ScrollPane>
+ </center>
 </BorderPane>
