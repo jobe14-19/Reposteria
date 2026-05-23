@@ -65,7 +65,10 @@ public class OrdenProduccionDetalleController {
     private int ordenId;
 
     public void setOrdenDAO(OrdenProduccionDAO dao) { this.ordenDAO = dao; }
-    public void setOrdenId(int id) { this.ordenId = id; }
+    public void setOrdenId(int id) {
+        this.ordenId = id;
+        if (id > 0) cargarOrden();
+    }
 
     @FXML
     public void initialize() {

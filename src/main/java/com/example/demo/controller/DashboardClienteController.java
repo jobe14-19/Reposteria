@@ -282,25 +282,7 @@ public class DashboardClienteController {
  actualizarTimestamp();
  }
 
- @FXML
- private void verMisPedidos(ActionEvent event) {
- try {
- FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MisPedidos.fxml"));
- Parent root = loader.load();
-
- Stage stage = new Stage();
- Scene scene = new Scene(root, 1000, 600);
- stage.setScene(scene);
- stage.setTitle(" Repostería Rosato - Mis Pedidos");
- stage.initModality(Modality.APPLICATION_MODAL);
- stage.show();
- } catch (Exception e) {
- LOGGER.log(Level.SEVERE, "Error al abrir Mis Pedidos: {0}", e.getMessage());
- mostrarError("Error", "No se pudo abrir la ventana de pedidos");
- }
- }
-
- @FXML
+    @FXML
  private void verMiPerfil(ActionEvent event) {
  try {
  FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MiPerfil.fxml"));

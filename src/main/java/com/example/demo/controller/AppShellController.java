@@ -33,12 +33,13 @@ public class AppShellController {
     @FXML private StackPane contentArea;
     @FXML private VBox welcomePane;
     @FXML private ScrollPane sidebarScroll;
-    @FXML private Button toggleSidebarBtn, themeToggleBtn;
+    @FXML private Button toggleSidebarBtn, themeToggleBtn, fullscreenBtn;
 
     private final Map<String, ModuloInfo> modulos = new LinkedHashMap<>();
     private String currentFxml;
     private boolean maximized = false;
     private boolean darkMode = false;
+    private boolean fullscreen = false;
     private static final String DARK_THEME = "/com/example/demo/theme-dark.css";
 
     private record ModuloInfo(String label, String fxml, String parent, Permiso permiso, String icon, String breadcrumb) {}
@@ -51,6 +52,7 @@ public class AppShellController {
 
         toggleSidebarBtn.setOnAction(e -> toggleSidebar());
         themeToggleBtn.setOnAction(e -> toggleTheme());
+        fullscreenBtn.setOnAction(e -> toggleFullscreen());
 
         definirModulos();
         construirSidebar(session);
@@ -97,16 +99,22 @@ public class AppShellController {
         }
     }
 
+    private void toggleFullscreen() {
+        Stage stage = (Stage) fullscreenBtn.getScene().getWindow();
+        if (stage == null) return;
+        fullscreen = !fullscreen;
+        stage.setFullScreen(fullscreen);
+        fullscreenBtn.setText(fullscreen ? "\u2716" : "\u2B1E");
+    }
+
     private void definirModulos() {
         modulos.put("dashboard",       new ModuloInfo("Dashboard",         "DashboardAdmin.fxml",      null,    Permiso.DASHBOARD_ADMIN_LEER,   "\uD83D\uDCCA", "Dashboard"));
         modulos.put("dashboard-emp",   new ModuloInfo("Mi Dashboard",      "DashboardEmpleado.fxml",   null,    Permiso.DASHBOARD_EMPLEADO_LEER,"\uD83D\uDCCA", "Dashboard"));
         modulos.put("dashboard-cli",   new ModuloInfo("Mi Dashboard",      "DashboardCliente.fxml",    null,    Permiso.DASHBOARD_CLIENTE_LEER, "\uD83D\uDCCA", "Dashboard"));
 
-        modulos.put("pedidos",         new ModuloInfo("Pedidos",           "Pedidos.fxml",             "pedidos-clientes", Permiso.PEDIDOS_LEER, "\uD83D\uDCCB", "Pedidos y Clientes > Pedidos"));
-        modulos.put("mis-pedidos",     new ModuloInfo("Mis Pedidos",       "MisPedidos.fxml",          "pedidos-clientes", Permiso.PEDIDOS_LEER, "\uD83D\uDCDD", "Pedidos y Clientes > Mis Pedidos"));
+        modulos.put("pedidos",         new ModuloInfo("Ordenes Produccion","OrdenesProduccion.fxml",   "produccion", Permiso.PRODUCCION_LEER, "\uD83D\uDD27", "Produccion > Ordenes"));
 
         modulos.put("planificacion",   new ModuloInfo("Planificacion",     "Planificacion.fxml",       "produccion", Permiso.PRODUCCION_LEER, "\uD83D\uDCC5", "Produccion > Planificacion"));
-        modulos.put("ordenes-prod",    new ModuloInfo("Ordenes Prod.",     "OrdenesProduccion.fxml",   "produccion", Permiso.PRODUCCION_LEER, "\uD83D\uDD27", "Produccion > Ordenes"));
         modulos.put("productos",       new ModuloInfo("Productos",         "Productos.fxml",           "produccion", Permiso.INVENTARIO_LEER, "\uD83C\uDF82", "Produccion > Productos"));
 
         modulos.put("inventario",      new ModuloInfo("Inventario",        "Inventario.fxml",          "inventario", Permiso.INVENTARIO_LEER, "\uD83D\uDCE6", "Inventario"));
@@ -121,6 +129,7 @@ public class AppShellController {
         modulos.put("chefsbox",        new ModuloInfo("Chef's Box",        "ChefsBox.fxml",            "plataforma", Permiso.CHEFS_BOX_LEER, "\uD83C\uDF81", "Plataforma Digital"));
 
         modulos.put("reportes",        new ModuloInfo("Reportes",          "Reportes.fxml",            null,       Permiso.REPORTES_LEER, "\uD83D\uDCC8", "Reportes"));
+        modulos.put("mis-pedidos",     new ModuloInfo("Mis Pedidos",       "ClientePedidos.fxml",      null,       Permiso.PEDIDOS_LEER, "\uD83D\uDCDD", "Mis Pedidos"));
         modulos.put("mi-perfil",       new ModuloInfo("Mi Perfil",         "MiPerfil.fxml",            null,       Permiso.PERFIL_LEER,   "\uD83D\uDC64", "Mi Perfil"));
     }
 
@@ -133,6 +142,7 @@ public class AppShellController {
         for (var e : modulos.entrySet()) {
             if (!session.tienePermiso(e.getValue().permiso())) continue;
             if (session.isCliente() && "pedidos".equals(e.getKey())) continue;
+            if (!session.isCliente() && "mis-pedidos".equals(e.getKey())) continue;
             if (e.getValue().parent() != null) {
                 itemsPorGrupo.computeIfAbsent(e.getValue().parent(), k -> new ArrayList<>()).add(e);
             } else {
@@ -154,9 +164,9 @@ public class AppShellController {
             .filter(e -> dKey == null || e.getKey().equals(dKey))
             .toList();
         var adminItems = sinGrupo.stream().filter(e -> List.of("reportes", "mi-perfil").contains(e.getKey())).toList();
+        var clientItems = sinGrupo.stream().filter(e -> "mis-pedidos".equals(e.getKey())).toList();
 
         Map<String, String> etiquetasGrupo = Map.ofEntries(
-            Map.entry("pedidos-clientes", "PEDIDOS Y CLIENTES"),
             Map.entry("produccion", "PRODUCCION"),
             Map.entry("inventario", "INVENTARIO"),
             Map.entry("entregas", "ENTREGAS Y COBROS"),
@@ -165,13 +175,22 @@ public class AppShellController {
             Map.entry("plataforma", "PLATAFORMA DIGITAL")
         );
 
-        List<String> ordenGrupos = List.of("pedidos-clientes", "produccion", "inventario", "entregas", "personal", "operaciones", "plataforma");
+        List<String> ordenGrupos = List.of("produccion", "inventario", "entregas", "personal", "operaciones", "plataforma");
 
         if (!dashboardItems.isEmpty()) {
             Label sec = new Label("PRINCIPAL");
             sec.getStyleClass().add("sidebar-section");
             sidebarContainer.getChildren().add(sec);
             for (var e : dashboardItems) {
+                sidebarContainer.getChildren().add(crearBoton(e.getKey(), e.getValue()));
+            }
+        }
+
+        if (!clientItems.isEmpty()) {
+            Label sec = new Label("MIS COSAS");
+            sec.getStyleClass().add("sidebar-section");
+            sidebarContainer.getChildren().add(sec);
+            for (var e : clientItems) {
                 sidebarContainer.getChildren().add(crearBoton(e.getKey(), e.getValue()));
             }
         }
@@ -242,7 +261,6 @@ public class AppShellController {
                     }
                 }
             }
-
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al cargar modulo {0}: {1}", new Object[]{info.fxml(), e.getMessage()});
         }
@@ -262,9 +280,13 @@ public class AppShellController {
     private void cerrarSesion() {
         SessionManager.getInstance().cerrarSesion();
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml"));
             Stage stage = (Stage) breadcrumbLabel.getScene().getWindow();
-            stage.getScene().setRoot(root);
+            if (stage.isFullScreen()) stage.setFullScreen(false);
+            stage.setMaximized(false);
+            stage.setResizable(false);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/Login.fxml"));
+            Scene scene = new Scene(loader.load(), 1000, 700);
+            stage.setScene(scene);
             stage.setTitle("Reposteria Rosato - Iniciar Sesion");
             stage.sizeToScene();
         } catch (IOException e) {

@@ -119,8 +119,15 @@ public class LoginController {
 
   Stage stage = (Stage) loginButton.getScene().getWindow();
   Scene scene = new Scene(root, 1280, 720);
+  scene.setOnKeyPressed(e -> {
+   if ("F11".equals(e.getCode().name())) {
+    stage.setFullScreen(!stage.isFullScreen());
+   }
+  });
   stage.setScene(scene);
   stage.setTitle(" Repostería Rosato - " + obtenerTituloPorPerfil(perfil));
+  stage.setResizable(true);
+  stage.setMaximized(true);
   stage.show();
 
   } catch (IOException e) {

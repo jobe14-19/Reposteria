@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox spacing="18" styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.ClientePedidosController">
+ <stylesheets><URL value="@styles.css"/></stylesheets>
+ <padding><Insets top="22" right="22" bottom="22" left="22"/></padding>
+
+ <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Mis Pedidos" styleClass="text-heading-lg"/>
+  <Region HBox.hgrow="ALWAYS"/>
+  <Button text="+ Nuevo Pedido" onAction="#nuevoPedido" styleClass="btn-primary"/>
+ </HBox>
+
+ <Separator/>
+
+ <TableView fx:id="pedidosTable" VBox.vgrow="ALWAYS">
+  <columns>
+   <TableColumn fx:id="idColumn" text="#" prefWidth="60"/>
+   <TableColumn fx:id="productoColumn" text="Producto" prefWidth="200"/>
+   <TableColumn fx:id="librasColumn" text="Libras" prefWidth="80"/>
+   <TableColumn fx:id="fechaColumn" text="Fecha Entrega" prefWidth="130"/>
+   <TableColumn fx:id="totalColumn" text="Total" prefWidth="100"/>
+   <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="120"/>
+  </columns>
+  <placeholder><Label text="No tienes pedidos registrados. Haz clic en 'Nuevo Pedido' para comenzar."/></placeholder>
+ </TableView>
+
+ <Label fx:id="totalLabel" styleClass="text-muted-sm"/>
+</VBox>

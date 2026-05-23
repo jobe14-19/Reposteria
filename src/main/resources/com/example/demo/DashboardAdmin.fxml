@@ -21,7 +21,7 @@
  <HBox spacing="3" alignment="CENTER">
  <Button text="Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
  <Button text="Clientes" onAction="#mostrarClientes" styleClass="nav-button"/>
- <Button text="Pedidos" onAction="#mostrarPedidos" styleClass="nav-button"/>
+  <Button text="Órdenes" onAction="#mostrarPedidos" styleClass="nav-button"/>
  <Button text="Producción" onAction="#mostrarProduccion" styleClass="nav-button"/>
   <Button text="Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
   <Button text="Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
@@ -51,7 +51,7 @@
    <FlowPane hgap="16" vgap="16" alignment="CENTER">
    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
    <Label text="&#128230;" style="-fx-font-size: 28px;"/>
-   <Label text="Pedidos Pendientes" styleClass="kpi-label"/>
+   <Label text="Órdenes Pendientes" styleClass="kpi-label"/>
    <Label fx:id="pedidosPendientesLabel" text="0" styleClass="kpi-value"/>
    </VBox>
    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
@@ -61,7 +61,7 @@
    </VBox>
    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
    <Label text="&#128197;" style="-fx-font-size: 28px;"/>
-   <Label text="Pedidos Hoy" styleClass="kpi-label"/>
+   <Label text="Entrega Hoy" styleClass="kpi-label"/>
    <Label fx:id="pedidosHoyLabel" text="0" styleClass="kpi-value"/>
    </VBox>
    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
@@ -95,18 +95,18 @@
   <HBox spacing="20" alignment="CENTER">
   <VBox spacing="10" HBox.hgrow="ALWAYS">
   <HBox alignment="CENTER_LEFT" spacing="15">
-   <Label text="Ventas Últimos 7 Días" style="-fx-font-size: 15px;" styleClass="text-heading"/>
+   <Label text="Producción Últimos 7 Días" style="-fx-font-size: 15px;" styleClass="text-heading"/>
   </HBox>
   <VBox styleClass="chart-container">
   <LineChart fx:id="salesChart" title="" legendVisible="false" prefHeight="220" createSymbols="false">
   <xAxis><CategoryAxis fx:id="xAxis" label=""/></xAxis>
-  <yAxis><NumberAxis fx:id="yAxis" label="Ventas ($)"/></yAxis>
+   <yAxis><NumberAxis fx:id="yAxis" label="Valor ($)"/></yAxis>
   </LineChart>
   </VBox>
   </VBox>
   <VBox spacing="10" HBox.hgrow="ALWAYS">
   <HBox alignment="CENTER_LEFT" spacing="15">
-   <Label text="Productos Más Vendidos" style="-fx-font-size: 15px;" styleClass="text-heading"/>
+   <Label text="Categorías en Producción" style="-fx-font-size: 15px;" styleClass="text-heading"/>
   </HBox>
   <VBox styleClass="chart-container">
   <BarChart fx:id="productsChart" title="" legendVisible="false" prefHeight="220" categoryGap="4" barGap="2">

@@ -19,8 +19,7 @@
 
  <HBox spacing="5" alignment="CENTER">
  <Button text="Mi Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
- <Button text="Mis Pedidos" onAction="#verMisPedidos" styleClass="nav-button"/>
- <Button text="Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
+  <Button text="Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
  <Button text="Chef's Box" onAction="#verChefsBox" styleClass="nav-button"/>
  </HBox>
 
@@ -80,7 +79,7 @@
  <VBox spacing="15">
  <HBox alignment="CENTER_LEFT" spacing="15">
   <Label text="Mis Últimos 5 Pedidos" style="-fx-font-size: 16px;" styleClass="text-heading"/>
- <Button text="Ver Todos" onAction="#verMisPedidos" styleClass="view-all-button"/>
+
  </HBox>
 
  <TableView fx:id="pedidosTable" styleClass="orders-table">

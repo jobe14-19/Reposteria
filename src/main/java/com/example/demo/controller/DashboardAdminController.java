@@ -41,35 +41,35 @@ public class DashboardAdminController {
 
  private static final Logger LOGGER = Logger.getLogger(DashboardAdminController.class.getName());
 
- // KPIs
- private static final String SQL_PEDIDOS_PENDIENTES =
-  "SELECT COUNT(*) as total FROM pedidos WHERE estado IN ('Pendiente','Confirmado','Programado')";
- private static final String SQL_PROD_ACTIVA =
-  "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN_PRODUCCION')";
- private static final String SQL_PEDIDOS_HOY =
-  "SELECT COUNT(*) as total FROM pedidos WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
- private static final String SQL_STOCK_BAJO =
-  "SELECT COUNT(*) as total FROM inventario WHERE stock_actual < stock_minimo";
- private static final String SQL_ENTREGAS_HOY =
-  "SELECT COUNT(*) as total FROM entregas WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
-  private static final String SQL_SALDO_PENDIENTE =
-  "SELECT COALESCE(SUM(total - ISNULL(adelanto, 0)), 0) as total FROM pedidos WHERE total > ISNULL(adelanto, 0)";
- private static final String SQL_PROD_ATRASADA =
-  "SELECT COUNT(*) as total FROM ordenes_produccion WHERE fecha_entrega < GETDATE() AND estado NOT IN ('COMPLETADA','ENTREGADA','CANCELADA')";
- private static final String SQL_CLIENTES_NUEVOS =
-  "SELECT COUNT(*) as total FROM clientes WHERE MONTH(fecha_registro) = MONTH(GETDATE()) AND YEAR(fecha_registro) = YEAR(GETDATE())";
+    // KPIs
+    private static final String SQL_PEDIDOS_PENDIENTES =
+        "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION')";
+    private static final String SQL_PROD_ACTIVA =
+        "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION')";
+    private static final String SQL_PEDIDOS_HOY =
+        "SELECT COUNT(*) as total FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
+    private static final String SQL_STOCK_BAJO =
+        "SELECT COUNT(*) as total FROM inventario WHERE stock_actual < stock_minimo";
+    private static final String SQL_ENTREGAS_HOY =
+        "SELECT COUNT(*) as total FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE) AND estado = 'ENTREGADA'";
+    private static final String SQL_SALDO_PENDIENTE =
+        "SELECT COALESCE(SUM(precio_venta - ISNULL(anticipo, 0)), 0) as total FROM ordenes_produccion WHERE precio_venta > ISNULL(anticipo, 0) AND estado NOT IN ('CANCELADA','ENTREGADA')";
+    private static final String SQL_PROD_ATRASADA =
+        "SELECT COUNT(*) as total FROM ordenes_produccion WHERE fecha_entrega < GETDATE() AND estado NOT IN ('COMPLETADA','ENTREGADA','CANCELADA')";
+    private static final String SQL_CLIENTES_NUEVOS =
+        "SELECT COUNT(*) as total FROM clientes WHERE MONTH(fecha_registro) = MONTH(GETDATE()) AND YEAR(fecha_registro) = YEAR(GETDATE())";
 
- // Charts
-  private static final String SQL_VENTAS_7_DIAS =
-  "SELECT CONVERT(VARCHAR, CAST(fecha_pedido AS DATE), 103) as dia, SUM(total) as ventas FROM pedidos WHERE fecha_pedido >= DATEADD(day, -6, GETDATE()) GROUP BY CAST(fecha_pedido AS DATE) ORDER BY CAST(fecha_pedido AS DATE)";
-  private static final String SQL_PRODUCTOS_TOP =
-  "SELECT TOP 10 p.nombre as producto, COUNT(*) as unidades FROM detalles_pedido dp INNER JOIN productos p ON dp.id_producto = p.id_producto INNER JOIN pedidos pe ON dp.id_pedido = pe.id_pedido WHERE pe.fecha_pedido >= DATEADD(month, -1, GETDATE()) GROUP BY p.nombre ORDER BY COUNT(*) DESC";
+    // Charts
+    private static final String SQL_VENTAS_7_DIAS =
+        "SELECT CONVERT(VARCHAR, CAST(fecha_entrega AS DATE), 103) as dia, SUM(precio_venta) as total FROM ordenes_produccion WHERE fecha_entrega >= DATEADD(day, -6, GETDATE()) AND estado IN ('COMPLETADA','ENTREGADA','EN PRODUCCION') GROUP BY CAST(fecha_entrega AS DATE) ORDER BY CAST(fecha_entrega AS DATE)";
+    private static final String SQL_PRODUCTOS_TOP =
+        "SELECT TOP 10 ISNULL(categoria, 'General') as producto, COUNT(*) as unidades FROM ordenes_produccion WHERE fecha_entrega >= DATEADD(month, -1, GETDATE()) GROUP BY categoria ORDER BY COUNT(*) DESC";
 
- // Tables
-  private static final String SQL_ENTREGAS_PROXIMAS =
-  "SELECT TOP 10 FORMAT(hora_entrega, 'HH:mm') as hora, cliente, direccion, estado FROM entregas WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE) ORDER BY hora_entrega ASC";
- private static final String SQL_ALERTAS =
-  "SELECT TOP 15 'Stock Bajo' as tipo, i.ingrediente + ' - Disp: ' + CAST(CAST(i.stock_actual AS INT) AS VARCHAR) + ' (Min: ' + CAST(CAST(i.stock_minimo AS INT) AS VARCHAR) + ')' as descripcion, FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm') as fecha, CASE WHEN i.stock_actual < i.stock_minimo THEN 'CRITICO' ELSE 'BAJO' END as estado FROM inventario i WHERE i.stock_actual < i.stock_minimo * 1.2 UNION ALL SELECT TOP 5 'Atrasado' as tipo, 'Pedido #' + CAST(p.id_pedido AS VARCHAR) + ' - ' + c.nombre as descripcion, FORMAT(p.fecha_entrega, 'yyyy-MM-dd HH:mm') as fecha, 'ATRASADO' as estado FROM pedidos p INNER JOIN clientes c ON p.id_cliente = c.id_cliente WHERE p.estado = 'Atrasado' ORDER BY fecha DESC";
+    // Tables
+    private static final String SQL_ENTREGAS_PROXIMAS =
+        "SELECT TOP 10 ISNULL(hora_entrega, '00:00') as hora, cliente, ISNULL(direccion, '') as direccion, estado FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE) ORDER BY hora_entrega ASC";
+    private static final String SQL_ALERTAS =
+        "SELECT 'Stock Bajo' as tipo, i.ingrediente + ' - Disp: ' + CAST(CAST(i.stock_actual AS INT) AS VARCHAR) + ' (Min: ' + CAST(CAST(i.stock_minimo AS INT) AS VARCHAR) + ')' as descripcion, FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm') as fecha, CASE WHEN i.stock_actual < i.stock_minimo THEN 'CRITICO' ELSE 'BAJO' END as estado FROM inventario i WHERE i.stock_actual < i.stock_minimo * 1.2 UNION ALL SELECT TOP 5 'Atrasado' as tipo, 'Orden #' + CAST(op.id AS VARCHAR) + ' - ' + op.cliente as descripcion, FORMAT(op.fecha_entrega, 'yyyy-MM-dd HH:mm') as fecha, 'ATRASADO' as estado FROM ordenes_produccion op WHERE op.fecha_entrega < GETDATE() AND op.estado NOT IN ('COMPLETADA','ENTREGADA','CANCELADA') ORDER BY fecha DESC";
  private static final String SQL_CLIENTES_RECIENTES =
   "SELECT TOP 10 c.nombre, c.telefono, FORMAT(c.fecha_registro, 'yyyy-MM-dd') as fecha_registro, COALESCE(SUM(p.total), 0) as total_gastado FROM clientes c LEFT JOIN pedidos p ON c.id_cliente = p.id_cliente GROUP BY c.id_cliente, c.nombre, c.telefono, c.fecha_registro ORDER BY c.fecha_registro DESC";
  private static final String SQL_ACTIVIDADES =
@@ -211,7 +211,7 @@ public class DashboardAdminController {
   ObservableList<XYChart.Data<String, Number>> data = FXCollections.observableArrayList();
   try (PreparedStatement stmt = conn.prepareStatement(SQL_VENTAS_7_DIAS);
     ResultSet rs = stmt.executeQuery()) {
-  while (rs.next()) data.add(new XYChart.Data<>(rs.getString("dia"), rs.getDouble("ventas")));
+    while (rs.next()) data.add(new XYChart.Data<>(rs.getString("dia"), rs.getDouble("total")));
   XYChart.Series<String, Number> series = new XYChart.Series<>();
   series.setData(data);
   salesChart.setData(FXCollections.observableArrayList(series));

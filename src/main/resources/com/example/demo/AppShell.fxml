@@ -12,11 +12,12 @@
  <top>
   <VBox>
    <!-- Top bar: app title + user info + toggle -->
-   <HBox styleClass="top-bar">
-    <Button fx:id="toggleSidebarBtn" text="☰" styleClass="toggle-sidebar-btn"/>
-    <Label text="Reposteria Rosato" styleClass="top-bar-title"/>
-    <Region HBox.hgrow="ALWAYS"/>
-    <Button fx:id="themeToggleBtn" text="☀️" styleClass="toggle-sidebar-btn"/>
+    <HBox styleClass="top-bar">
+     <Button fx:id="toggleSidebarBtn" text="☰" styleClass="toggle-sidebar-btn"/>
+     <Label text="Reposteria Rosato" styleClass="top-bar-title"/>
+     <Region HBox.hgrow="ALWAYS"/>
+     <Button fx:id="fullscreenBtn" text="⛶" styleClass="toggle-sidebar-btn"/>
+     <Button fx:id="themeToggleBtn" text="☀️" styleClass="toggle-sidebar-btn"/>
     <Label fx:id="userLabel" styleClass="top-bar-user"/>
     <Label fx:id="perfilLabel" styleClass="top-bar-perfil"/>
    </HBox>

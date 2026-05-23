@@ -165,7 +165,7 @@ public class OrdenesProduccionController {
             stage.setOnHidden(e -> cargarOrdenes());
             stage.showAndWait();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error abrir detalle: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error abrir detalle", e);
         }
     }
 }

@@ -42,7 +42,7 @@ public class MenuPrincipalController {
  // Si el perfil es ADMIN, se permite todo.
  
  sections.put("Dashboards Principales", new String[]{"DashboardAdmin.fxml", "DashboardCliente.fxml", "DashboardEmpleado.fxml"});
- sections.put("Gestión de Pedidos", new String[]{"Pedidos.fxml", "MisPedidos.fxml", "PedidoModal.fxml", "PedidoDetalleModal.fxml", "CompraModal.fxml"});
+        sections.put("Gestión de Pedidos", new String[]{"Pedidos.fxml", "PedidoModal.fxml", "CompraModal.fxml"});
  sections.put("Entregas", new String[]{"Entregas.fxml", "EntregaModal.fxml"});
  sections.put("Clientes y Perfiles", new String[]{"Clientes.fxml", "ClienteModal.fxml", "MiPerfil.fxml"});
  sections.put("Inventario e Ingredientes", new String[]{"Inventario.fxml", "IngredienteModal.fxml"});
@@ -97,16 +97,15 @@ public class MenuPrincipalController {
  if (session.tienePermiso(Permiso.DASHBOARD_ADMIN_LEER)) return true;
 
  if (PermisoService.tienePermiso(perfil, Permiso.DASHBOARD_CLIENTE_LEER)) {
- return fxml.equals("DashboardCliente.fxml") ||
- fxml.equals("MisPedidos.fxml") ||
- fxml.equals("PedidoModal.fxml") ||
- fxml.equals("MiPerfil.fxml");
+  return fxml.equals("DashboardCliente.fxml") ||
+  fxml.equals("PedidoModal.fxml") ||
+  fxml.equals("MiPerfil.fxml");
  }
 
  if (fxml.equals("MiPerfil.fxml") && session.tienePermiso(Permiso.PERFIL_LEER)) return true;
  if (fxml.equals("DashboardEmpleado.fxml") && session.tienePermiso(Permiso.DASHBOARD_EMPLEADO_LEER)) return true;
 
- if (fxml.equals("Pedidos.fxml") || fxml.equals("PedidoDetalleModal.fxml")) {
+  if (fxml.equals("Pedidos.fxml")) {
  return session.tienePermiso(Permiso.PEDIDOS_LEER);
  }
  if (fxml.equals("PedidoModal.fxml") || fxml.equals("CompraModal.fxml")) {
