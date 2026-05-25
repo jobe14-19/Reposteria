@@ -41,23 +41,23 @@ public class DashboardEmpleadoController {
 
  private static final Logger LOGGER = Logger.getLogger(DashboardEmpleadoController.class.getName());
 
- // Constantes SQL
- private static final String SQL_PENDIENTES_HOY =
- "SELECT COUNT(*) as pendientes FROM pedidos WHERE estado = 'Confirmado' AND CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE)";
- private static final String SQL_URGENTES_HOY =
- "SELECT COUNT(*) as urgententes FROM pedidos WHERE estado = 'Confirmado' AND prioridad = 'ALTA' AND CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE)";
-  private static final String SQL_PARA_HOY =
-  "SELECT COUNT(*) as para_hoy FROM pedidos WHERE CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE)";
-  private static final String SQL_PROD_ACTIVA_EMP =
-  "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN_PRODUCCION')";
-  private static final String SQL_STOCK_CRITICO_EMP =
-  "SELECT COUNT(*) as total FROM inventario WHERE stock_actual < stock_minimo";
-  private static final String SQL_PRODUCCION_ACTIVA =
-  "SELECT TOP 5 o.id_orden as id_produccion, ISNULL(r.nombre_receta, 'Producto') as producto, o.libras as cantidad, o.progreso, o.estado FROM ordenes_produccion o LEFT JOIN recetas r ON o.id_receta = r.id_receta WHERE o.estado IN ('ACTIVA','EN_PRODUCCION') ORDER BY o.id_orden DESC";
- private static final String SQL_STOCK_CRITICO =
- "SELECT ingrediente, stock_actual, stock_minimo, (stock_minimo - stock_actual) as diferencia, CASE WHEN stock_actual < stock_minimo THEN 'CRÍTICO' WHEN stock_actual < stock_minimo * 1.2 THEN 'BAJO' ELSE 'OK' END as urgencia FROM inventario WHERE stock_actual < stock_minimo * 1.5 ORDER BY (stock_minimo - stock_actual) DESC";
- private static final String SQL_ENTREGAS_HOY =
- "SELECT TOP 10 FORMAT(hora_entrega, 'HH:mm') as hora, cliente, direccion, producto, estado FROM entregas WHERE CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE) ORDER BY hora_entrega ASC";
+  // Constantes SQL - usando ordenes_produccion como fuente principal
+  private static final String SQL_PENDIENTES_HOY =
+  "SELECT COUNT(*) as pendientes FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION') AND CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
+  private static final String SQL_URGENTES_HOY =
+  "SELECT COUNT(*) as urgententes FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION') AND fecha_entrega <= CAST(GETDATE() AS DATE) AND CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
+   private static final String SQL_PARA_HOY =
+   "SELECT COUNT(*) as para_hoy FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
+   private static final String SQL_PROD_ACTIVA_EMP =
+   "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION')";
+   private static final String SQL_STOCK_CRITICO_EMP =
+   "SELECT COUNT(*) as total FROM inventario WHERE stock_actual < stock_minimo";
+   private static final String SQL_PRODUCCION_ACTIVA =
+   "SELECT TOP 5 id as id_produccion, COALESCE(categoria, 'General') as producto, libras as cantidad, progreso, estado FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION') ORDER BY id DESC";
+  private static final String SQL_STOCK_CRITICO =
+  "SELECT ingrediente, stock_actual, stock_minimo, (stock_minimo - stock_actual) as diferencia, CASE WHEN stock_actual < stock_minimo THEN 'CRÍTICO' WHEN stock_actual < stock_minimo * 1.2 THEN 'BAJO' ELSE 'OK' END as urgencia FROM inventario WHERE stock_actual < stock_minimo * 1.5 ORDER BY (stock_minimo - stock_actual) DESC";
+  private static final String SQL_ENTREGAS_HOY =
+  "SELECT TOP 10 COALESCE(hora_entrega, '00:00') as hora, COALESCE(cliente, '-') as cliente, COALESCE(direccion, '-') as direccion, COALESCE(categoria, 'Pastel') as producto, estado FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE) ORDER BY hora_entrega ASC";
 
  // Constantes
  private static final int REFRESH_INTERVAL_MS = 30000;
@@ -354,7 +354,7 @@ public class DashboardEmpleadoController {
  @FXML private void mostrarInventario(ActionEvent e) { navegarAVista("Inventario.fxml", "Gestión de Inventario"); }
  @FXML private void mostrarHigiene(ActionEvent e) { navegarAVista("Limpieza.fxml", "Gestión de Higiene"); }
   @FXML private void mostrarChefsBox(ActionEvent e) { navegarAVista("ChefsBox.fxml", "Chef's Box"); }
-  @FXML private void mostrarPedidos(ActionEvent e) { navegarAVista("Pedidos.fxml", "Pedidos"); }
+  @FXML private void mostrarPedidos(ActionEvent e) { navegarAVista("OrdenesProduccion.fxml", "Ordenes de Produccion"); }
 
  @FXML
  private void verMiPerfil(ActionEvent e) {
