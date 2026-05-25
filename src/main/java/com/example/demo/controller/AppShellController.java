@@ -130,7 +130,7 @@ public class AppShellController {
 
         modulos.put("chefsbox",        new ModuloInfo("Chef's Box",        "ChefsBox.fxml",            "plataforma", Permiso.CHEFS_BOX_LEER, "\uD83C\uDF81", "Plataforma Digital"));
 
-        modulos.put("facturas",        new ModuloInfo("Facturación",       "Factura.fxml",             null,       Permiso.REPORTES_LEER, "\uD83D\uDCCB", "Facturación"));
+        modulos.put("facturas",        new ModuloInfo("Facturación",       "Factura.fxml",             null,       Permiso.FACTURACION_LEER, "\uD83D\uDCCB", "Administracion > Facturación"));
         modulos.put("reportes",        new ModuloInfo("Reportes",          "Reportes.fxml",            null,       Permiso.REPORTES_LEER, "\uD83D\uDCC8", "Reportes"));
         modulos.put("usuarios",        new ModuloInfo("Usuarios",          "Usuarios.fxml",            null,       Permiso.DASHBOARD_ADMIN_LEER, "\uD83D\uDC65", "Administracion > Usuarios"));
         modulos.put("mis-pedidos",     new ModuloInfo("Mis Pedidos",       "ClientePedidos.fxml",      null,       Permiso.PEDIDOS_LEER, "\uD83D\uDCDD", "Mis Pedidos"));
@@ -167,7 +167,7 @@ public class AppShellController {
             .filter(e -> e.getKey().startsWith("dashboard-") || e.getKey().equals("dashboard"))
             .filter(e -> dKey == null || e.getKey().equals(dKey))
             .toList();
-        var adminItems = sinGrupo.stream().filter(e -> List.of("reportes", "mi-perfil").contains(e.getKey())).toList();
+        var adminItems = sinGrupo.stream().filter(e -> List.of("reportes", "mi-perfil", "facturas", "usuarios").contains(e.getKey())).toList();
         var clientItems = sinGrupo.stream().filter(e -> "mis-pedidos".equals(e.getKey())).toList();
 
         Map<String, String> etiquetasGrupo = Map.ofEntries(

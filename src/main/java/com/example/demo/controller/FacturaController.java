@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -28,7 +29,7 @@ public class FacturaController {
         "op.direccion, op.precio_venta, op.anticipo, op.libras, " +
         "op.categoria, op.decoracion, op.adornos, op.rellenos, " +
         "op.mensaje, op.costo_delivery, op.fecha_entrega " +
-        "FROM ordenes_produccion op WHERE op.id = ? OR op.cliente LIKE ?";
+        "FROM ordenes_produccion op WHERE op.cliente LIKE ? OR op.numero_orden LIKE ?";
 
     private static final String SQL_INSERT_FACTURA =
         "INSERT INTO facturas (id_orden, cliente, telefono, direccion, " +
@@ -80,6 +81,19 @@ public class FacturaController {
         factImpuestoColumn.setCellValueFactory(new PropertyValueFactory<>("itbis"));
         factTotalColumn.setCellValueFactory(new PropertyValueFactory<>("total"));
         factEstadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        factEstadoColumn.setCellFactory(col -> new TableCell<>() {
+ private final Label badge = new Label();
+ private final HBox hbox = new HBox(5);
+ { badge.setStyle("-fx-background-radius: 12; -fx-padding: 4 8 4 8; -fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white;"); hbox.getChildren().add(badge); }
+ @Override protected void updateItem(String item, boolean empty) {
+ super.updateItem(item, empty);
+ if (empty || item == null) { setGraphic(null); return; }
+ String color = "EMITIDA".equals(item) ? "#28A745" : "PAGADA".equals(item) ? "#007BFF" : "#FF9800";
+ badge.setStyle("-fx-background-radius: 12; -fx-padding: 4 8 4 8; -fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: " + color + ";");
+ badge.setText(item);
+ setGraphic(hbox);
+ }
+ });
 
         asegurarTabla();
         cargarFacturas();
@@ -127,8 +141,9 @@ public class FacturaController {
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_ORDEN)) {
-            stmt.setString(1, texto);
-            stmt.setString(2, "%" + texto + "%");
+            String like = "%" + texto + "%";
+            stmt.setString(1, like);
+            stmt.setString(2, like);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     ordenSeleccionadaId = rs.getInt("id");
