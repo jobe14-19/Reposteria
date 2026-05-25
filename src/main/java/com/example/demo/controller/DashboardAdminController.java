@@ -49,7 +49,7 @@ public class DashboardAdminController {
     private static final String SQL_PROD_HOY =
         "SELECT COUNT(*) as total FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
     private static final String SQL_STOCK_BAJO =
-        "SELECT COUNT(*) as total FROM inventario WHERE stock_actual < stock_minimo";
+        "SELECT COUNT(*) as total FROM ingredientes WHERE estado='Activo' AND stock_actual < stock_minimo";
     private static final String SQL_ENTREGAS_HOY =
         "SELECT COUNT(*) as total FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE) AND estado = 'ENTREGADA'";
     private static final String SQL_SALDO_PENDIENTE =
@@ -69,7 +69,7 @@ public class DashboardAdminController {
     private static final String SQL_ENTREGAS_PROXIMAS =
         "SELECT TOP 10 ISNULL(hora_entrega, '00:00') as hora, cliente, ISNULL(direccion, '') as direccion, estado FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE) ORDER BY hora_entrega ASC";
     private static final String SQL_ALERTAS =
-        "SELECT 'Stock Bajo' as tipo, i.ingrediente + ' - Disp: ' + CAST(CAST(i.stock_actual AS INT) AS VARCHAR) + ' (Min: ' + CAST(CAST(i.stock_minimo AS INT) AS VARCHAR) + ')' as descripcion, FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm') as fecha, CASE WHEN i.stock_actual < i.stock_minimo THEN 'CRITICO' ELSE 'BAJO' END as estado FROM inventario i WHERE i.stock_actual < i.stock_minimo * 1.2 UNION ALL SELECT TOP 5 'Atrasado' as tipo, 'Orden #' + CAST(op.id AS VARCHAR) + ' - ' + op.cliente as descripcion, FORMAT(op.fecha_entrega, 'yyyy-MM-dd HH:mm') as fecha, 'ATRASADO' as estado FROM ordenes_produccion op WHERE op.fecha_entrega < GETDATE() AND op.estado NOT IN ('COMPLETADA','ENTREGADA','CANCELADA') ORDER BY fecha DESC";
+        "SELECT 'Stock Bajo' as tipo, i.nombre + ' - Disp: ' + CAST(CAST(i.stock_actual AS INT) AS VARCHAR) + ' (Min: ' + CAST(CAST(i.stock_minimo AS INT) AS VARCHAR) + ')' as descripcion, FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm') as fecha, CASE WHEN i.stock_actual < i.stock_minimo THEN 'CRITICO' ELSE 'BAJO' END as estado FROM ingredientes i WHERE i.estado='Activo' AND i.stock_actual < i.stock_minimo * 1.2 UNION ALL SELECT TOP 5 'Atrasado' as tipo, 'Orden #' + CAST(op.id_orden AS VARCHAR) + ' - ' + op.cliente as descripcion, FORMAT(op.fecha_entrega, 'yyyy-MM-dd HH:mm') as fecha, 'ATRASADO' as estado FROM ordenes_produccion op WHERE op.fecha_entrega < GETDATE() AND op.estado NOT IN ('COMPLETADA','ENTREGADA','CANCELADA') ORDER BY fecha DESC";
  private static final String SQL_CLIENTES_RECIENTES =
   "SELECT TOP 10 c.nombre, c.telefono, FORMAT(c.fecha_registro, 'yyyy-MM-dd') as fecha_registro, COALESCE(SUM(p.total), 0) as total_gastado FROM clientes c LEFT JOIN pedidos p ON c.id_cliente = p.id_cliente GROUP BY c.id_cliente, c.nombre, c.telefono, c.fecha_registro ORDER BY c.fecha_registro DESC";
  private static final String SQL_ACTIVIDADES =
