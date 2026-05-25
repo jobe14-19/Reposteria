@@ -119,6 +119,7 @@ public class AppShellController {
 
         modulos.put("inventario",      new ModuloInfo("Inventario",        "Inventario.fxml",          "inventario", Permiso.INVENTARIO_LEER, "\uD83D\uDCE6", "Inventario"));
         modulos.put("compras",         new ModuloInfo("Compras",           "HistorialCompras.fxml",    "inventario", Permiso.INVENTARIO_LEER, "\uD83D\uDED2", "Inventario > Compras"));
+        modulos.put("proveedores",     new ModuloInfo("Proveedores",       "Proveedores.fxml",         "inventario", Permiso.INVENTARIO_LEER, "\uD83C\uDFED", "Inventario > Proveedores"));
 
         modulos.put("entregas",        new ModuloInfo("Entregas",          "Entregas.fxml",            "entregas",  Permiso.ENTREGAS_LEER, "\uD83D\uDE9A", "Entregas y Cobros"));
 
