@@ -1,4 +1,5 @@
 package com.example.demo.controller;
+import com.example.demo.dao.OrdenProduccionDAO;
 import com.example.demo.dao.RecetaDAO;
 import com.example.demo.model.Receta;
 import com.example.demo.model.Receta.RecetaIngrediente;
@@ -77,6 +78,7 @@ public class PlanificacionController {
  private SessionManager sessionManager;
  private DatabaseConnection dbConnection;
  private RecetaDAO recetaDAO;
+ private OrdenProduccionDAO ordenDAO;
  private Orden ordenSeleccionada;
  private ObservableList<Orden> ordenesList;
  private ObservableList<Receta> recetasList;
@@ -85,7 +87,8 @@ public class PlanificacionController {
  public void initialize() {
  sessionManager = SessionManager.getInstance();
  dbConnection = DatabaseConnection.getInstance();
- recetaDAO = new RecetaDAO();
+  recetaDAO = new RecetaDAO();
+  ordenDAO = new OrdenProduccionDAO();
 
  if (!sessionManager.tienePermiso(Permiso.PRODUCCION_LEER)) {
  mostrarError("Acceso Denegado", "No tienes permiso para acceder a la planificaci\u00f3n de producci\u00f3n.");
@@ -505,26 +508,13 @@ public class PlanificacionController {
  return;
  }
  if (ordenSeleccionada != null) {
- try (Connection conn = dbConnection.getConnection()) {
- String sql = "UPDATE ordenes_produccion SET estado = 'COMPLETADA' " +
- "WHERE id = ?";
-
- try (PreparedStatement stmt = conn.prepareStatement(sql)) {
- stmt.setInt(1, ordenSeleccionada.getId());
- int filasAfectadas = stmt.executeUpdate();
-
- if (filasAfectadas > 0) {
- mostrarMensaje("Orden Actualizada", "La orden ha sido marcada como completada.");
- cargarOrdenesActivas();
- } else {
- mostrarError("Error al Actualizar", "No se pudo actualizar el estado de la orden.");
- }
- }
-
- } catch (SQLException e) {
- LOGGER.log(Level.INFO, "Modo offline: no se puede actualizar el estado de la orden");
- mostrarMensaje("Modo offline", "No se puede actualizar el estado de la orden en modo offline.");
- }
+   String usuario = sessionManager.getUsuarioActual();
+   if (ordenDAO.cambiarEstado(ordenSeleccionada.getId(), "COMPLETADA", usuario)) {
+     mostrarMensaje("Orden Actualizada", "La orden ha sido marcada como completada.");
+     cargarOrdenesActivas();
+   } else {
+     mostrarError("Error al Actualizar", "No se pudo actualizar el estado de la orden.");
+   }
  } else {
  mostrarMensaje("Sin Seleccion", "Por favor seleccione una orden para marcar como completada.");
  }

@@ -202,7 +202,9 @@ public class OrdenProduccionDAO {
     public boolean cambiarEstado(int idOrden, String nuevoEstado, String usuario) {
         String sql = "UPDATE ordenes_produccion SET estado=? WHERE id_orden=?";
         String hist = "UPDATE orden_historial SET accion='CAMBIO_ESTADO', detalle='Estado cambiado a: " + nuevoEstado + "', usuario=? WHERE id_orden=?";
-        try (Connection conn = dbConnection.getConnection()) {
+        Connection conn = null;
+        try {
+            conn = dbConnection.getConnection();
             conn.setAutoCommit(false);
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, nuevoEstado); stmt.setInt(2, idOrden);
@@ -211,6 +213,10 @@ public class OrdenProduccionDAO {
             if ("EN PRODUCCION".equals(nuevoEstado)) {
                 try (PreparedStatement up = conn.prepareStatement("UPDATE ordenes_produccion SET fecha_inicio=GETDATE(), progreso=10 WHERE id_orden=?")) {
                     up.setInt(1, idOrden); up.executeUpdate();
+                }
+                if (!descontarStock(conn, idOrden, usuario)) {
+                    conn.rollback();
+                    return false;
                 }
             }
             if ("COMPLETADA".equals(nuevoEstado)) {
@@ -223,7 +229,10 @@ public class OrdenProduccionDAO {
             return true;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error cambiar estado: {0}", e.getMessage());
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) {}
             return false;
+        } finally {
+            if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
         }
     }
 
@@ -307,41 +316,9 @@ public class OrdenProduccionDAO {
         try {
             conn = dbConnection.getConnection();
             conn.setAutoCommit(false);
-            List<OrdenIngrediente> ingredientes = obtenerIngredientes(conn, idOrden);
-            StockMovimientoDAO stockDAO = new StockMovimientoDAO();
-            for (OrdenIngrediente ing : ingredientes) {
-                if (ing.isDescontado()) continue;
-                double stockActual = stockDAO.getStockActual(ing.getIdIngrediente());
-                if (stockActual < ing.getCantidadRequerida()) {
-                    conn.rollback();
-                    return false;
-                }
-                try (PreparedStatement stmt = conn.prepareStatement(
-                    "UPDATE ingredientes SET stock_actual = stock_actual - ? WHERE id_ingrediente=?")) {
-                    stmt.setDouble(1, ing.getCantidadRequerida()); stmt.setInt(2, ing.getIdIngrediente());
-                    stmt.executeUpdate();
-                }
-                try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO stock_movimientos (id_ingrediente, tipo_movimiento, cantidad, stock_anterior, stock_nuevo, motivo, referencia_tipo, referencia_id, usuario_registra, fecha_hora) " +
-                    "VALUES (?, 'SALIDA', ?, (SELECT stock_actual + ? FROM ingredientes WHERE id_ingrediente=?), (SELECT stock_actual FROM ingredientes WHERE id_ingrediente=?), 'Produccion - Orden " + idOrden + "', 'ORDEN', ?, ?, GETDATE())")) {
-                    stmt.setInt(1, ing.getIdIngrediente());
-                    stmt.setDouble(2, ing.getCantidadRequerida());
-                    stmt.setDouble(3, ing.getCantidadRequerida());
-                    stmt.setInt(4, ing.getIdIngrediente());
-                    stmt.setInt(5, ing.getIdIngrediente());
-                    stmt.setInt(6, idOrden);
-                    stmt.setString(7, usuario);
-                    stmt.executeUpdate();
-                }
-                try (PreparedStatement stmt = conn.prepareStatement(
-                    "UPDATE orden_ingredientes SET cantidad_descontada=?, descontado=1 WHERE id_orden=? AND id_ingrediente=?")) {
-                    stmt.setDouble(1, ing.getCantidadRequerida()); stmt.setInt(2, idOrden); stmt.setInt(3, ing.getIdIngrediente());
-                    stmt.executeUpdate();
-                }
-            }
-            registrarHistorial(conn, idOrden, "STOCK_DESHABITADO", "Stock descontado para produccion", usuario);
-            conn.commit();
-            return true;
+            boolean result = descontarStock(conn, idOrden, usuario);
+            if (result) conn.commit();
+            return result;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error descontar stock: {0}", e.getMessage());
             if (conn != null) try { conn.rollback(); } catch (SQLException ex) {}
@@ -349,6 +326,42 @@ public class OrdenProduccionDAO {
         } finally {
             if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
         }
+    }
+
+    private boolean descontarStock(Connection conn, int idOrden, String usuario) throws SQLException {
+        List<OrdenIngrediente> ingredientes = obtenerIngredientes(conn, idOrden);
+        StockMovimientoDAO stockDAO = new StockMovimientoDAO();
+        for (OrdenIngrediente ing : ingredientes) {
+            if (ing.isDescontado()) continue;
+            double stockActual = stockDAO.getStockActual(ing.getIdIngrediente());
+            if (stockActual < ing.getCantidadRequerida()) {
+                return false;
+            }
+            try (PreparedStatement stmt = conn.prepareStatement(
+                "UPDATE ingredientes SET stock_actual = stock_actual - ? WHERE id_ingrediente=?")) {
+                stmt.setDouble(1, ing.getCantidadRequerida()); stmt.setInt(2, ing.getIdIngrediente());
+                stmt.executeUpdate();
+            }
+            try (PreparedStatement stmt = conn.prepareStatement(
+                "INSERT INTO stock_movimientos (id_ingrediente, tipo_movimiento, cantidad, stock_anterior, stock_nuevo, motivo, referencia_tipo, referencia_id, usuario_registra, fecha_hora) " +
+                "VALUES (?, 'SALIDA', ?, (SELECT stock_actual + ? FROM ingredientes WHERE id_ingrediente=?), (SELECT stock_actual FROM ingredientes WHERE id_ingrediente=?), 'Produccion - Orden " + idOrden + "', 'ORDEN', ?, ?, GETDATE())")) {
+                stmt.setInt(1, ing.getIdIngrediente());
+                stmt.setDouble(2, ing.getCantidadRequerida());
+                stmt.setDouble(3, ing.getCantidadRequerida());
+                stmt.setInt(4, ing.getIdIngrediente());
+                stmt.setInt(5, ing.getIdIngrediente());
+                stmt.setInt(6, idOrden);
+                stmt.setString(7, usuario);
+                stmt.executeUpdate();
+            }
+            try (PreparedStatement stmt = conn.prepareStatement(
+                "UPDATE orden_ingredientes SET cantidad_descontada=?, descontado=1 WHERE id_orden=? AND id_ingrediente=?")) {
+                stmt.setDouble(1, ing.getCantidadRequerida()); stmt.setInt(2, idOrden); stmt.setInt(3, ing.getIdIngrediente());
+                stmt.executeUpdate();
+            }
+        }
+        registrarHistorial(conn, idOrden, "STOCK_DESHABITADO", "Stock descontado para produccion", usuario);
+        return true;
     }
 
     private void insertarIngredientes(Connection conn, int idOrden, List<OrdenIngrediente> ingredientes) throws SQLException {
