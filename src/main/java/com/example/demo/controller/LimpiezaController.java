@@ -32,6 +32,8 @@ public class LimpiezaController {
 
  private static final Logger LOGGER = Logger.getLogger(LimpiezaController.class.getName());
 
+ private static final String BADGE_BASE = "-fx-background-radius: 12; -fx-padding: 4 8 4 8; -fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white;";
+
  @FXML private Button registrarLimpiezaButton;
  @FXML private Button actualizarMaterialesButton;
  @FXML private VBox checklistContainer;
@@ -69,7 +71,47 @@ public class LimpiezaController {
  areaColumn.setCellValueFactory(new PropertyValueFactory<>("area"));
  ultimaLimpiezaColumn.setCellValueFactory(new PropertyValueFactory<>("ultimaLimpieza"));
  diasSinLimpiezaColumn.setCellValueFactory(new PropertyValueFactory<>("diasSinLimpieza"));
+
+ diasSinLimpiezaColumn.setCellFactory(col -> new TableCell<>() {
+ @Override protected void updateItem(Long item, boolean empty) {
+ super.updateItem(item, empty);
+ if (empty || item == null) { setText(null); return; }
+ String color = item > 7 ? "#DC3545" : item > 3 ? "#FF9800" : "#28A745";
+ setText(item + " días");
+ setStyle("-fx-text-fill: " + color + "; -fx-font-weight: bold;");
+ }
+ });
+
  estadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
+ estadoColumn.setCellFactory(col -> new TableCell<>() {
+ private final Label badge = new Label();
+ private final HBox hbox = new HBox(5);
+ { badge.setStyle(BADGE_BASE); hbox.getChildren().add(badge); }
+ @Override protected void updateItem(String item, boolean empty) {
+ super.updateItem(item, empty);
+ if (empty || item == null) { setGraphic(null); return; }
+ String color = switch (item) {
+ case "Crítico" -> "#DC3545";
+ case "Pendiente" -> "#FF9800";
+ default -> "#28A745";
+ };
+ badge.setStyle(BADGE_BASE + "-fx-background-color: " + color + ";");
+ badge.setText(item.toUpperCase());
+ setGraphic(hbox);
+ }
+ });
+
+ accionColumn.setCellFactory(param -> new TableCell<>() {
+ private final Button limpiarBtn = new Button("Registrar");
+ { limpiarBtn.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 4 10; -fx-background-radius: 4; -fx-cursor: hand;"); }
+ @Override protected void updateItem(Void item, boolean empty) {
+ super.updateItem(item, empty);
+ if (empty) { setGraphic(null); return; }
+ LimpiezaRecord rec = getTableView().getItems().get(getIndex());
+ limpiarBtn.setOnAction(e -> abrirModalLimpiezaConArea(rec.getArea()));
+ setGraphic(limpiarBtn);
+ }
+ });
  }
 
  private void setupEvents() {
@@ -81,7 +123,6 @@ public class LimpiezaController {
 
  private void cargarDatosLimpieza() {
  limpiezaList = FXCollections.observableArrayList();
- // Agrupamos por área para obtener la última fecha de limpieza
  String sql = "SELECT area, MAX(fecha_limpieza) as ultima_fecha FROM limpieza GROUP BY area";
  
  try (Connection conn = dbConnection.getConnection();
@@ -193,9 +234,17 @@ String sql = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='checklist_item
  }
 
  private void abrirModalLimpieza(ActionEvent event) {
+ abrirModalLimpiezaConArea(null);
+ }
+
+ private void abrirModalLimpiezaConArea(String area) {
  try {
  FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/LimpiezaModal.fxml"));
  Parent root = loader.load();
+ if (area != null) {
+ LimpiezaModalController controller = loader.getController();
+ controller.setAreaLimpieza(area);
+ }
  Stage stage = new Stage();
  stage.setTitle("Registro de Limpieza");
  stage.setScene(new Scene(root));

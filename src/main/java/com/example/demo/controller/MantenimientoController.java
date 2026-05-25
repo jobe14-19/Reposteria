@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -27,6 +28,8 @@ import java.util.logging.Logger;
 public class MantenimientoController {
 
  private static final Logger LOGGER = Logger.getLogger(MantenimientoController.class.getName());
+
+ private static final String BADGE_BASE = "-fx-background-radius: 12; -fx-padding: 4 8 4 8; -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white;";
 
  @FXML private Button registrarMantenimientoButton;
  @FXML private Button verHistorialButton;
@@ -67,17 +70,64 @@ public class MantenimientoController {
  idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
  nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
  utilidadColumn.setCellValueFactory(new PropertyValueFactory<>("utilidad"));
+
  estadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
+ estadoColumn.setCellFactory(col -> new TableCell<>() {
+ private final Label badge = new Label();
+ private final HBox hbox = new HBox(5);
+ { badge.setStyle(BADGE_BASE); hbox.getChildren().add(badge); }
+ @Override protected void updateItem(String item, boolean empty) {
+ super.updateItem(item, empty);
+ if (empty || item == null) { setGraphic(null); return; }
+ String color = switch (item) {
+ case "Operativo" -> "#28A745";
+ case "Mantenimiento" -> "#FF9800";
+ case "Fuera de servicio" -> "#DC3545";
+ default -> "#6C757D";
+ };
+ badge.setStyle(BADGE_BASE + "-fx-background-color: " + color + ";");
+ badge.setText(item.toUpperCase());
+ setGraphic(hbox);
+ }
+ });
+
  ultimoMantenimientoColumn.setCellValueFactory(new PropertyValueFactory<>("ultimoMantenimiento"));
  proximoMantenimientoColumn.setCellValueFactory(new PropertyValueFactory<>("proximoMantenimiento"));
- diasRestantesColumn.setCellValueFactory(new PropertyValueFactory<>("diasRestantes"));
 
- // Acciones column could have buttons if needed, but for now we'll leave it empty or add a simple button
+ diasRestantesColumn.setCellValueFactory(new PropertyValueFactory<>("diasRestantes"));
+ diasRestantesColumn.setCellFactory(col -> new TableCell<>() {
+ @Override protected void updateItem(Long item, boolean empty) {
+ super.updateItem(item, empty);
+ if (empty || item == null) { setText(null); return; }
+ String color = item <= 0 ? "#DC3545" : item <= 7 ? "#FF9800" : "#28A745";
+ setText(item <= 0 ? "VENCIDO" : item + " días");
+ setStyle("-fx-text-fill: " + color + "; -fx-font-weight: bold;");
+ }
+ });
+
+ accionesColumn.setCellFactory(param -> new TableCell<>() {
+ private final Button historialBtn = new Button("Historial");
+ private final Button mantenimientoBtn = new Button("Mant.");
+ private final HBox hbox = new HBox(5);
+ {
+ historialBtn.setStyle("-fx-background-color: #3498DB; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 4 8; -fx-background-radius: 4; -fx-cursor: hand;");
+ mantenimientoBtn.setStyle("-fx-background-color: #f55580; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 4 8; -fx-background-radius: 4; -fx-cursor: hand;");
+ hbox.getChildren().addAll(historialBtn, mantenimientoBtn);
+ }
+ @Override protected void updateItem(Void item, boolean empty) {
+ super.updateItem(item, empty);
+ if (empty) { setGraphic(null); return; }
+ Maquina m = getTableView().getItems().get(getIndex());
+ historialBtn.setOnAction(e -> mostrarMensaje("Historial", "Historial de mantenimiento de: " + m.getNombre()));
+ mantenimientoBtn.setOnAction(e -> abrirModalMantenimientoConMaquina(m.getNombre()));
+ setGraphic(hbox);
+ }
+ });
  }
 
  private void setupEvents() {
  registrarMantenimientoButton.setOnAction(this::abrirModalMantenimiento);
- verHistorialButton.setOnAction(e -> mostrarMensaje("Historial", "Función de historial en desarrollo"));
+ verHistorialButton.setOnAction(e -> mostrarMensaje("Historial", "Seleccione una máquina y use el botón en la tabla."));
  cambiarEstadoButton.setOnAction(this::cambiarEstadoMaquina);
  actualizarAlertasButton.setOnAction(e -> cargarAlertas());
  }
@@ -151,17 +201,19 @@ public class MantenimientoController {
 
  } catch (SQLException e) {
  LOGGER.log(Level.SEVERE, "Error al cargar máquinas: {0}", e.getMessage());
- // Si la tabla no existe, podríamos mostrar un mensaje amistoso
  }
  }
 
  private void cargarAlertas() {
  ObservableList<String> alertas = FXCollections.observableArrayList();
- // Simular alertas basadas en días restantes
  if (maquinasList != null) {
  for (Maquina m : maquinasList) {
- if (m.getDiasRestantes() <= 7) {
- alertas.add(" " + m.getNombre() + " requiere mantenimiento en " + m.getDiasRestantes() + " días");
+ if (m.getDiasRestantes() <= 0) {
+ alertas.add(" VENCIDO - " + m.getNombre() + " requiere mantenimiento urgente");
+ } else if (m.getDiasRestantes() <= 3) {
+ alertas.add(" CRITICO - " + m.getNombre() + " vence en " + m.getDiasRestantes() + " días");
+ } else if (m.getDiasRestantes() <= 7) {
+ alertas.add(" PRONTO - " + m.getNombre() + " requiere mantenimiento en " + m.getDiasRestantes() + " días");
  }
  }
  }
@@ -172,9 +224,17 @@ public class MantenimientoController {
  }
 
  private void abrirModalMantenimiento(ActionEvent event) {
+ abrirModalMantenimientoConMaquina(null);
+ }
+
+ private void abrirModalMantenimientoConMaquina(String maquina) {
  try {
  FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/MantenimientoModal.fxml"));
  Parent root = loader.load();
+ if (maquina != null) {
+ MantenimientoModalController controller = loader.getController();
+ controller.setMaquina(maquina);
+ }
  Stage stage = new Stage();
  stage.setTitle("Registro de Mantenimiento");
  stage.setScene(new Scene(root));
