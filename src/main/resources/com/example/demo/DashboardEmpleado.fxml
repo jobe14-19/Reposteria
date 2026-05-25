@@ -24,7 +24,7 @@
  <Button fx:id="btnEntregas" text="Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
  <Button fx:id="btnInventario" text="Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
  <Button fx:id="btnHigiene" text="Higiene" onAction="#mostrarHigiene" styleClass="nav-button"/>
-  <Button fx:id="btnPedidos" text="Pedidos" onAction="#mostrarPedidos" styleClass="nav-button"/>
+   <Button fx:id="btnOrdenesProduccion" text="&Oacute;rdenes" onAction="#mostrarOrdenesProduccion" styleClass="nav-button"/>
   <Button fx:id="btnChefsBox" text="Chef's Box" onAction="#mostrarChefsBox" styleClass="nav-button"/>
   <Button fx:id="btnPerfil" text="Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
  </HBox>
@@ -78,7 +78,7 @@
    </FlowPane>
 
  <VBox styleClass="table-container" spacing="10">
-  <Label text="Lista Rápida de Pedidos" styleClass="text-heading-sm"/>
+  <Label text="Lista R&aacute;pida de &Oacute;rdenes" styleClass="text-heading-sm"/>
  <ListView fx:id="pedidosRapidosList" prefHeight="150" styleClass="orders-list"/>
  </VBox>
  </VBox>

@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
- public class PlanificacionController {
+public class PlanificacionController {
 
  private static final Logger LOGGER = Logger.getLogger(PlanificacionController.class.getName());
 
@@ -47,17 +47,17 @@ import java.util.logging.Logger;
  @FXML private Button cerrarSesionButton;
  @FXML private VBox planificacionView;
  @FXML private VBox seguimientoView;
-  @FXML private VBox recetasView;
-  @FXML private GridPane semanaGridPane;
-  private boolean modoEmbedded;
- @FXML private Label totalPedidosLabel;
+   @FXML private VBox recetasView;
+   @FXML private GridPane semanaGridPane;
+   private boolean modoEmbedded;
+ @FXML private Label totalOrdenesLabel;
  @FXML private Label enProduccionLabel;
  @FXML private Label listosEntregarLabel;
  @FXML private ListView<String> alertasListView;
- @FXML private TextField buscarPedidoField;
- @FXML private Button buscarPedidoButton;
+ @FXML private TextField buscarOrdenField;
+ @FXML private Button buscarOrdenButton;
  @FXML private Button verDetallesButton;
- @FXML private Label pedidoIdLabel;
+ @FXML private Label ordenIdLabel;
  @FXML private Label clienteLabel;
  @FXML private Label estadoActualLabel;
  @FXML private ListView<String> timelineListView;
@@ -76,8 +76,8 @@ import java.util.logging.Logger;
  private SessionManager sessionManager;
  private DatabaseConnection dbConnection;
  private RecetaDAO recetaDAO;
- private Pedido pedidoSeleccionado;
- private ObservableList<Pedido> pedidosList;
+ private Orden ordenSeleccionada;
+ private ObservableList<Orden> ordenesList;
  private ObservableList<Receta> recetasList;
 
  @FXML
@@ -87,7 +87,7 @@ import java.util.logging.Logger;
  recetaDAO = new RecetaDAO();
 
  if (!sessionManager.tienePermiso(Permiso.PRODUCCION_LEER)) {
- mostrarError("Acceso Denegado", "No tienes permiso para acceder a la planificación de producción.");
+ mostrarError("Acceso Denegado", "No tienes permiso para acceder a la planificaci\u00f3n de producci\u00f3n.");
  return;
  }
 
@@ -114,44 +114,44 @@ import java.util.logging.Logger;
  pestana3Button.setOnAction(event -> mostrarRecetas());
  cerrarSesionButton.setOnAction(event -> cerrarSesion());
 
- buscarPedidoField.textProperty().addListener((obs, oldVal, newVal) -> {
+ buscarOrdenField.textProperty().addListener((obs, oldVal, newVal) -> {
  if (newVal == null || newVal.isEmpty()) {
  limpiarSeguimiento();
  } else {
- buscarPedido(newVal);
+ buscarOrden(newVal);
  }
  });
 
- buscarPedidoButton.setOnAction(event -> buscarPedido(buscarPedidoField.getText()));
- verDetallesButton.setOnAction(event -> verDetallesPedido());
- actualizarButton.setOnAction(event -> actualizarEstadoPedido());
+ buscarOrdenButton.setOnAction(event -> buscarOrden(buscarOrdenField.getText()));
+ verDetallesButton.setOnAction(event -> verDetallesOrden());
+ actualizarButton.setOnAction(event -> actualizarEstadoOrden());
  marcarListoButton.setOnAction(event -> marcarComoListo());
 
-  nuevaRecetaButton.setOnAction(event -> abrirModalReceta(null));
-  editarRecetaButton.setOnAction(event -> {
-  Receta seleccionada = recetasTable.getSelectionModel().getSelectedItem();
-  if (seleccionada != null) {
-  abrirModalReceta(seleccionada);
-  } else {
-  mostrarMensaje("Sin Seleccion", "Seleccione una receta para editar.");
-  }
-  });
-  eliminarRecetaButton.setOnAction(event -> {
-  Receta seleccionada = recetasTable.getSelectionModel().getSelectedItem();
-  if (seleccionada != null) {
-  eliminarReceta(seleccionada);
-  } else {
-  mostrarMensaje("Sin Seleccion", "Seleccione una receta para eliminar.");
-  }
-  });
-  recetasTable.setOnMouseClicked(event -> {
-  if (event.getClickCount() == 2) {
-  Receta seleccionada = recetasTable.getSelectionModel().getSelectedItem();
-  if (seleccionada != null) {
-  abrirRecetaViewer(seleccionada);
-  }
-  }
-  });
+   nuevaRecetaButton.setOnAction(event -> abrirModalReceta(null));
+   editarRecetaButton.setOnAction(event -> {
+   Receta seleccionada = recetasTable.getSelectionModel().getSelectedItem();
+   if (seleccionada != null) {
+   abrirModalReceta(seleccionada);
+   } else {
+   mostrarMensaje("Sin Seleccion", "Seleccione una receta para editar.");
+   }
+   });
+   eliminarRecetaButton.setOnAction(event -> {
+   Receta seleccionada = recetasTable.getSelectionModel().getSelectedItem();
+   if (seleccionada != null) {
+   eliminarReceta(seleccionada);
+   } else {
+   mostrarMensaje("Sin Seleccion", "Seleccione una receta para eliminar.");
+   }
+   });
+   recetasTable.setOnMouseClicked(event -> {
+   if (event.getClickCount() == 2) {
+   Receta seleccionada = recetasTable.getSelectionModel().getSelectedItem();
+   if (seleccionada != null) {
+   abrirRecetaViewer(seleccionada);
+   }
+   }
+   });
  }
 
  private void mostrarPlanificacion() {
@@ -177,7 +177,7 @@ import java.util.logging.Logger;
  pestana1Button.setStyle("-fx-background-color: #007BFF; -fx-text-fill: white;");
  pestana2Button.setStyle("-fx-background-color: #8B5E3C; -fx-text-fill: white;");
  pestana3Button.setStyle("-fx-background-color: #007BFF; -fx-text-fill: white;");
- cargarPedidosConfirmados();
+ cargarOrdenesActivas();
  }
 
  private void mostrarRecetas() {
@@ -198,92 +198,89 @@ import java.util.logging.Logger;
  recetasTable.setItems(recetasList);
  }
 
-  private void abrirModalReceta(Receta receta) {
-  try {
-  FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/RecetaWizard.fxml"));
-  Parent root = loader.load();
-  RecetaWizardController wizardController = loader.getController();
-  wizardController.setRecetaDAO(recetaDAO);
-  if (receta != null) {
-  wizardController.setReceta(receta);
-  }
-  Stage stage = new Stage();
-  stage.setScene(new Scene(root, 800, 700));
-  stage.setTitle(receta == null ? "Nueva Receta" : "Editar Receta");
-  stage.initModality(Modality.APPLICATION_MODAL);
-  stage.setOnHidden(e -> cargarRecetas());
-  stage.showAndWait();
-  } catch (Exception e) {
-  LOGGER.log(Level.SEVERE, "Error al abrir wizard receta: {0}", e.getMessage());
-  mostrarError("Error", "No se pudo abrir el wizard de recetas.");
-  }
-  }
+   private void abrirModalReceta(Receta receta) {
+   try {
+   FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/RecetaWizard.fxml"));
+   Parent root = loader.load();
+   RecetaWizardController wizardController = loader.getController();
+   wizardController.setRecetaDAO(recetaDAO);
+   if (receta != null) {
+   wizardController.setReceta(receta);
+   }
+   Stage stage = new Stage();
+   stage.setScene(new Scene(root, 800, 700));
+   stage.setTitle(receta == null ? "Nueva Receta" : "Editar Receta");
+   stage.initModality(Modality.APPLICATION_MODAL);
+   stage.setOnHidden(e -> cargarRecetas());
+   stage.showAndWait();
+   } catch (Exception e) {
+   LOGGER.log(Level.SEVERE, "Error al abrir wizard receta: {0}", e.getMessage());
+   mostrarError("Error", "No se pudo abrir el wizard de recetas.");
+   }
+   }
 
-  private void eliminarReceta(Receta receta) {
-  Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-  confirm.setTitle("Confirmar Eliminacion");
-  confirm.setHeaderText(null);
-  confirm.setContentText("Esta seguro de eliminar la receta de " + receta.getNombreProducto() + "?");
-  if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-  if (recetaDAO.eliminar(receta.getId())) {
-  mostrarMensaje("Eliminado", "Receta eliminada correctamente.");
-  cargarRecetas();
-  } else {
-  mostrarError("Error", "No se pudo eliminar la receta.");
-  }
-  }
-  }
+   private void eliminarReceta(Receta receta) {
+   Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+   confirm.setTitle("Confirmar Eliminacion");
+   confirm.setHeaderText(null);
+   confirm.setContentText("Esta seguro de eliminar la receta de " + receta.getNombreProducto() + "?");
+   if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+   if (recetaDAO.eliminar(receta.getId())) {
+   mostrarMensaje("Eliminado", "Receta eliminada correctamente.");
+   cargarRecetas();
+   } else {
+   mostrarError("Error", "No se pudo eliminar la receta.");
+   }
+   }
+   }
 
-  private void abrirRecetaViewer(Receta receta) {
-  try {
-  Receta completa = recetaDAO.obtenerPorId(receta.getId());
-  if (completa == null) { mostrarError("Error", "No se pudo cargar la receta."); return; }
-  FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/RecetaViewer.fxml"));
-  Parent root = loader.load();
-  RecetaViewerController viewer = loader.getController();
-  viewer.setReceta(completa);
-  viewer.setModoCapacitacion(false);
-  viewer.initialize();
-  Stage stage = new Stage();
-  stage.setScene(new Scene(root, 750, 650));
-  stage.setTitle("Receta: " + completa.getNombreReceta());
-  stage.initModality(Modality.APPLICATION_MODAL);
-  stage.showAndWait();
-  } catch (Exception e) {
-  LOGGER.log(Level.SEVERE, "Error al abrir visor receta: {0}", e.getMessage());
-  mostrarError("Error", "No se pudo abrir la receta.");
-  }
-  }
+   private void abrirRecetaViewer(Receta receta) {
+   try {
+   Receta completa = recetaDAO.obtenerPorId(receta.getId());
+   if (completa == null) { mostrarError("Error", "No se pudo cargar la receta."); return; }
+   FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/RecetaViewer.fxml"));
+   Parent root = loader.load();
+   RecetaViewerController viewer = loader.getController();
+   viewer.setReceta(completa);
+   viewer.setModoCapacitacion(false);
+   viewer.initialize();
+   Stage stage = new Stage();
+   stage.setScene(new Scene(root, 750, 650));
+   stage.setTitle("Receta: " + completa.getNombreReceta());
+   stage.initModality(Modality.APPLICATION_MODAL);
+   stage.showAndWait();
+   } catch (Exception e) {
+   LOGGER.log(Level.SEVERE, "Error al abrir visor receta: {0}", e.getMessage());
+   mostrarError("Error", "No se pudo abrir la receta.");
+   }
+   }
 
  private void cargarDatosPlanificacion() {
  try (Connection conn = dbConnection.getConnection()) {
- String sql = "SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente, " +
- "pr.nombre as producto, p.libras, " +
- "DATEPART(WEEKDAY, p.fecha_entrega) as dia_semana, " +
- "p.fecha_entrega, p.estado " +
- "FROM pedidos p " +
- "INNER JOIN clientes c ON p.id_cliente = c.id_cliente " +
- "INNER JOIN productos pr ON p.id_producto = pr.id_producto " +
- "WHERE p.estado IN ('Confirmado', 'En produccion', 'Listo') " +
- "AND p.fecha_entrega >= DATEADD(DAY, -DATEPART(WEEKDAY, GETDATE()), GETDATE()) " +
- "AND p.fecha_entrega <= DATEADD(DAY, 6 - DATEPART(WEEKDAY, GETDATE()), GETDATE()) " +
- "ORDER BY p.fecha_entrega";
+ String sql = "SELECT op.id, op.cliente, op.categoria as producto, op.libras, " +
+ "DATEPART(WEEKDAY, op.fecha_entrega) as dia_semana, " +
+ "op.fecha_entrega, op.estado " +
+ "FROM ordenes_produccion op " +
+ "WHERE op.estado IN ('ACTIVA', 'EN PRODUCCION', 'COMPLETADA') " +
+ "AND op.fecha_entrega >= DATEADD(DAY, -DATEPART(WEEKDAY, GETDATE()), GETDATE()) " +
+ "AND op.fecha_entrega <= DATEADD(DAY, 6 - DATEPART(WEEKDAY, GETDATE()), GETDATE()) " +
+ "ORDER BY op.fecha_entrega";
 
- pedidosList = FXCollections.observableArrayList();
+ ordenesList = FXCollections.observableArrayList();
 
  try (PreparedStatement stmt = conn.prepareStatement(sql);
  ResultSet rs = stmt.executeQuery()) {
  while (rs.next()) {
- Pedido pedido = new Pedido(
- rs.getInt("id_pedido"),
- rs.getString("nombre_cliente"),
+ Orden orden = new Orden(
+ rs.getInt("id"),
+ rs.getString("cliente"),
  rs.getString("producto"),
  rs.getDouble("libras"),
  rs.getInt("dia_semana"),
  rs.getString("fecha_entrega"),
  rs.getString("estado")
  );
- pedidosList.add(pedido);
+ ordenesList.add(orden);
  }
  }
 
@@ -292,10 +289,10 @@ import java.util.logging.Logger;
  cargarAlertas();
 
  } catch (SQLException e) {
- LOGGER.log(Level.INFO, "Modo offline: usando datos de demostraciUn en planificaciUn");
- pedidosList = FXCollections.observableArrayList();
+ LOGGER.log(Level.INFO, "Modo offline: usando datos de demostracion en planificacion");
+ ordenesList = FXCollections.observableArrayList();
  construirSemanalGrid();
- totalPedidosLabel.setText("--");
+ totalOrdenesLabel.setText("--");
  enProduccionLabel.setText("--");
  listosEntregarLabel.setText("--");
  alertasListView.setItems(FXCollections.observableArrayList());
@@ -311,17 +308,17 @@ import java.util.logging.Logger;
 
  for (int i = 0; i < dias.length; i++) {
  VBox cell = new VBox(5);
-  cell.setStyle("-fx-padding: 10; -fx-border-width: 1;");
-  cell.getStyleClass().addAll("border-light", "bg-input");
+   cell.setStyle("-fx-padding: 10; -fx-border-width: 1;");
+   cell.getStyleClass().addAll("border-light", "bg-input");
 
- for (Pedido pedido : pedidosList) {
- int diaSemana = pedido.getDiaSemana();
+ for (Orden orden : ordenesList) {
+ int diaSemana = orden.getDiaSemana();
  if (diaSemana == i + 2) {
- Label clienteLbl = new Label(pedido.getNombreCliente());
+ Label clienteLbl = new Label(orden.getNombreCliente());
  clienteLbl.setStyle("-fx-font-weight: bold; -fx-font-size: 11px;");
- Label productoLbl = new Label(pedido.getProducto());
+ Label productoLbl = new Label(orden.getProducto());
  productoLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #666;");
- Label librasLbl = new Label(pedido.getLibras() + " lbs");
+ Label librasLbl = new Label(orden.getLibras() + " lbs");
  librasLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #666;");
  VBox card = new VBox(2, clienteLbl, productoLbl, librasLbl);
  card.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 6; -fx-border-radius: 4; -fx-background-radius: 4;");
@@ -336,33 +333,31 @@ import java.util.logging.Logger;
  private void cargarEstadisticas() {
  try (Connection conn = dbConnection.getConnection()) {
  String sql = "SELECT " +
- "(SELECT COUNT(*) FROM pedidos WHERE estado = 'Confirmado') as total_pedidos, " +
- "(SELECT COUNT(*) FROM pedidos WHERE estado = 'En produccion') as en_produccion, " +
- "(SELECT COUNT(*) FROM pedidos WHERE estado = 'Listo') as listos_entregar";
+ "(SELECT COUNT(*) FROM ordenes_produccion WHERE estado = 'ACTIVA') as total_ordenes, " +
+ "(SELECT COUNT(*) FROM ordenes_produccion WHERE estado = 'EN PRODUCCION') as en_produccion, " +
+ "(SELECT COUNT(*) FROM ordenes_produccion WHERE estado = 'COMPLETADA') as listos_entregar";
 
  try (PreparedStatement stmt = conn.prepareStatement(sql);
  ResultSet rs = stmt.executeQuery()) {
  if (rs.next()) {
- totalPedidosLabel.setText(String.valueOf(rs.getInt("total_pedidos")));
+ totalOrdenesLabel.setText(String.valueOf(rs.getInt("total_ordenes")));
  enProduccionLabel.setText(String.valueOf(rs.getInt("en_produccion")));
  listosEntregarLabel.setText(String.valueOf(rs.getInt("listos_entregar")));
  }
  }
 
  } catch (SQLException e) {
- LOGGER.log(Level.INFO, "Modo offline: estadAsticas no disponibles");
+ LOGGER.log(Level.INFO, "Modo offline: estadisticas no disponibles");
  }
  }
 
  private void cargarAlertas() {
  try (Connection conn = dbConnection.getConnection()) {
  String sql = "SELECT TOP 10 " +
- "'Pedido #' + CAST(p.id_pedido AS VARCHAR) + ' - ' + c.nombre + ' - ' + pr.nombre + ' - ' + p.estado as alerta " +
- "FROM pedidos p " +
- "INNER JOIN clientes c ON p.id_cliente = c.id_cliente " +
- "INNER JOIN productos pr ON p.id_producto = pr.id_producto " +
- "WHERE p.estado IN ('En produccion', 'Listo') " +
- "ORDER BY p.fecha_entrega";
+ "'Orden #' + CAST(op.id AS VARCHAR) + ' - ' + op.cliente + ' - ' + ISNULL(op.categoria, 'General') + ' - ' + op.estado as alerta " +
+ "FROM ordenes_produccion op " +
+ "WHERE op.estado IN ('EN PRODUCCION', 'COMPLETADA') " +
+ "ORDER BY op.fecha_entrega";
 
  ObservableList<String> alertas = FXCollections.observableArrayList();
 
@@ -381,23 +376,21 @@ import java.util.logging.Logger;
  }
  }
 
- private void cargarPedidosConfirmados() {
+ private void cargarOrdenesActivas() {
  try (Connection conn = dbConnection.getConnection()) {
- String sql = "SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente, " +
- "p.estado, p.fecha_entrega, pr.nombre as producto, p.libras " +
- "FROM pedidos p " +
- "INNER JOIN clientes c ON p.id_cliente = c.id_cliente " +
- "INNER JOIN productos pr ON p.id_producto = pr.id_producto " +
- "WHERE p.estado IN ('Confirmado', 'En produccion', 'Listo') " +
- "ORDER BY p.fecha_entrega";
+ String sql = "SELECT op.id, op.cliente as nombre_cliente, " +
+ "op.estado, op.fecha_entrega, ISNULL(op.categoria, 'General') as producto, op.libras " +
+ "FROM ordenes_produccion op " +
+ "WHERE op.estado IN ('ACTIVA', 'EN PRODUCCION', 'COMPLETADA') " +
+ "ORDER BY op.fecha_entrega";
 
- pedidosList = FXCollections.observableArrayList();
+ ordenesList = FXCollections.observableArrayList();
 
  try (PreparedStatement stmt = conn.prepareStatement(sql);
  ResultSet rs = stmt.executeQuery()) {
  while (rs.next()) {
- Pedido pedido = new Pedido(
- rs.getInt("id_pedido"),
+ Orden orden = new Orden(
+ rs.getInt("id"),
  rs.getString("nombre_cliente"),
  rs.getString("producto"),
  rs.getDouble("libras"),
@@ -405,37 +398,34 @@ import java.util.logging.Logger;
  rs.getString("fecha_entrega"),
  rs.getString("estado")
  );
- pedidosList.add(pedido);
+ ordenesList.add(orden);
  }
  }
 
  } catch (SQLException e) {
- LOGGER.log(Level.INFO, "Modo offline: pedidos confirmados no disponibles");
- pedidosList = FXCollections.observableArrayList();
+ LOGGER.log(Level.INFO, "Modo offline: ordenes activas no disponibles");
+ ordenesList = FXCollections.observableArrayList();
  }
  }
 
- private void buscarPedido(String textoBusqueda) {
+ private void buscarOrden(String textoBusqueda) {
  try (Connection conn = dbConnection.getConnection()) {
- String sql = "SELECT TOP 1 p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente, " +
- "p.estado, p.fecha_entrega, pr.nombre as producto, p.libras " +
- "FROM pedidos p " +
- "INNER JOIN clientes c ON p.id_cliente = c.id_cliente " +
- "INNER JOIN productos pr ON p.id_producto = pr.id_producto " +
- "WHERE (CAST(p.id_pedido AS VARCHAR) LIKE ? OR " +
- "c.nombre LIKE ? OR c.apellido LIKE ?) " +
- "AND p.estado IN ('Confirmado', 'En produccion', 'Listo')";
+ String sql = "SELECT TOP 1 op.id, op.cliente as nombre_cliente, " +
+ "op.estado, op.fecha_entrega, ISNULL(op.categoria, 'General') as producto, op.libras " +
+ "FROM ordenes_produccion op " +
+ "WHERE (CAST(op.id AS VARCHAR) LIKE ? OR " +
+ "op.cliente LIKE ?) " +
+ "AND op.estado IN ('ACTIVA', 'EN PRODUCCION', 'COMPLETADA')";
 
  try (PreparedStatement stmt = conn.prepareStatement(sql)) {
  String busqueda = "%" + textoBusqueda + "%";
  stmt.setString(1, busqueda);
  stmt.setString(2, busqueda);
- stmt.setString(3, busqueda);
 
  try (ResultSet rs = stmt.executeQuery()) {
  if (rs.next()) {
- pedidoSeleccionado = new Pedido(
- rs.getInt("id_pedido"),
+ ordenSeleccionada = new Orden(
+ rs.getInt("id"),
  rs.getString("nombre_cliente"),
  rs.getString("producto"),
  rs.getDouble("libras"),
@@ -443,43 +433,43 @@ import java.util.logging.Logger;
  rs.getString("fecha_entrega"),
  rs.getString("estado")
  );
- mostrarDetallesPedido(pedidoSeleccionado);
+ mostrarDetallesOrden(ordenSeleccionada);
  } else {
  limpiarSeguimiento();
- mostrarMensaje("No Encontrado", "No se encontrA ningAn pedido con ese criterio.");
+ mostrarMensaje("No Encontrado", "No se encontr\u00f3 ninguna orden con ese criterio.");
  }
  }
  }
 
  } catch (SQLException e) {
- LOGGER.log(Level.INFO, "Modo offline: bAsqueda de pedidos no disponible");
- mostrarMensaje("BAAsqueda no disponible", "La bAsqueda de pedidos no estA disponible en modo offline.");
+ LOGGER.log(Level.INFO, "Modo offline: busqueda de ordenes no disponible");
+ mostrarMensaje("Busqueda no disponible", "La busqueda de ordenes no est\u00e1 disponible en modo offline.");
  }
  }
 
- private void verDetallesPedido() {
- if (pedidoSeleccionado != null) {
- mostrarDetallesPedido(pedidoSeleccionado);
+ private void verDetallesOrden() {
+ if (ordenSeleccionada != null) {
+ mostrarDetallesOrden(ordenSeleccionada);
  } else {
- mostrarMensaje("Sin SelecciA n", "Por favor seleccione un pedido para ver sus detalles.");
+ mostrarMensaje("Sin Seleccion", "Por favor seleccione una orden para ver sus detalles.");
  }
  }
 
- private void mostrarDetallesPedido(Pedido pedido) {
- pedidoIdLabel.setText(String.valueOf(pedido.getId()));
- clienteLabel.setText(pedido.getNombreCliente());
- estadoActualLabel.setText(pedido.getEstado());
- construirTimeline(pedido);
+ private void mostrarDetallesOrden(Orden orden) {
+ ordenIdLabel.setText(String.valueOf(orden.getId()));
+ clienteLabel.setText(orden.getNombreCliente());
+ estadoActualLabel.setText(orden.getEstado());
+ construirTimeline(orden);
  }
 
- private void construirTimeline(Pedido pedido) {
+ private void construirTimeline(Orden orden) {
  timelineListView.getItems().clear();
  String[] pasos = {
- "1. PreparaciA n de masas",
+ "1. Preparacion de masas",
  "2. Horneado",
  "3. Enfriado controlado",
- "4. PreparaciA n de rellenos",
- "5. DecoraciA n",
+ "4. Preparacion de rellenos",
+ "5. Decoracion",
  "6. Empaque y control de calidad"
  };
  for (String paso : pasos) {
@@ -488,49 +478,49 @@ import java.util.logging.Logger;
  }
 
  @FXML
- private void actualizarEstadoPedido() {
- if (pedidoSeleccionado != null) {
- mostrarMensaje("Actualizar Estado", "FunciA n de actualizaciA n de estado en desarrollo.");
+ private void actualizarEstadoOrden() {
+ if (ordenSeleccionada != null) {
+ mostrarMensaje("Actualizar Estado", "Funcion de actualizacion de estado en desarrollo.");
  } else {
- mostrarMensaje("Sin SelecciA n", "Por favor seleccione un pedido para actualizar su estado.");
+ mostrarMensaje("Sin Seleccion", "Por favor seleccione una orden para actualizar su estado.");
  }
  }
 
  @FXML
  private void marcarComoListo() {
  if (!sessionManager.tienePermiso(Permiso.PRODUCCION_ACTUALIZAR)) {
- mostrarError("Acceso Denegado", "No tienes permiso para actualizar el estado de producciA n.");
+ mostrarError("Acceso Denegado", "No tienes permiso para actualizar el estado de producci\u00f3n.");
  return;
  }
- if (pedidoSeleccionado != null) {
+ if (ordenSeleccionada != null) {
  try (Connection conn = dbConnection.getConnection()) {
- String sql = "UPDATE pedidos SET estado = 'Listo' " +
- "WHERE id_pedido = ?";
+ String sql = "UPDATE ordenes_produccion SET estado = 'COMPLETADA' " +
+ "WHERE id = ?";
 
  try (PreparedStatement stmt = conn.prepareStatement(sql)) {
- stmt.setInt(1, pedidoSeleccionado.getId());
+ stmt.setInt(1, ordenSeleccionada.getId());
  int filasAfectadas = stmt.executeUpdate();
 
  if (filasAfectadas > 0) {
- mostrarMensaje("Pedido Actualizado", "El pedido ha sido marcado como listo para entregar.");
- cargarPedidosConfirmados();
+ mostrarMensaje("Orden Actualizada", "La orden ha sido marcada como completada.");
+ cargarOrdenesActivas();
  } else {
- mostrarError("Error al Actualizar", "No se pudo actualizar el estado del pedido.");
+ mostrarError("Error al Actualizar", "No se pudo actualizar el estado de la orden.");
  }
  }
 
  } catch (SQLException e) {
- LOGGER.log(Level.INFO, "Modo offline: no se puede actualizar el estado del pedido");
- mostrarMensaje("Modo offline", "No se puede actualizar el estado del pedido en modo offline.");
+ LOGGER.log(Level.INFO, "Modo offline: no se puede actualizar el estado de la orden");
+ mostrarMensaje("Modo offline", "No se puede actualizar el estado de la orden en modo offline.");
  }
  } else {
- mostrarMensaje("Sin SelecciA n", "Por favor seleccione un pedido para marcar como listo.");
+ mostrarMensaje("Sin Seleccion", "Por favor seleccione una orden para marcar como completada.");
  }
  }
 
  private void limpiarSeguimiento() {
- pedidoSeleccionado = null;
- pedidoIdLabel.setText("-");
+ ordenSeleccionada = null;
+ ordenIdLabel.setText("-");
  clienteLabel.setText("-");
  estadoActualLabel.setText("-");
  timelineListView.getItems().clear();
@@ -546,14 +536,14 @@ import java.util.logging.Logger;
  }
  }
 
-  private void cerrarSesion() {
-  if (sessionManager != null) {
-  sessionManager.cerrarSesion();
-  }
-  if (modoEmbedded) return;
-  Stage stage = (Stage) cerrarSesionButton.getScene().getWindow();
-  stage.close();
-  }
+   private void cerrarSesion() {
+   if (sessionManager != null) {
+   sessionManager.cerrarSesion();
+   }
+   if (modoEmbedded) return;
+   Stage stage = (Stage) cerrarSesionButton.getScene().getWindow();
+   stage.close();
+   }
 
  private void mostrarError(String titulo, String mensaje) {
  Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -571,7 +561,7 @@ import java.util.logging.Logger;
  alert.showAndWait();
  }
 
- public static class Pedido {
+ public static class Orden {
  private int id;
  private String nombreCliente;
  private String producto;
@@ -580,7 +570,7 @@ import java.util.logging.Logger;
  private String fechaEntrega;
  private String estado;
 
- public Pedido(int id, String nombreCliente, String producto, double libras, int diaSemana, String fechaEntrega, String estado) {
+ public Orden(int id, String nombreCliente, String producto, double libras, int diaSemana, String fechaEntrega, String estado) {
  this.id = id;
  this.nombreCliente = nombreCliente;
  this.producto = producto;

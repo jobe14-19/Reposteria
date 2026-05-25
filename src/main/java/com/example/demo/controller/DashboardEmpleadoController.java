@@ -101,7 +101,7 @@ public class DashboardEmpleadoController {
  @FXML private Button btnEntregas;
  @FXML private Button btnInventario;
   @FXML private Button btnHigiene;
-  @FXML private Button btnPedidos;
+   @FXML private Button btnOrdenesProduccion;
 
   // Content Sections
  @FXML private VBox sectionKPIs;
@@ -142,7 +142,7 @@ public class DashboardEmpleadoController {
   btnEntregas.setVisible(false); btnEntregas.setManaged(false);
   btnInventario.setVisible(false); btnInventario.setManaged(false);
   btnHigiene.setVisible(false); btnHigiene.setManaged(false);
-  btnPedidos.setVisible(false); btnPedidos.setManaged(false);
+  btnOrdenesProduccion.setVisible(false); btnOrdenesProduccion.setManaged(false);
 
  sectionProduccion.setVisible(false); sectionProduccion.setManaged(false);
  sectionStock.setVisible(false); sectionStock.setManaged(false);
@@ -172,7 +172,7 @@ public class DashboardEmpleadoController {
   btnHigiene.setVisible(true); btnHigiene.setManaged(true);
   }
   if (puedePedidos) {
-  btnPedidos.setVisible(true); btnPedidos.setManaged(true);
+  btnOrdenesProduccion.setVisible(true); btnOrdenesProduccion.setManaged(true);
   }
  if (!puedeProduccion && !puedeInventario && !puedeEntregas && !puedeLimpieza) {
  sectionKPIs.setVisible(false); sectionKPIs.setManaged(false);
@@ -354,7 +354,7 @@ public class DashboardEmpleadoController {
  @FXML private void mostrarInventario(ActionEvent e) { navegarAVista("Inventario.fxml", "Gestión de Inventario"); }
  @FXML private void mostrarHigiene(ActionEvent e) { navegarAVista("Limpieza.fxml", "Gestión de Higiene"); }
   @FXML private void mostrarChefsBox(ActionEvent e) { navegarAVista("ChefsBox.fxml", "Chef's Box"); }
-  @FXML private void mostrarPedidos(ActionEvent e) { navegarAVista("OrdenesProduccion.fxml", "Ordenes de Produccion"); }
+   @FXML private void mostrarOrdenesProduccion(ActionEvent e) { navegarAVista("OrdenesProduccion.fxml", "Ordenes de Produccion"); }
 
  @FXML
  private void verMiPerfil(ActionEvent e) {

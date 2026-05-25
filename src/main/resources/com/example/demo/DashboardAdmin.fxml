@@ -52,7 +52,7 @@
    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
    <Label text="&#128230;" style="-fx-font-size: 28px;"/>
    <Label text="Órdenes Pendientes" styleClass="kpi-label"/>
-   <Label fx:id="pedidosPendientesLabel" text="0" styleClass="kpi-value"/>
+   <Label fx:id="prodPendientesLabel" text="0" styleClass="kpi-value"/>
    </VBox>
    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
    <Label text="&#128293;" style="-fx-font-size: 28px;"/>
@@ -62,7 +62,7 @@
    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
    <Label text="&#128197;" style="-fx-font-size: 28px;"/>
    <Label text="Entrega Hoy" styleClass="kpi-label"/>
-   <Label fx:id="pedidosHoyLabel" text="0" styleClass="kpi-value"/>
+   <Label fx:id="prodHoyLabel" text="0" styleClass="kpi-value"/>
    </VBox>
    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
    <Label text="&#128200;" style="-fx-font-size: 28px;"/>

@@ -10,7 +10,7 @@
  <padding><Insets top="20" right="25" bottom="20" left="25"/></padding>
 
  <HBox alignment="CENTER_LEFT" spacing="15">
-  <Label text="Ordenes de Produccion" styleClass="text-heading" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+   <Label text="Ordenes de Produccion" styleClass="text-heading-lg"/>
   <Region HBox.hgrow="ALWAYS"/>
   <Button fx:id="nuevaOrdenButton" text="+ Nueva Orden" styleClass="btn-success"/>
   <Button fx:id="refrescarButton" text="Refrescar" styleClass="btn-secondary"/>
@@ -23,7 +23,7 @@
   <Label fx:id="totalLabel" text="Total: 0 ordenes" styleClass="text-muted" style="-fx-font-style: italic;"/>
  </HBox>
 
- <TableView fx:id="ordenesTable" VBox.vgrow="ALWAYS" prefHeight="500">
+ <TableView fx:id="ordenesTable" VBox.vgrow="ALWAYS" prefHeight="500" styleClass="production-table">
   <columns>
    <TableColumn fx:id="numColumn" text="Orden" prefWidth="100"/>
    <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="130"/>
@@ -35,6 +35,6 @@
    <TableColumn fx:id="totalColumn" text="Total" prefWidth="100"/>
    <TableColumn fx:id="accionesColumn" text="Accion" prefWidth="80"/>
   </columns>
-  <placeholder><Label text="No hay ordenes de produccion registradas." style="-fx-text-fill: #999;"/></placeholder>
+   <placeholder><Label text="No hay ordenes de produccion registradas." styleClass="text-muted"/></placeholder>
  </TableView>
 </VBox>

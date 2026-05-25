@@ -112,7 +112,7 @@ public class AppShellController {
         modulos.put("dashboard-emp",   new ModuloInfo("Mi Dashboard",      "DashboardEmpleado.fxml",   null,    Permiso.DASHBOARD_EMPLEADO_LEER,"\uD83D\uDCCA", "Dashboard"));
         modulos.put("dashboard-cli",   new ModuloInfo("Mi Dashboard",      "DashboardCliente.fxml",    null,    Permiso.DASHBOARD_CLIENTE_LEER, "\uD83D\uDCCA", "Dashboard"));
 
-        modulos.put("pedidos",         new ModuloInfo("Ordenes Produccion","OrdenesProduccion.fxml",   "produccion", Permiso.PRODUCCION_LEER, "\uD83D\uDD27", "Produccion > Ordenes"));
+        modulos.put("ordenes-produccion", new ModuloInfo("Ordenes Produccion","OrdenesProduccion.fxml", "produccion", Permiso.PRODUCCION_LEER, "\uD83D\uDD27", "Produccion > Ordenes"));
 
         modulos.put("planificacion",   new ModuloInfo("Planificacion",     "Planificacion.fxml",       "produccion", Permiso.PRODUCCION_LEER, "\uD83D\uDCC5", "Produccion > Planificacion"));
         modulos.put("productos",       new ModuloInfo("Productos",         "Productos.fxml",           "produccion", Permiso.INVENTARIO_LEER, "\uD83C\uDF82", "Produccion > Productos"));
@@ -141,7 +141,7 @@ public class AppShellController {
 
         for (var e : modulos.entrySet()) {
             if (!session.tienePermiso(e.getValue().permiso())) continue;
-            if (session.isCliente() && "pedidos".equals(e.getKey())) continue;
+            if (session.isCliente() && "ordenes-produccion".equals(e.getKey())) continue;
             if (!session.isCliente() && "mis-pedidos".equals(e.getKey())) continue;
             if (e.getValue().parent() != null) {
                 itemsPorGrupo.computeIfAbsent(e.getValue().parent(), k -> new ArrayList<>()).add(e);

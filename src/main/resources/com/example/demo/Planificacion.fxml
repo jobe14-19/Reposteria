@@ -16,7 +16,7 @@
  </padding>
  <HBox alignment="CENTER_LEFT" spacing="15">
  <Button fx:id="pestana1Button" text="Planificacion Semanal" styleClass="btn-primary"/>
- <Button fx:id="pestana2Button" text="Seguimiento por Pedido" styleClass="btn-secondary"/>
+ <Button fx:id="pestana2Button" text="Seguimiento de Ordenes" styleClass="btn-secondary"/>
  <Button fx:id="pestana3Button" text="Recetas" styleClass="btn-secondary"/>
  <Region HBox.hgrow="ALWAYS"/>
  <Label fx:id="usuarioLabel" styleClass="section-title"/>
@@ -24,7 +24,7 @@
  </HBox>
  </VBox>
 
- <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="bg-primary">
+ <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-bg bg-primary">
  <VBox style="-fx-padding: 20; -fx-spacing: 20;" maxWidth="Infinity" alignment="TOP_CENTER">
 
  <!-- TAB 1: Planificacion Semanal -->
@@ -56,11 +56,11 @@
  <VBox spacing="10" alignment="CENTER_LEFT">
  <Label text="Estadisticas de Produccion" styleClass="section-title"/>
  <GridPane hgap="10" vgap="10" alignment="CENTER_LEFT">
- <Label text="Total Pedidos:" style="-fx-font-size: 12px;" styleClass="text-muted-sm" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
- <Label fx:id="totalPedidosLabel" text="0" styleClass="kpi-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+ <Label text="Total Ordenes:" style="-fx-font-size: 12px;" styleClass="text-muted-sm" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <Label fx:id="totalOrdenesLabel" text="0" styleClass="kpi-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
  <Label text="En Produccion:" style="-fx-font-size: 12px;" styleClass="text-muted-sm" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
  <Label fx:id="enProduccionLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #f0ad4e;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
- <Label text="Listos para Entregar:" style="-fx-font-size: 12px;" styleClass="text-muted-sm" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+ <Label text="Completadas:" style="-fx-font-size: 12px;" styleClass="text-muted-sm" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
  <Label fx:id="listosEntregarLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #4caf50;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
  </GridPane>
  </VBox>
@@ -71,27 +71,27 @@
  </HBox>
  </VBox>
 
- <!-- TAB 2: Seguimiento por Pedido -->
+ <!-- TAB 2: Seguimiento de Ordenes -->
  <VBox fx:id="seguimientoView" spacing="20" maxWidth="Infinity" alignment="TOP_CENTER">
- <Label text="Seguimiento por Pedido" styleClass="section-header"/>
+ <Label text="Seguimiento de Ordenes" styleClass="section-header"/>
 
  <HBox spacing="15" alignment="CENTER_LEFT">
  <VBox spacing="10" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" maxWidth="Infinity">
- <Label text="Seleccionar Pedido:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading-sm"/>
+ <Label text="Seleccionar Orden:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading-sm"/>
  <HBox spacing="10" alignment="CENTER">
- <TextField fx:id="buscarPedidoField" promptText="Buscar pedido por ID o cliente" styleClass="form-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
- <Button fx:id="buscarPedidoButton" text="Buscar" styleClass="btn-primary" style="-fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+ <TextField fx:id="buscarOrdenField" promptText="Buscar orden por ID o cliente" styleClass="form-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+ <Button fx:id="buscarOrdenButton" text="Buscar" styleClass="btn-primary" style="-fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
  </HBox>
- <Button fx:id="verDetallesButton" text="Ver Detalles del Pedido" styleClass="btn-success"/>
+ <Button fx:id="verDetallesButton" text="Ver Detalles de la Orden" styleClass="btn-success"/>
  </VBox>
  </HBox>
 
  <VBox fx:id="detallesView" spacing="15" maxWidth="Infinity" alignment="TOP_CENTER">
- <Label text="Detalles del Pedido" styleClass="section-header"/>
+ <Label text="Detalles de la Orden" styleClass="section-header"/>
 
  <GridPane hgap="15" vgap="15" maxWidth="Infinity">
- <Label text="ID Pedido:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading-sm" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
- <Label fx:id="pedidoIdLabel" text="-" style="-fx-font-size: 16px; -fx-text-fill: #333333;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+ <Label text="ID Orden:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading-sm" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <Label fx:id="ordenIdLabel" text="-" style="-fx-font-size: 16px; -fx-text-fill: #333333;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
  <Label text="Cliente:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading-sm" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
  <Label fx:id="clienteLabel" text="-" style="-fx-font-size: 16px; -fx-text-fill: #333333;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
  <Label text="Estado Actual:" style="-fx-font-size: 14px; -fx-font-weight: bold;" styleClass="text-heading-sm" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
@@ -104,7 +104,7 @@
 
  <HBox spacing="10" alignment="CENTER_RIGHT">
  <Button fx:id="actualizarButton" text="Actualizar Estado" styleClass="btn-warning"/>
- <Button fx:id="marcarListoButton" text="Marcar como Listo para Entregar" styleClass="btn-success"/>
+ <Button fx:id="marcarListoButton" text="Marcar como Completada" styleClass="btn-success"/>
  </HBox>
  </VBox>
  </VBox>

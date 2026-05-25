@@ -12,7 +12,7 @@
  <!-- Header -->
  <HBox alignment="CENTER_LEFT" spacing="12">
   <Label fx:id="numOrdenLabel" text="ORD-0000" styleClass="text-heading" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
-  <Label fx:id="estadoLabel" text="ACTIVA" styleClass="bg-accent text-white" style="-fx-font-weight: bold; -fx-padding: 4 12; -fx-background-radius: 4;"/>
+   <Label fx:id="estadoLabel" text="ACTIVA" styleClass="badge-pill"/>
   <Label fx:id="pausadoLabel" text="EN CURSO" style="-fx-font-size: 11px;"/>
   <Region HBox.hgrow="ALWAYS"/>
   <Label text="Progreso:" styleClass="text-muted"/>
@@ -20,14 +20,14 @@
   <Label fx:id="progresoLabel" text="0%" styleClass="text-heading-sm" style="-fx-font-weight: bold;"/>
  </HBox>
 
- <Separator/>
+ <Separator styleClass="separator-accent"/>
 
- <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background: transparent;">
+  <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-bg">
  <VBox spacing="12" maxWidth="Infinity">
 
-  <!-- Info Cliente -->
-  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 6;">
-   <Label text="Informacion General" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <!-- Info Cliente -->
+   <VBox styleClass="detail-section">
+    <Label text="Informacion General" styleClass="detail-header"/>
    <GridPane hgap="15" vgap="3">
     <columnConstraints><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="25"/><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="25"/><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="14"/></columnConstraints>
     <Label text="Cliente:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -51,9 +51,9 @@
    </GridPane>
   </VBox>
 
-  <!-- Especificaciones -->
-  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 6;">
-   <Label text="Especificaciones" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <!-- Especificaciones -->
+   <VBox styleClass="detail-section">
+    <Label text="Especificaciones" styleClass="detail-header"/>
    <GridPane hgap="15" vgap="3">
     <columnConstraints><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="25"/><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="25"/><ColumnConstraints percentWidth="12"/><ColumnConstraints percentWidth="14"/></columnConstraints>
     <Label text="Base:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -83,9 +83,9 @@
    </GridPane>
   </VBox>
 
-  <!-- Costos -->
-  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 6;">
-   <Label text="Costos y Totales" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <!-- Costos -->
+   <VBox styleClass="detail-section">
+    <Label text="Costos y Totales" styleClass="detail-header"/>
    <HBox spacing="20">
     <Label text="" fx:id="costoEstLabel" style="-fx-text-fill: #555;"/>
     <Label text="" fx:id="costoRealLabel" style="-fx-text-fill: #555;"/>
@@ -116,7 +116,7 @@
   <!-- Ingredientes -->
   <VBox spacing="6">
    <Label text="Ingredientes" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
-   <TableView fx:id="ingredientesTable" prefHeight="120" maxWidth="Infinity">
+    <TableView fx:id="ingredientesTable" prefHeight="120" maxWidth="Infinity" styleClass="production-table">
     <columns>
      <TableColumn fx:id="ingNombreCol" text="Ingrediente" prefWidth="250"/>
      <TableColumn fx:id="ingReqCol" text="Requerido" prefWidth="100"/>
@@ -131,7 +131,7 @@
   <!-- Historial -->
   <VBox spacing="6">
    <Label text="Historial de Cambios" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
-   <TableView fx:id="historialTable" prefHeight="150" maxWidth="Infinity">
+    <TableView fx:id="historialTable" prefHeight="150" maxWidth="Infinity" styleClass="activity-table">
     <columns>
      <TableColumn fx:id="histAccionCol" text="Accion" prefWidth="150"/>
      <TableColumn fx:id="histDetalleCol" text="Detalle" prefWidth="300"/>

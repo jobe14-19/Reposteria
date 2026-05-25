@@ -15,9 +15,9 @@
   <Button text="+ Nuevo Pedido" onAction="#nuevoPedido" styleClass="btn-primary"/>
  </HBox>
 
- <Separator/>
+ <Separator styleClass="separator-accent"/>
 
- <TableView fx:id="pedidosTable" VBox.vgrow="ALWAYS">
+ <TableView fx:id="pedidosTable" VBox.vgrow="ALWAYS" styleClass="client-orders-table">
   <columns>
    <TableColumn fx:id="idColumn" text="#" prefWidth="60"/>
    <TableColumn fx:id="productoColumn" text="Producto" prefWidth="200"/>
@@ -26,7 +26,7 @@
    <TableColumn fx:id="totalColumn" text="Total" prefWidth="100"/>
    <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="120"/>
   </columns>
-  <placeholder><Label text="No tienes pedidos registrados. Haz clic en 'Nuevo Pedido' para comenzar."/></placeholder>
+   <placeholder><Label text="No tienes pedidos registrados. Haz clic en 'Nuevo Pedido' para comenzar." styleClass="text-muted"/></placeholder>
  </TableView>
 
  <Label fx:id="totalLabel" styleClass="text-muted-sm"/>

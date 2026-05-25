@@ -42,11 +42,11 @@ public class DashboardAdminController {
  private static final Logger LOGGER = Logger.getLogger(DashboardAdminController.class.getName());
 
     // KPIs
-    private static final String SQL_PEDIDOS_PENDIENTES =
+    private static final String SQL_PROD_PENDIENTES =
         "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION')";
     private static final String SQL_PROD_ACTIVA =
         "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION')";
-    private static final String SQL_PEDIDOS_HOY =
+    private static final String SQL_PROD_HOY =
         "SELECT COUNT(*) as total FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
     private static final String SQL_STOCK_BAJO =
         "SELECT COUNT(*) as total FROM inventario WHERE stock_actual < stock_minimo";
@@ -78,7 +78,7 @@ public class DashboardAdminController {
  private static final int REFRESH_INTERVAL_MS = 30000;
 
  @FXML private Label userLabel, lastUpdateLabel;
- @FXML private Label pedidosPendientesLabel, prodActivaLabel, pedidosHoyLabel, stockBajoLabel;
+ @FXML private Label prodPendientesLabel, prodActivaLabel, prodHoyLabel, stockBajoLabel;
  @FXML private Label entregasHoyLabel, saldoPendienteLabel, atrasadaLabel, clientesNuevosLabel;
 
  @FXML private LineChart<String, Number> salesChart;
@@ -175,8 +175,8 @@ public class DashboardAdminController {
   } catch (SQLException e) {
   LOGGER.log(Level.INFO, "Modo offline: {0}", e.getMessage());
   String na = "--";
-  pedidosPendientesLabel.setText(na); prodActivaLabel.setText(na);
-  pedidosHoyLabel.setText(na); stockBajoLabel.setText(na);
+ prodPendientesLabel.setText(na); prodActivaLabel.setText(na);
+ prodHoyLabel.setText(na); stockBajoLabel.setText(na);
   entregasHoyLabel.setText(na); saldoPendienteLabel.setText(na);
   atrasadaLabel.setText(na); clientesNuevosLabel.setText(na);
   salesChart.setData(FXCollections.observableArrayList());
@@ -185,9 +185,9 @@ public class DashboardAdminController {
  }
 
  private void cargarKPIs(Connection conn) {
-  ejecutarKPI(conn, SQL_PEDIDOS_PENDIENTES, pedidosPendientesLabel);
+  ejecutarKPI(conn, SQL_PROD_PENDIENTES, prodPendientesLabel);
   ejecutarKPI(conn, SQL_PROD_ACTIVA, prodActivaLabel);
-  ejecutarKPI(conn, SQL_PEDIDOS_HOY, pedidosHoyLabel);
+  ejecutarKPI(conn, SQL_PROD_HOY, prodHoyLabel);
   ejecutarKPI(conn, SQL_STOCK_BAJO, stockBajoLabel);
   ejecutarKPI(conn, SQL_ENTREGAS_HOY, entregasHoyLabel);
   ejecutarKPI(conn, SQL_PROD_ATRASADA, atrasadaLabel);
