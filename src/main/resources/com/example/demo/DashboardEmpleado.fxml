@@ -14,7 +14,7 @@
   <!-- Navigation Bar -->
   <top>
   <VBox fx:id="topBar">
- <HBox styleClass="nav-bar" alignment="CENTER_LEFT">
+  <HBox styleClass="nav-bar-gradient" alignment="CENTER_LEFT">
  <Label text="Panel de Empleado" styleClass="nav-logo"/>
  <Region HBox.hgrow="ALWAYS"/>
 

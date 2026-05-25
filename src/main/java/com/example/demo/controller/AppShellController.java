@@ -128,6 +128,7 @@ public class AppShellController {
 
         modulos.put("chefsbox",        new ModuloInfo("Chef's Box",        "ChefsBox.fxml",            "plataforma", Permiso.CHEFS_BOX_LEER, "\uD83C\uDF81", "Plataforma Digital"));
 
+        modulos.put("facturas",        new ModuloInfo("Facturación",       "Factura.fxml",             null,       Permiso.REPORTES_LEER, "\uD83D\uDCCB", "Facturación"));
         modulos.put("reportes",        new ModuloInfo("Reportes",          "Reportes.fxml",            null,       Permiso.REPORTES_LEER, "\uD83D\uDCC8", "Reportes"));
         modulos.put("mis-pedidos",     new ModuloInfo("Mis Pedidos",       "ClientePedidos.fxml",      null,       Permiso.PEDIDOS_LEER, "\uD83D\uDCDD", "Mis Pedidos"));
         modulos.put("mi-perfil",       new ModuloInfo("Mi Perfil",         "MiPerfil.fxml",            null,       Permiso.PERFIL_LEER,   "\uD83D\uDC64", "Mi Perfil"));

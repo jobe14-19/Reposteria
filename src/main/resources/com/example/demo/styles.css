@@ -7,58 +7,63 @@
    VARIABLES GLOBALES (Looked-up Colors)
    ========================================================= */
 .root {
-    /* Paleta Principal */
-    -bg-primary: #fbfafa;
-    -accent-primary: #f55580;
+    /* Paleta Principal - Rosato Premium */
+    -bg-primary: #fdf8f7;
+    -accent-primary: #e8476f;
     -text-dark: #6c4540;
-    -accent-secondary: #f595ba;
-    -accent-warm: #e0b193;
+    -accent-secondary: #f2a6c0;
+    -accent-warm: #d9a88c;
 
-    /* Derivados del acento principal */
-    -accent-primary-hover: #d44a6e;
-    -accent-primary-pressed: #b83d5e;
-    -accent-primary-light: derive(#f55580, 85%);
-    -accent-primary-transparent: rgba(245, 85, 128, 0.12);
-    -accent-primary-glow: rgba(245, 85, 128, 0.3);
+    /* Derivados del acento principal (rose) */
+    -accent-primary-hover: #d13d62;
+    -accent-primary-pressed: #b83253;
+    -accent-primary-light: #fdf0f3;
+    -accent-primary-transparent: rgba(232, 71, 111, 0.10);
+    -accent-primary-glow: rgba(232, 71, 111, 0.25);
 
-    /* Derivados del color oscuro */
-    -text-dark-soft: derive(#6c4540, 25%);
-    -text-dark-muted: derive(#6c4540, 45%);
-    -text-dark-bg: derive(#6c4540, 60%);
+    /* Derivados del color oscuro (brown) */
+    -text-dark-soft: derive(#6c4540, 22%);
+    -text-dark-muted: derive(#6c4540, 42%);
+    -text-dark-bg: derive(#6c4540, 58%);
 
-    /* Derivados del acento cálido */
-    -warm-light: derive(#e0b193, 70%);
-    -warm-bg: derive(#e0b193, 85%);
-    -warm-border: derive(#e0b193, 40%);
+    /* Derivados del acento cálido (light brown) */
+    -warm-light: derive(#d9a88c, 72%);
+    -warm-bg: derive(#d9a88c, 86%);
+    -warm-border: derive(#d9a88c, 42%);
 
-    /* Derivados del secundario */
-    -secondary-light: derive(#f595ba, 70%);
-    -secondary-bg: derive(#f595ba, 85%);
+    /* Derivados del secundario (soft pink) */
+    -secondary-light: derive(#f2a6c0, 72%);
+    -secondary-bg: derive(#f2a6c0, 86%);
 
     /* Fondos generales */
     -bg-card: white;
-    -bg-input: #f7f5f5;
-    -bg-hover: #fcf8f8;
-    -bg-nav: #6c4540;
-    -bg-section: #fefcfc;
+    -bg-input: #faf5f3;
+    -bg-hover: #fdf8f6;
+    -bg-nav: #5c3a36;
+    -bg-section: #fefbfa;
 
     /* Textos por uso */
-    -text-heading: #6c4540;
-    -text-body: #5a3d38;
+    -text-heading: #5c3a36;
+    -text-body: #4d322e;
     -text-muted: #9a7a75;
     -text-on-accent: white;
 
     /* Bordes */
-    -border-light: #ebe3e0;
+    -border-light: #ede2de;
     -border-medium: #dccbc6;
-    -border-focus: #f595ba;
+    -border-focus: #f2a6c0;
 
-    /* Sombras */
-    -shadow-sm: dropshadow(gaussian, rgba(108, 69, 64, 0.08), 6, 0.3, 0, 2);
-    -shadow-md: dropshadow(gaussian, rgba(108, 69, 64, 0.1), 14, 0.4, 0, 4);
-    -shadow-lg: dropshadow(gaussian, rgba(108, 69, 64, 0.14), 22, 0.5, 0, 6);
-    -shadow-xl: dropshadow(gaussian, rgba(108, 69, 64, 0.18), 30, 0.6, 0, 8);
+    /* Sombras mejoradas */
+    -shadow-sm: dropshadow(gaussian, rgba(92, 58, 54, 0.06), 6, 0.3, 0, 2);
+    -shadow-md: dropshadow(gaussian, rgba(92, 58, 54, 0.08), 14, 0.4, 0, 4);
+    -shadow-lg: dropshadow(gaussian, rgba(92, 58, 54, 0.12), 22, 0.5, 0, 6);
+    -shadow-xl: dropshadow(gaussian, rgba(92, 58, 54, 0.16), 30, 0.6, 0, 8);
     -shadow-glow: dropshadow(gaussian, -accent-primary-glow, 14, 0.5, 0, 0);
+
+    /* Gradientes */
+    -gradient-rose: linear-gradient(to right, #e8476f, #f2a6c0);
+    -gradient-warm: linear-gradient(to right, #d9a88c, #f2c8a0);
+    -gradient-sidebar: linear-gradient(to bottom, #5c3a36, #7a4d42);
 
     /* Transiciones */
     -fx-font-family: 'Segoe UI', 'Poppins', 'Inter', system-ui, sans-serif;
@@ -112,6 +117,13 @@
    ========================================================= */
 .nav-bar {
     -fx-background-color: -bg-nav;
+    -fx-padding: 14 24 14 24;
+    -fx-spacing: 8;
+    -fx-effect: -shadow-md;
+}
+
+.nav-bar-gradient {
+    -fx-background-color: -gradient-sidebar;
     -fx-padding: 14 24 14 24;
     -fx-spacing: 8;
     -fx-effect: -shadow-md;
@@ -198,6 +210,16 @@
     -fx-padding: 40;
     -fx-border-color: -border-light;
     -fx-border-width: 1;
+}
+
+.login-card-accent {
+    -fx-background-color: white;
+    -fx-background-radius: 24px;
+    -fx-border-radius: 24px;
+    -fx-effect: -shadow-xl;
+    -fx-padding: 40;
+    -fx-border-color: -accent-secondary;
+    -fx-border-width: 2;
 }
 
 .pastel-logo {
