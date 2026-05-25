@@ -25,11 +25,18 @@ public class FacturaController {
         "FROM facturas f ORDER BY f.id_factura DESC";
 
     private static final String SQL_BUSCAR_ORDEN =
-        "SELECT op.id, op.numero_orden, op.cliente, op.telefono, " +
+        "SELECT op.id_orden as id, op.numero_orden, op.cliente, op.telefono, " +
         "op.direccion, op.precio_venta, op.anticipo, op.libras, " +
         "op.categoria, op.decoracion, op.adornos, op.rellenos, " +
         "op.mensaje, op.costo_delivery, op.fecha_entrega " +
         "FROM ordenes_produccion op WHERE op.cliente LIKE ? OR op.numero_orden LIKE ?";
+
+    private static final String SQL_BUSCAR_ORDEN_POR_ID =
+        "SELECT op.id_orden as id, op.numero_orden, op.cliente, op.telefono, " +
+        "op.direccion, op.precio_venta, op.anticipo, op.libras, " +
+        "op.categoria, op.decoracion, op.adornos, op.rellenos, " +
+        "op.mensaje, op.costo_delivery, op.fecha_entrega " +
+        "FROM ordenes_produccion op WHERE op.id_orden = ?";
 
     private static final String SQL_INSERT_FACTURA =
         "INSERT INTO facturas (id_orden, cliente, telefono, direccion, " +
@@ -173,9 +180,8 @@ public class FacturaController {
         }
 
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_ORDEN)) {
+             PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_ORDEN_POR_ID)) {
             stmt.setInt(1, ordenSeleccionadaId);
-            stmt.setString(2, "%");
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String cliente = rs.getString("cliente");
