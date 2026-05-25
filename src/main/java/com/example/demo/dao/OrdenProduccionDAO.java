@@ -40,6 +40,12 @@ public class OrdenProduccionDAO {
             "usuario_crea NVARCHAR(100), progreso INT DEFAULT 0, pausado BIT DEFAULT 0, " +
             "FOREIGN KEY (id_receta) REFERENCES recetas(id_receta))",
 
+            "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='tipo_entrega') " +
+            "ALTER TABLE ordenes_produccion ADD tipo_entrega NVARCHAR(2) DEFAULT 'L'",
+
+            "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='costo_delivery') " +
+            "ALTER TABLE ordenes_produccion ADD costo_delivery DECIMAL(12,2) DEFAULT 0",
+
             "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='orden_fases' AND xtype='U') CREATE TABLE orden_fases (" +
             "id_fase INT IDENTITY(1,1) PRIMARY KEY, id_orden INT NOT NULL, fase_nombre NVARCHAR(50) NOT NULL, fase_orden INT NOT NULL, " +
             "estado NVARCHAR(20) DEFAULT 'PENDIENTE', fecha_inicio DATETIME, fecha_fin DATETIME, " +

@@ -23,6 +23,8 @@ public class OrdenProduccion {
     private String usuarioCrea;
     private int progreso;
     private boolean pausado;
+    private String tipoEntrega;
+    private double costoDelivery;
 
     private List<OrdenFase> fases;
     private List<OrdenHistorial> historial;
@@ -110,6 +112,10 @@ public class OrdenProduccion {
     public void setProgreso(int progreso) { this.progreso = progreso; }
     public boolean isPausado() { return pausado; }
     public void setPausado(boolean pausado) { this.pausado = pausado; }
+    public String getTipoEntrega() { return tipoEntrega; }
+    public void setTipoEntrega(String tipoEntrega) { this.tipoEntrega = tipoEntrega; }
+    public double getCostoDelivery() { return costoDelivery; }
+    public void setCostoDelivery(double costoDelivery) { this.costoDelivery = costoDelivery; }
     public List<OrdenFase> getFases() { return fases; }
     public void setFases(List<OrdenFase> fases) { this.fases = fases; }
     public List<OrdenHistorial> getHistorial() { return historial; }

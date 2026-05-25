@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -311,17 +312,28 @@ public class PlanificacionController {
    cell.setStyle("-fx-padding: 10; -fx-border-width: 1;");
    cell.getStyleClass().addAll("border-light", "bg-input");
 
+  int diaActual = LocalDate.now().getDayOfWeek().getValue();
+  if (i + 1 == diaActual) cell.setStyle(cell.getStyle() + "; -fx-background-color: #fdf0f3;");
+
  for (Orden orden : ordenesList) {
  int diaSemana = orden.getDiaSemana();
  if (diaSemana == i + 2) {
+ String estadoColor = switch (orden.getEstado()) {
+ case "ACTIVA" -> "#007BFF";
+ case "EN PRODUCCION" -> "#FF9800";
+ case "COMPLETADA" -> "#28A745";
+ default -> "#6C757D";
+ };
  Label clienteLbl = new Label(orden.getNombreCliente());
  clienteLbl.setStyle("-fx-font-weight: bold; -fx-font-size: 11px;");
  Label productoLbl = new Label(orden.getProducto());
  productoLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #666;");
  Label librasLbl = new Label(orden.getLibras() + " lbs");
  librasLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #666;");
- VBox card = new VBox(2, clienteLbl, productoLbl, librasLbl);
- card.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 6; -fx-border-radius: 4; -fx-background-radius: 4;");
+ Label estadoBadge = new Label(orden.getEstado());
+ estadoBadge.setStyle("-fx-font-size: 9px; -fx-text-fill: white; -fx-background-color: " + estadoColor + "; -fx-background-radius: 999px; -fx-padding: 1 8;");
+ VBox card = new VBox(2, clienteLbl, productoLbl, librasLbl, estadoBadge);
+ card.setStyle("-fx-background-color: " + (orden.getEstado().equals("ACTIVA") ? "#e8f4fd" : orden.getEstado().equals("EN PRODUCCION") ? "#fff3e0" : orden.getEstado().equals("COMPLETADA") ? "#e8f5e9" : "#f5f5f5") + "; -fx-padding: 6; -fx-border-radius: 4; -fx-background-radius: 4;");
  cell.getChildren().add(card);
  }
  }
