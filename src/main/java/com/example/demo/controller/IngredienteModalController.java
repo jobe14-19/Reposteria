@@ -65,8 +65,8 @@ public class IngredienteModalController {
  }
 
  private void initializeCategoriaCombo() {
- categoriaComboBox.getItems().addAll("Harinas", "Lácteos", "Huevos", "Grasas",
- "Azúcares", "Frutas", "Frutos Secos", "Especias", "Otros");
+  categoriaComboBox.getItems().addAll("Harinas", "Lácteos", "Huevos", "Grasas",
+  "Azúcares", "Frutas", "Frutos Secos", "Especias", "Utensilios", "Detergentes", "Empaques", "Equipos", "Otros");
  categoriaComboBox.getSelectionModel().selectFirst();
  }
 
