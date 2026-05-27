@@ -46,6 +46,17 @@ public class OrdenProduccionDAO {
             "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='costo_delivery') " +
             "ALTER TABLE ordenes_produccion ADD costo_delivery DECIMAL(12,2) DEFAULT 0",
 
+            "IF EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='forma_pago') " +
+            "EXEC sp_rename 'ordenes_produccion.forma_pago', 'tipo_pago', 'COLUMN'; " +
+            "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='tipo_pago') " +
+            "ALTER TABLE ordenes_produccion ADD tipo_pago NVARCHAR(50) DEFAULT 'Efectivo'",
+
+            "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='estado_pago') " +
+            "ALTER TABLE ordenes_produccion ADD estado_pago NVARCHAR(20) DEFAULT 'Pendiente'",
+
+            "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='id_pedido') " +
+            "ALTER TABLE ordenes_produccion ADD id_pedido INT",
+
             "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='orden_fases' AND xtype='U') CREATE TABLE orden_fases (" +
             "id_fase INT IDENTITY(1,1) PRIMARY KEY, id_orden INT NOT NULL, fase_nombre NVARCHAR(50) NOT NULL, fase_orden INT NOT NULL, " +
             "estado NVARCHAR(20) DEFAULT 'PENDIENTE', fecha_inicio DATETIME, fecha_fin DATETIME, " +
@@ -71,7 +82,7 @@ public class OrdenProduccionDAO {
     }
 
     public String generarNumeroOrden() {
-        String sql = "SELECT ISNULL(MAX(CAST(SUBSTRING(numero_orden, 4, 10) AS INT)), 0) + 1 FROM ordenes_produccion WHERE numero_orden LIKE 'ORD-%'";
+        String sql = "SELECT ISNULL(MAX(CAST(SUBSTRING(numero_orden, 5, 10) AS INT)), 0) + 1 FROM ordenes_produccion WHERE numero_orden LIKE 'ORD-%'";
         try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) return String.format("ORD-%04d", rs.getInt(1));
         } catch (SQLException e) { LOGGER.log(Level.WARNING, "Error generar numero: {0}", e.getMessage()); }
@@ -82,8 +93,8 @@ public class OrdenProduccionDAO {
         String sql = "INSERT INTO ordenes_produccion (numero_orden, estado, categoria, revestimiento, sucursal, " +
             "fecha_entrega, hora_entrega, cliente, direccion, telefono, vendedor, libras, base_tipo, masa_tipo, forma, pisos, " +
             "lustres, decoracion, camuflajes, flores, mensaje, observaciones, adornos, rellenos, " +
-            "costo_estimado, costo_real, precio_venta, anticipo, saldo, id_receta, usuario_crea) " +
-            "VALUES (?, 'ACTIVA', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "costo_estimado, costo_real, precio_venta, anticipo, saldo, id_receta, usuario_crea, tipo_pago, estado_pago, id_pedido) " +
+            "VALUES (?, 'ACTIVA', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conn = null;
         try {
             conn = dbConnection.getConnection();
@@ -94,7 +105,7 @@ public class OrdenProduccionDAO {
                 stmt.setString(2, orden.getCategoria());
                 stmt.setString(3, orden.getRevestimiento());
                 stmt.setString(4, orden.getSucursal());
-                stmt.setString(5, orden.getFechaEntrega());
+                if (orden.getFechaEntrega() != null) stmt.setDate(5, java.sql.Date.valueOf(orden.getFechaEntrega())); else stmt.setNull(5, Types.DATE);
                 stmt.setString(6, orden.getHoraEntrega());
                 stmt.setString(7, orden.getCliente());
                 stmt.setString(8, orden.getDireccion());
@@ -120,6 +131,9 @@ public class OrdenProduccionDAO {
                 stmt.setDouble(28, orden.getSaldo());
                 if (orden.getIdReceta() > 0) stmt.setInt(29, orden.getIdReceta()); else stmt.setNull(29, Types.INTEGER);
                 stmt.setString(30, orden.getUsuarioCrea());
+                stmt.setString(31, orden.getTipoPago() != null ? orden.getTipoPago() : "Efectivo");
+                stmt.setString(32, orden.getEstadoPago() != null ? orden.getEstadoPago() : "Pendiente");
+                if (orden.getIdPedido() > 0) stmt.setInt(33, orden.getIdPedido()); else stmt.setNull(33, Types.INTEGER);
                 stmt.executeUpdate();
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
@@ -143,6 +157,62 @@ public class OrdenProduccionDAO {
         return -1;
     }
 
+    public int insertarEnTransaccion(Connection conn, OrdenProduccion orden) throws SQLException {
+        String sql = "INSERT INTO ordenes_produccion (numero_orden, estado, categoria, revestimiento, sucursal, " +
+            "fecha_entrega, hora_entrega, cliente, direccion, telefono, vendedor, libras, base_tipo, masa_tipo, forma, pisos, " +
+            "lustres, decoracion, camuflajes, flores, mensaje, observaciones, adornos, rellenos, " +
+            "costo_estimado, costo_real, precio_venta, anticipo, saldo, id_receta, usuario_crea, tipo_pago, estado_pago, id_pedido) " +
+            "VALUES (?, 'ACTIVA', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String num = orden.getNumeroOrden() != null ? orden.getNumeroOrden() : generarNumeroOrden();
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, num);
+            stmt.setString(2, orden.getCategoria());
+            stmt.setString(3, orden.getRevestimiento());
+            stmt.setString(4, orden.getSucursal());
+            if (orden.getFechaEntrega() != null) stmt.setDate(5, java.sql.Date.valueOf(orden.getFechaEntrega())); else stmt.setNull(5, Types.DATE);
+            stmt.setString(6, orden.getHoraEntrega());
+            stmt.setString(7, orden.getCliente());
+            stmt.setString(8, orden.getDireccion());
+            stmt.setString(9, orden.getTelefono());
+            stmt.setString(10, orden.getVendedor());
+            stmt.setDouble(11, orden.getLibras());
+            stmt.setString(12, orden.getBaseTipo());
+            stmt.setString(13, orden.getMaso());
+            stmt.setString(14, orden.getForma());
+            stmt.setInt(15, orden.getPisos());
+            stmt.setString(16, orden.getLustres());
+            stmt.setString(17, orden.getDecoracion());
+            stmt.setString(18, orden.getCamuflajes());
+            stmt.setString(19, orden.getFlores());
+            stmt.setString(20, orden.getMensaje());
+            stmt.setString(21, orden.getObservaciones());
+            stmt.setString(22, orden.getAdornos());
+            stmt.setString(23, orden.getRellenos());
+            stmt.setDouble(24, orden.getCostoEstimado());
+            stmt.setDouble(25, orden.getCostoReal());
+            stmt.setDouble(26, orden.getPrecioVenta());
+            stmt.setDouble(27, orden.getAnticipo());
+            stmt.setDouble(28, orden.getSaldo());
+            if (orden.getIdReceta() > 0) stmt.setInt(29, orden.getIdReceta()); else stmt.setNull(29, Types.INTEGER);
+            stmt.setString(30, orden.getUsuarioCrea());
+            stmt.setString(31, orden.getTipoPago() != null ? orden.getTipoPago() : "Efectivo");
+            stmt.setString(32, orden.getEstadoPago() != null ? orden.getEstadoPago() : "Pendiente");
+            if (orden.getIdPedido() > 0) stmt.setInt(33, orden.getIdPedido()); else stmt.setNull(33, Types.INTEGER);
+            stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    crearFasesPorDefecto(conn, id);
+                    if (orden.getIngredientes() != null && !orden.getIngredientes().isEmpty())
+                        insertarIngredientes(conn, id, orden.getIngredientes());
+                    registrarHistorial(conn, id, "CREACION", "Orden creada: " + num, orden.getUsuarioCrea());
+                    return id;
+                }
+            }
+        }
+        return -1;
+    }
+
     private void crearFasesPorDefecto(Connection conn, int idOrden) throws SQLException {
         String[] fases = {"Recepcion Pedido", "Validacion Stock", "Preparacion", "Relleno", "Decoracion", "Revestimiento", "Control Calidad", "Empaque y Entrega"};
         String sql = "INSERT INTO orden_fases (id_orden, fase_nombre, fase_orden, estado) VALUES (?, ?, ?, 'PENDIENTE')";
@@ -161,12 +231,12 @@ public class OrdenProduccionDAO {
         String sql = "UPDATE ordenes_produccion SET categoria=?, revestimiento=?, sucursal=?, fecha_entrega=?, " +
             "hora_entrega=?, cliente=?, direccion=?, telefono=?, vendedor=?, libras=?, base_tipo=?, masa_tipo=?, forma=?, " +
             "pisos=?, lustres=?, decoracion=?, camuflajes=?, flores=?, mensaje=?, observaciones=?, adornos=?, rellenos=?, " +
-            "costo_estimado=?, costo_real=?, precio_venta=?, anticipo=?, saldo=?, id_receta=? WHERE id_orden=?";
+            "costo_estimado=?, costo_real=?, precio_venta=?, anticipo=?, saldo=?, id_receta=?, tipo_pago=?, estado_pago=?, id_pedido=? WHERE id_orden=?";
         try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, orden.getCategoria());
             stmt.setString(2, orden.getRevestimiento());
             stmt.setString(3, orden.getSucursal());
-            stmt.setString(4, orden.getFechaEntrega());
+            if (orden.getFechaEntrega() != null) stmt.setDate(4, java.sql.Date.valueOf(orden.getFechaEntrega())); else stmt.setNull(4, Types.DATE);
             stmt.setString(5, orden.getHoraEntrega());
             stmt.setString(6, orden.getCliente());
             stmt.setString(7, orden.getDireccion());
@@ -191,7 +261,10 @@ public class OrdenProduccionDAO {
             stmt.setDouble(26, orden.getAnticipo());
             stmt.setDouble(27, orden.getSaldo());
             if (orden.getIdReceta() > 0) stmt.setInt(28, orden.getIdReceta()); else stmt.setNull(28, Types.INTEGER);
-            stmt.setInt(29, orden.getId());
+            stmt.setString(29, orden.getTipoPago() != null ? orden.getTipoPago() : "Efectivo");
+            stmt.setString(30, orden.getEstadoPago() != null ? orden.getEstadoPago() : "Pendiente");
+            if (orden.getIdPedido() > 0) stmt.setInt(31, orden.getIdPedido()); else stmt.setNull(31, Types.INTEGER);
+            stmt.setInt(32, orden.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al actualizar orden: {0}", e.getMessage());
@@ -223,6 +296,10 @@ public class OrdenProduccionDAO {
                 try (PreparedStatement up = conn.prepareStatement("UPDATE ordenes_produccion SET fecha_completado=GETDATE(), progreso=100 WHERE id_orden=?")) {
                     up.setInt(1, idOrden); up.executeUpdate();
                 }
+                generarFacturaAuto(conn, idOrden, usuario);
+            }
+            if ("ENTREGADA".equals(nuevoEstado)) {
+                generarFacturaAuto(conn, idOrden, usuario);
             }
             registrarHistorial(conn, idOrden, "CAMBIO_ESTADO", "Estado cambiado a: " + nuevoEstado, usuario);
             conn.commit();
@@ -325,6 +402,45 @@ public class OrdenProduccionDAO {
             return false;
         } finally {
             if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
+        }
+    }
+
+    private void generarFacturaAuto(Connection conn, int idOrden, String usuario) throws SQLException {
+        String sqlOrd = "SELECT id_orden, cliente, telefono, direccion, precio_venta, costo_delivery, categoria, libras, decoracion, adornos, rellenos, mensaje FROM ordenes_produccion WHERE id_orden=?";
+        try (PreparedStatement stmt = conn.prepareStatement(sqlOrd)) {
+            stmt.setInt(1, idOrden);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String cliente = rs.getString("cliente");
+                    if (cliente == null || cliente.trim().isEmpty()) return;
+                    String telefono = rs.getString("telefono");
+                    String direccion = rs.getString("direccion");
+                    double subtotal = rs.getDouble("precio_venta");
+                    double delivery = rs.getDouble("costo_delivery");
+                    if (delivery < 0) delivery = 0;
+                    double itbis = (subtotal + delivery) * 0.18;
+                    double total = subtotal + delivery + itbis;
+                    String detalles = String.format("Categoria: %s | Libras: %.1f | Decoracion: %s | Adornos: %s | Rellenos: %s | Mensaje: %s",
+                        rs.getString("categoria"), rs.getDouble("libras"),
+                        rs.getString("decoracion"), rs.getString("adornos"),
+                        rs.getString("rellenos"), rs.getString("mensaje"));
+                    String sqlIns = "INSERT INTO facturas (id_orden, cliente, telefono, direccion, fecha, subtotal, costo_delivery, itbis, descuento, total, estado, detalles, usuario_genera, fecha_generacion) VALUES (?, ?, ?, ?, CAST(GETDATE() AS DATE), ?, ?, ?, 0, ?, 'EMITIDA', ?, ?, GETDATE())";
+                    try (PreparedStatement ins = conn.prepareStatement(sqlIns)) {
+                        ins.setInt(1, idOrden);
+                        ins.setString(2, cliente);
+                        ins.setString(3, telefono);
+                        ins.setString(4, direccion);
+                        ins.setDouble(5, subtotal);
+                        ins.setDouble(6, delivery);
+                        ins.setDouble(7, itbis);
+                        ins.setDouble(8, total);
+                        ins.setString(9, detalles);
+                        ins.setString(10, usuario);
+                        ins.executeUpdate();
+                    }
+                    registrarHistorial(conn, idOrden, "FACTURA_AUTO", "Factura generada automaticamente para " + cliente, usuario);
+                }
+            }
         }
     }
 
@@ -464,6 +580,9 @@ public class OrdenProduccionDAO {
         o.setUsuarioCrea(rs.getString("usuario_crea"));
         o.setProgreso(rs.getInt("progreso"));
         o.setPausado(rs.getBoolean("pausado"));
+        o.setTipoPago(rs.getString("tipo_pago"));
+        o.setEstadoPago(rs.getString("estado_pago"));
+        o.setIdPedido(rs.getInt("id_pedido"));
         Timestamp ts = rs.getTimestamp("fecha_creacion");
         if (ts != null) o.setFechaCreacion(ts.toLocalDateTime());
         ts = rs.getTimestamp("fecha_inicio");
@@ -552,6 +671,32 @@ public class OrdenProduccionDAO {
     public List<Receta.RecetaIngrediente> obtenerIngredientesReceta(int idReceta) {
         Receta r = new RecetaDAO().obtenerPorId(idReceta);
         return r != null ? r.getIngredientes() : new ArrayList<>();
+    }
+
+    public boolean actualizarPagoPorIdPedido(int idPedido, double monto, String estadoPago) {
+        String sql = "UPDATE ordenes_produccion SET anticipo = ?, saldo = CASE WHEN ? = 'Pagado' THEN 0 ELSE saldo END, estado_pago = ? WHERE id_pedido = ?";
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, monto);
+            stmt.setString(2, estadoPago);
+            stmt.setString(3, estadoPago);
+            stmt.setInt(4, idPedido);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar pago orden: {0}", e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean asignarReceta(int idOrden, int idReceta) {
+        String sql = "UPDATE ordenes_produccion SET id_receta = ? WHERE id_orden = ?";
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idReceta);
+            stmt.setInt(2, idOrden);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al asignar receta a orden {0}: {1}", new Object[]{idOrden, e.getMessage()});
+            return false;
+        }
     }
 
     public boolean validarStockDisponible(int idOrden) {

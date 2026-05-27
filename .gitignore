@@ -39,3 +39,7 @@ build/
 ### Runtime logs ###
 database_errors.log
 Reposteria/
+
+### Stripe config (contiene keys reales) ###
+stripe.properties
+stripe.properties.*

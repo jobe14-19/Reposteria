@@ -60,7 +60,7 @@ public class PedidoModalController {
  private static final String PRODUCTO_FRESA = "Fresa";
  private static final String TITULO_NUEVO = " Nuevo Pedido";
  private static final String TITULO_EDITAR = " Editar Pedido";
- private static final String FORMATO_MONEDA = "$%.2f";
+ private static final String FORMATO_MONEDA = "RD$%.2f";
 
  private static final String DISABLED_STYLE = "-fx-background-color: #FAFAFA; -fx-border-color: #E0E0E0; -fx-border-width: 1;";
  private static final String ENABLED_STYLE = "-fx-background-color: #F0F0F0; -fx-border-color: #E0E0E0; -fx-border-width: 1;";
@@ -443,9 +443,9 @@ public class PedidoModalController {
  private double obtenerTotal() {
  try {
  String totalText = totalField.getText();
- return (totalText != null && !totalText.trim().isEmpty())
- ? Double.parseDouble(totalText.replace("$", "").trim())
- : 0.0;
+  return (totalText != null && !totalText.trim().isEmpty())
+  ? Double.parseDouble(totalText.replace("RD$", "").replace("$", "").trim())
+  : 0.0;
  } catch (NumberFormatException e) {
  return 0.0;
  }
@@ -454,9 +454,9 @@ public class PedidoModalController {
  private double obtenerAdelanto() {
  try {
  String adelantoText = adelantoField.getText();
- return (adelantoText != null && !adelantoText.trim().isEmpty())
- ? Double.parseDouble(adelantoText.replace("$", "").trim())
- : 0.0;
+  return (adelantoText != null && !adelantoText.trim().isEmpty())
+  ? Double.parseDouble(adelantoText.replace("RD$", "").replace("$", "").trim())
+  : 0.0;
  } catch (NumberFormatException e) {
  return 0.0;
  }

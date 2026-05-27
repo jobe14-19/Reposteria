@@ -43,7 +43,7 @@ public class DashboardAdminController {
 
     // KPIs
     private static final String SQL_PROD_PENDIENTES =
-        "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION')";
+        "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado = 'PENDIENTE'";
     private static final String SQL_PROD_ACTIVA =
         "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION')";
     private static final String SQL_PROD_HOY =
@@ -58,6 +58,12 @@ public class DashboardAdminController {
         "SELECT COUNT(*) as total FROM ordenes_produccion WHERE fecha_entrega < GETDATE() AND estado NOT IN ('COMPLETADA','ENTREGADA','CANCELADA')";
     private static final String SQL_CLIENTES_NUEVOS =
         "SELECT COUNT(*) as total FROM clientes WHERE MONTH(fecha_registro) = MONTH(GETDATE()) AND YEAR(fecha_registro) = YEAR(GETDATE())";
+    private static final String SQL_INGRESOS_MES_ADMIN =
+        "SELECT COALESCE(SUM(total), 0) as total FROM facturas WHERE MONTH(fecha) = MONTH(GETDATE()) AND YEAR(fecha) = YEAR(GETDATE()) AND estado = 'PAGADA'";
+    private static final String SQL_COMPRAS_MES_ADMIN =
+        "SELECT COUNT(*) as total FROM compras WHERE MONTH(fecha_compra) = MONTH(GETDATE()) AND YEAR(fecha_compra) = YEAR(GETDATE())";
+    private static final String SQL_MANTENIMIENTO_PROX =
+        "SELECT COUNT(*) as total FROM maquinas WHERE proximo_mantenimiento <= DATEADD(day, 7, GETDATE()) AND estado != 'Fuera de servicio'";
 
     // Charts
     private static final String SQL_VENTAS_7_DIAS =
@@ -68,10 +74,10 @@ public class DashboardAdminController {
     // Tables
     private static final String SQL_ENTREGAS_PROXIMAS =
         "SELECT TOP 10 ISNULL(hora_entrega, '00:00') as hora, cliente, ISNULL(direccion, '') as direccion, estado FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE) ORDER BY hora_entrega ASC";
-    private static final String SQL_ALERTAS =
-        "SELECT 'Stock Bajo' as tipo, i.nombre + ' - Disp: ' + CAST(CAST(i.stock_actual AS INT) AS VARCHAR) + ' (Min: ' + CAST(CAST(i.stock_minimo AS INT) AS VARCHAR) + ')' as descripcion, FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm') as fecha, CASE WHEN i.stock_actual < i.stock_minimo THEN 'CRITICO' ELSE 'BAJO' END as estado FROM ingredientes i WHERE i.estado='Activo' AND i.stock_actual < i.stock_minimo * 1.2 UNION ALL SELECT TOP 5 'Atrasado' as tipo, 'Orden #' + CAST(op.id_orden AS VARCHAR) + ' - ' + op.cliente as descripcion, FORMAT(op.fecha_entrega, 'yyyy-MM-dd HH:mm') as fecha, 'ATRASADO' as estado FROM ordenes_produccion op WHERE op.fecha_entrega < GETDATE() AND op.estado NOT IN ('COMPLETADA','ENTREGADA','CANCELADA') ORDER BY fecha DESC";
+ private static final String SQL_ALERTAS =
+  "SELECT 'Stock Bajo' as tipo, i.nombre + ' - Disp: ' + CAST(CAST(i.stock_actual AS INT) AS VARCHAR) + ' (Min: ' + CAST(CAST(i.stock_minimo AS INT) AS VARCHAR) + ')' as descripcion, FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm') as fecha, CASE WHEN i.stock_actual < i.stock_minimo THEN 'CRITICO' ELSE 'BAJO' END as estado FROM ingredientes i WHERE i.estado='Activo' AND i.stock_actual < i.stock_minimo * 1.2 UNION ALL SELECT TOP 5 'Atrasado' as tipo, 'Orden #' + CAST(op.id_orden AS VARCHAR) + ' - ' + op.cliente as descripcion, FORMAT(op.fecha_entrega, 'yyyy-MM-dd HH:mm') as fecha, 'ATRASADO' as estado FROM ordenes_produccion op WHERE op.fecha_entrega < GETDATE() AND op.estado NOT IN ('COMPLETADA','ENTREGADA','CANCELADA') UNION ALL SELECT 'Mantenimiento' as tipo, m.nombre + ' - Vence: ' + FORMAT(m.proximo_mantenimiento, 'yyyy-MM-dd') as descripcion, FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm') as fecha, CASE WHEN m.proximo_mantenimiento <= GETDATE() THEN 'CRITICO' WHEN m.proximo_mantenimiento <= DATEADD(day, 3, GETDATE()) THEN 'URGENTE' ELSE 'PRONTO' END as estado FROM maquinas m WHERE m.proximo_mantenimiento <= DATEADD(day, 7, GETDATE()) AND m.estado != 'Fuera de servicio' ORDER BY fecha DESC";
  private static final String SQL_CLIENTES_RECIENTES =
-  "SELECT TOP 10 c.nombre, c.telefono, FORMAT(c.fecha_registro, 'yyyy-MM-dd') as fecha_registro, COALESCE(SUM(p.total), 0) as total_gastado FROM clientes c LEFT JOIN pedidos p ON c.id_cliente = p.id_cliente GROUP BY c.id_cliente, c.nombre, c.telefono, c.fecha_registro ORDER BY c.fecha_registro DESC";
+  "SELECT TOP 10 c.nombre + ' ' + ISNULL(c.apellido, '') as nombre, ISNULL(c.telefono, '') as telefono, FORMAT(c.fecha_registro, 'yyyy-MM-dd') as fecha_registro, COALESCE(SUM(p.total), 0) as total_gastado FROM clientes c LEFT JOIN pedidos p ON c.id_cliente = p.id_cliente GROUP BY c.id_cliente, c.nombre, c.apellido, c.telefono, c.fecha_registro ORDER BY c.fecha_registro DESC";
  private static final String SQL_ACTIVIDADES =
   "SELECT TOP 20 FORMAT(a.fecha_hora, 'yyyy-MM-dd HH:mm') as fecha, a.usuario, a.accion, a.detalle FROM actividad a ORDER BY a.fecha_hora DESC";
 
@@ -80,6 +86,7 @@ public class DashboardAdminController {
  @FXML private Label userLabel, lastUpdateLabel;
  @FXML private Label prodPendientesLabel, prodActivaLabel, prodHoyLabel, stockBajoLabel;
  @FXML private Label entregasHoyLabel, saldoPendienteLabel, atrasadaLabel, clientesNuevosLabel;
+ @FXML private Label ingresosMesAdminLabel, comprasMesAdminLabel, proxMantenimientoAdminLabel;
 
  @FXML private LineChart<String, Number> salesChart;
  @FXML private CategoryAxis xAxis;
@@ -192,20 +199,32 @@ public class DashboardAdminController {
   ejecutarKPI(conn, SQL_ENTREGAS_HOY, entregasHoyLabel);
   ejecutarKPI(conn, SQL_PROD_ATRASADA, atrasadaLabel);
   ejecutarKPI(conn, SQL_CLIENTES_NUEVOS, clientesNuevosLabel);
+  ejecutarKPIDecimal(conn, SQL_INGRESOS_MES_ADMIN, ingresosMesAdminLabel);
+  ejecutarKPI(conn, SQL_COMPRAS_MES_ADMIN, comprasMesAdminLabel);
+  ejecutarKPI(conn, SQL_MANTENIMIENTO_PROX, proxMantenimientoAdminLabel);
   try (PreparedStatement stmt = conn.prepareStatement(SQL_SALDO_PENDIENTE);
     ResultSet rs = stmt.executeQuery()) {
   if (rs.next()) saldoPendienteLabel.setText(String.format("$%.2f", rs.getDouble("total")));
   } catch (SQLException e) { LOGGER.log(Level.WARNING, "Error saldo: {0}", e.getMessage()); }
  }
 
- private void ejecutarKPI(Connection conn, String sql, Label label) {
+  private void ejecutarKPI(Connection conn, String sql, Label label) {
   try (PreparedStatement stmt = conn.prepareStatement(sql);
     ResultSet rs = stmt.executeQuery()) {
   if (rs.next()) label.setText(String.valueOf(rs.getInt("total")));
   } catch (SQLException e) {
   LOGGER.log(Level.WARNING, "Error KPI: {0}", e.getMessage());
   }
- }
+  }
+
+  private void ejecutarKPIDecimal(Connection conn, String sql, Label label) {
+  try (PreparedStatement stmt = conn.prepareStatement(sql);
+    ResultSet rs = stmt.executeQuery()) {
+  if (rs.next()) label.setText("RD$" + String.format("%.2f", rs.getDouble("total")));
+  } catch (SQLException e) {
+  LOGGER.log(Level.WARNING, "Error KPI: {0}", e.getMessage());
+  }
+  }
 
  private void cargarGraficoVentas(Connection conn) {
   ObservableList<XYChart.Data<String, Number>> data = FXCollections.observableArrayList();
@@ -271,16 +290,19 @@ public class DashboardAdminController {
   clientesRecTable.setItems(list);
  }
 
- private void cargarActividades(Connection conn) {
-  ObservableList<Actividad> list = FXCollections.observableArrayList();
-  try (PreparedStatement stmt = conn.prepareStatement(SQL_ACTIVIDADES);
-    ResultSet rs = stmt.executeQuery()) {
-  while (rs.next()) list.add(new Actividad(
-   rs.getString("fecha"), rs.getString("usuario"),
-   rs.getString("accion"), rs.getString("detalle")));
-  } catch (SQLException e) { LOGGER.log(Level.WARNING, "Error actividad: {0}", e.getMessage()); }
-  actividadesTable.setItems(list);
- }
+  private void cargarActividades(Connection conn) {
+   ObservableList<Actividad> list = FXCollections.observableArrayList();
+   try (PreparedStatement stmt = conn.prepareStatement(SQL_ACTIVIDADES);
+     ResultSet rs = stmt.executeQuery()) {
+   while (rs.next()) list.add(new Actividad(
+    rs.getString("fecha"), rs.getString("usuario"),
+    rs.getString("accion"), rs.getString("detalle")));
+   } catch (SQLException e) {
+    LOGGER.log(Level.WARNING, "Error actividad: {0}", e.getMessage());
+    list.add(new Actividad("--", "Sistema", "Tabla de actividad no disponible", "Verifique la conexión"));
+   }
+   actividadesTable.setItems(list);
+  }
 
  private void iniciarAutoRefresh() {
   refreshTimer = new Timer(true);
@@ -339,11 +361,29 @@ public class DashboardAdminController {
  }
 
  @FXML private void mostrarAlertas(ActionEvent event) {
-  mostrarMensaje("Alertas del Sistema", "Las alertas se muestran en el panel del dashboard.");
+  if (alertasTable.getItems().isEmpty()) {
+   mostrarMensaje("Alertas del Sistema", "No hay alertas actualmente.");
+  } else {
+   StringBuilder sb = new StringBuilder("Alertas activas:\n");
+   for (Alerta a : alertasTable.getItems()) {
+    sb.append("• [").append(a.getTipo()).append("] ").append(a.getDescripcion()).append("\n");
+   }
+   mostrarMensaje("Alertas del Sistema (" + alertasTable.getItems().size() + ")", sb.toString());
+  }
  }
 
  @FXML private void mostrarLogs(ActionEvent event) {
-  mostrarMensaje("Logs del Sistema", "Los logs se muestran en el panel del dashboard.");
+  if (actividadesTable.getItems().isEmpty()) {
+   mostrarMensaje("Logs del Sistema", "No hay registros de actividad.");
+  } else {
+   StringBuilder sb = new StringBuilder("Últimas actividades:\n");
+   int count = 0;
+   for (Actividad a : actividadesTable.getItems()) {
+    if (count++ >= 10) break;
+    sb.append("• ").append(a.getFechaHora()).append(" | ").append(a.getUsuario()).append(" | ").append(a.getAccion()).append("\n");
+   }
+   mostrarMensaje("Logs del Sistema", sb.toString());
+  }
  }
 
  private void navegarAVista(String fxmlName, String titulo) {

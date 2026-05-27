@@ -56,11 +56,27 @@ public class DatabaseConnection {
  try {
  Class.forName(DRIVER);
  LOGGER.log(Level.INFO, "Driver SQL Server cargado correctamente");
+ ejecutarMigraciones();
  } catch (ClassNotFoundException e) {
  String error = "Error al cargar el driver SQL Server: " + e.getMessage();
  LOGGER.log(Level.SEVERE, error);
  logError(error);
  mostrarAlertaError("Error de Driver", error);
+ }
+ }
+
+ private void ejecutarMigraciones() {
+ String[] sqls = {
+ "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('pedidos') AND name='tipo_pago') " +
+ "ALTER TABLE pedidos ADD tipo_pago NVARCHAR(50) DEFAULT 'Efectivo'",
+ "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('pedidos') AND name='estado_pago') " +
+ "ALTER TABLE pedidos ADD estado_pago NVARCHAR(20) DEFAULT 'Pendiente'"
+ };
+ try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
+ for (String sql : sqls) stmt.execute(sql);
+ LOGGER.log(Level.INFO, "Migraciones de base de datos ejecutadas correctamente");
+ } catch (SQLException e) {
+ LOGGER.log(Level.WARNING, "No se pudieron ejecutar migraciones: {0}", e.getMessage());
  }
  }
 
@@ -150,36 +166,32 @@ public class DatabaseConnection {
  }
  }
 
- // Validate user credentials and return user info
- public Optional<Usuario> getUsuarioPorCredenciales(String usuario, String contrasena) {
- if (OFFLINE_MODE) {
- LOGGER.log(Level.INFO, "Modo OFFLINE: Validando usuario localmente");
- return validarUsuarioOffline(usuario, contrasena);
- }
+  // Validate user credentials and return user info
+  public Optional<Usuario> getUsuarioPorCredenciales(String usuario, String contrasena) {
 
- try (Connection conn = getConnection();
- PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR_USUARIO)) {
+  try (Connection conn = getConnection();
+  PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR_USUARIO)) {
 
- stmt.setString(1, usuario);
- stmt.setString(2, contrasena);
+  stmt.setString(1, usuario);
+  stmt.setString(2, contrasena);
 
- try (ResultSet rs = stmt.executeQuery()) {
- if (rs.next()) {
- return Optional.of(new Usuario(
- rs.getInt("id_usuario"),
- rs.getString("nombre"),
- rs.getString("perfil")
- ));
- }
- }
- } catch (SQLException e) {
- String error = "Error al validar credenciales: " + e.getMessage();
- LOGGER.log(Level.SEVERE, error);
- logError(error);
- }
+  try (ResultSet rs = stmt.executeQuery()) {
+  if (rs.next()) {
+  return Optional.of(new Usuario(
+  rs.getInt("id_usuario"),
+  rs.getString("nombre"),
+  rs.getString("perfil")
+  ));
+  }
+  }
+  } catch (SQLException e) {
+  String error = "Error al validar credenciales: " + e.getMessage();
+  LOGGER.log(Level.INFO, "Base de datos no disponible, usando validación offline: {0}", error);
+  }
 
- return Optional.empty();
- }
+  // Fallback a validación offline (hardcoded) cuando la BD no está disponible
+  return validarUsuarioOffline(usuario, contrasena);
+  }
 
  // Validaci\u00f3n de usuario en modo offline
  private Optional<Usuario> validarUsuarioOffline(String usuario, String contrasena) {

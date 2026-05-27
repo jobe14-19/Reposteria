@@ -5,42 +5,36 @@
 <?import javafx.geometry.Insets?>
 <?import java.net.URL?>
 
-<StackPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.LoginController">
+<StackPane style="-fx-background-color: linear-gradient(135deg, #fdf8f7 0%, #f5e6e0 50%, #ede0d8 100%);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.LoginController">
  <stylesheets>
  <URL value="@styles.css"/>
  </stylesheets>
  
  <!-- Login Card -->
- <VBox styleClass="login-card" maxWidth="400" maxHeight="600" alignment="CENTER" spacing="20">
+ <VBox styleClass="login-card" maxWidth="400" maxHeight="620" alignment="CENTER" spacing="18">
  <padding>
  <Insets top="40" right="40" bottom="40" left="40"/>
  </padding>
  
  <!-- Logo and Title -->
- <VBox alignment="CENTER" spacing="10">
+ <VBox alignment="CENTER" spacing="8">
  <Label text="" styleClass="pastel-logo"/>
  <Label text="Repostería Rosato" styleClass="title-label"/>
  <Label text="El Hub de Repostería como Servicio (PaaS)" styleClass="subtitle-label"/>
  </VBox>
  
  <!-- Form Fields -->
- <VBox spacing="15" alignment="CENTER_LEFT">
- <VBox spacing="5">
-  <Label text="Usuario" style="-fx-font-size: 12px;" styleClass="text-muted-sm"/>
+ <VBox spacing="14" alignment="CENTER_LEFT">
+ <VBox spacing="4">
+  <Label text="Usuario" style="-fx-font-size: 12px; -fx-font-weight: bold;" styleClass="text-muted-sm"/>
  <TextField fx:id="usernameField" promptText="Ingresa tu usuario" styleClass="form-field" prefWidth="320"/>
  </VBox>
  
- <VBox spacing="5">
-  <Label text="Contraseña" style="-fx-font-size: 12px;" styleClass="text-muted-sm"/>
+ <VBox spacing="4">
+  <Label text="Contraseña" style="-fx-font-size: 12px; -fx-font-weight: bold;" styleClass="text-muted-sm"/>
  <PasswordField fx:id="passwordField" styleClass="form-field" prefWidth="320"/>
  </VBox>
  </VBox>
- 
- <!-- Remember Me Checkbox -->
- <HBox alignment="CENTER_LEFT" spacing="10">
- <CheckBox fx:id="rememberMeCheckbox"/>
- <Label text="Recordarme" styleClass="checkbox-label"/>
- </HBox>
  
  <!-- Message Label -->
  <Label fx:id="messageLabel" styleClass="error-message" wrapText="true" maxWidth="320"/>

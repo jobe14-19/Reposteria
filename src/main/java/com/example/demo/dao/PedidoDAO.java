@@ -17,11 +17,11 @@ public class PedidoDAO {
  private static final Logger LOGGER = Logger.getLogger(PedidoDAO.class.getName());
  private final DatabaseConnection dbConnection;
 
- private static final String SQL_CARGAR_PEDIDOS =
- "SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente, FORMAT(p.fecha_pedido, 'yyyy-MM-dd') as fecha_pedido, FORMAT(p.fecha_entrega, 'yyyy-MM-dd') as fecha_entrega, pr.nombre as producto, p.libras, p.total, p.adelanto, p.estado FROM pedidos p INNER JOIN clientes c ON p.id_cliente = c.id_cliente INNER JOIN productos pr ON p.id_producto = pr.id_producto ORDER BY p.fecha_pedido DESC";
+  private static final String SQL_CARGAR_PEDIDOS =
+  "SELECT p.id_pedido, ISNULL(c.nombre + ' ' + c.apellido, p.username) as nombre_cliente, FORMAT(p.fecha_pedido, 'yyyy-MM-dd') as fecha_pedido, FORMAT(p.fecha_entrega, 'yyyy-MM-dd') as fecha_entrega, ISNULL(pr.nombre, p.producto) as producto, p.libras, p.total, p.adelanto, p.estado, ISNULL(p.tipo_pago, 'Efectivo') as tipo_pago, ISNULL(p.estado_pago, 'Pendiente') as estado_pago FROM pedidos p LEFT JOIN clientes c ON p.id_cliente = c.id_cliente LEFT JOIN productos pr ON p.id_producto = pr.id_producto ORDER BY p.fecha_pedido DESC";
 
- private static final String SQL_BUSCAR_PEDIDOS =
- "SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente, FORMAT(p.fecha_pedido, 'yyyy-MM-dd') as fecha_pedido, FORMAT(p.fecha_entrega, 'yyyy-MM-dd') as fecha_entrega, pr.nombre as producto, p.libras, p.total, p.adelanto, p.estado FROM pedidos p INNER JOIN clientes c ON p.id_cliente = c.id_cliente INNER JOIN productos pr ON p.id_producto = pr.id_producto WHERE CAST(p.id_pedido AS VARCHAR) LIKE ? OR c.nombre LIKE ? OR c.apellido LIKE ? OR pr.nombre LIKE ? ORDER BY p.fecha_pedido DESC";
+  private static final String SQL_BUSCAR_PEDIDOS =
+  "SELECT p.id_pedido, ISNULL(c.nombre + ' ' + c.apellido, p.username) as nombre_cliente, FORMAT(p.fecha_pedido, 'yyyy-MM-dd') as fecha_pedido, FORMAT(p.fecha_entrega, 'yyyy-MM-dd') as fecha_entrega, ISNULL(pr.nombre, p.producto) as producto, p.libras, p.total, p.adelanto, p.estado, ISNULL(p.tipo_pago, 'Efectivo') as tipo_pago, ISNULL(p.estado_pago, 'Pendiente') as estado_pago FROM pedidos p LEFT JOIN clientes c ON p.id_cliente = c.id_cliente LEFT JOIN productos pr ON p.id_producto = pr.id_producto WHERE CAST(p.id_pedido AS VARCHAR) LIKE ? OR ISNULL(c.nombre, p.username) LIKE ? OR ISNULL(c.apellido, '') LIKE ? OR ISNULL(pr.nombre, p.producto) LIKE ? ORDER BY p.fecha_pedido DESC";
 
  public PedidoDAO() {
  this.dbConnection = DatabaseConnection.getInstance();
@@ -84,7 +84,32 @@ public class PedidoDAO {
  return pedidos;
  }
 
- private Pedido mapearPedido(ResultSet rs) throws SQLException {
+    public boolean actualizarEstadoPago(int idPedido, String estadoPago) {
+        String sql = "UPDATE pedidos SET estado_pago = ? WHERE id_pedido = ?";
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, estadoPago);
+            stmt.setInt(2, idPedido);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar estado_pago: {0}", e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean actualizarAdelantoYEstadoPago(int idPedido, double adelanto, String estadoPago) {
+        String sql = "UPDATE pedidos SET adelanto = ?, estado_pago = ? WHERE id_pedido = ?";
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, adelanto);
+            stmt.setString(2, estadoPago);
+            stmt.setInt(3, idPedido);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar adelanto/estado_pago: {0}", e.getMessage());
+            return false;
+        }
+    }
+
+    private Pedido mapearPedido(ResultSet rs) throws SQLException {
  return new Pedido(
  rs.getInt("id_pedido"),
  rs.getString("nombre_cliente"),
@@ -94,7 +119,9 @@ public class PedidoDAO {
  rs.getDouble("libras"),
  rs.getDouble("total"),
  rs.getDouble("adelanto"),
- rs.getString("estado")
+ rs.getString("estado"),
+ rs.getString("tipo_pago"),
+ rs.getString("estado_pago")
  );
  }
 }

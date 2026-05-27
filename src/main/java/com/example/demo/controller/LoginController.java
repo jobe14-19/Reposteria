@@ -100,14 +100,14 @@ public class LoginController {
  return;
  }
 
- // 3. Fallback para desarrollo (AnelizEr)
- if (VALID_USERNAME.equals(username) && VALID_PASSWORD.equals(password)) {
- sessionManager.iniciarSesion(1, username, VALID_PROFILE);
- redirigirAlDashboard();
- return;
- }
+  // 3. Fallback para desarrollo (AnelizEr)
+  if (VALID_USERNAME.equals(username) && VALID_PASSWORD.equals(password)) {
+  sessionManager.iniciarSesion(1, username, VALID_PROFILE);
+  redirigirAlDashboard();
+  return;
+  }
 
- mostrarError("Usuario o contraseña incorrectos");
+  mostrarError("Usuario o contraseña incorrectos");
  }
 
   private void redirigirAlDashboard() {
@@ -174,11 +174,11 @@ public class LoginController {
  messageLabel.setStyle(ERROR_STYLE);
  }
 
- private void mostrarInformacion(String mensaje) {
- Alert alert = new Alert(Alert.AlertType.INFORMATION);
- alert.setTitle("Información");
- alert.setHeaderText(null);
- alert.setContentText(mensaje);
- alert.showAndWait();
- }
+  private void mostrarInformacion(String mensaje) {
+  Alert alert = new Alert(Alert.AlertType.INFORMATION);
+  alert.setTitle("Información");
+  alert.setHeaderText(null);
+  alert.setContentText(mensaje);
+  alert.showAndWait();
+  }
 }

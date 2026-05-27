@@ -25,6 +25,9 @@ public class OrdenProduccion {
     private boolean pausado;
     private String tipoEntrega;
     private double costoDelivery;
+    private String tipoPago;
+    private String estadoPago;
+    private int idPedido;
 
     private List<OrdenFase> fases;
     private List<OrdenHistorial> historial;
@@ -116,6 +119,12 @@ public class OrdenProduccion {
     public void setTipoEntrega(String tipoEntrega) { this.tipoEntrega = tipoEntrega; }
     public double getCostoDelivery() { return costoDelivery; }
     public void setCostoDelivery(double costoDelivery) { this.costoDelivery = costoDelivery; }
+    public String getTipoPago() { return tipoPago; }
+    public void setTipoPago(String tipoPago) { this.tipoPago = tipoPago; }
+    public String getEstadoPago() { return estadoPago; }
+    public void setEstadoPago(String estadoPago) { this.estadoPago = estadoPago; }
+    public int getIdPedido() { return idPedido; }
+    public void setIdPedido(int idPedido) { this.idPedido = idPedido; }
     public List<OrdenFase> getFases() { return fases; }
     public void setFases(List<OrdenFase> fases) { this.fases = fases; }
     public List<OrdenHistorial> getHistorial() { return historial; }
@@ -127,6 +136,9 @@ public class OrdenProduccion {
     }
     public String getFechaInicioStr() {
         return fechaInicio != null ? fechaInicio.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : "-";
+    }
+    public String getFechaCompletadoStr() {
+        return fechaCompletado != null ? fechaCompletado.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : "-";
     }
     public String getEstadoBadge() {
         switch (estado != null ? estado : "") {

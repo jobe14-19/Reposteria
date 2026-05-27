@@ -1,8 +1,10 @@
 package com.example.demo.controller;
+import com.example.demo.dao.MantenimientoDAO;
 import com.example.demo.service.Permiso;
 import com.example.demo.service.SessionManager;
 import com.example.demo.util.DatabaseConnection;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -118,7 +121,7 @@ public class MantenimientoController {
  super.updateItem(item, empty);
  if (empty) { setGraphic(null); return; }
  Maquina m = getTableView().getItems().get(getIndex());
- historialBtn.setOnAction(e -> mostrarMensaje("Historial", "Historial de mantenimiento de: " + m.getNombre()));
+  historialBtn.setOnAction(e -> mostrarHistorial(m));
  mantenimientoBtn.setOnAction(e -> abrirModalMantenimientoConMaquina(m.getNombre()));
  setGraphic(hbox);
  }
@@ -127,7 +130,14 @@ public class MantenimientoController {
 
  private void setupEvents() {
  registrarMantenimientoButton.setOnAction(this::abrirModalMantenimiento);
- verHistorialButton.setOnAction(e -> mostrarMensaje("Historial", "Seleccione una máquina y use el botón en la tabla."));
+  verHistorialButton.setOnAction(e -> {
+  Maquina seleccionada = maquinasTable.getSelectionModel().getSelectedItem();
+  if (seleccionada != null) {
+  mostrarHistorial(seleccionada);
+  } else {
+  mostrarMensaje("Historial", "Seleccione una máquina de la tabla o use el botón 'Historial' en la fila correspondiente.");
+  }
+  });
  cambiarEstadoButton.setOnAction(this::cambiarEstadoMaquina);
  actualizarAlertasButton.setOnAction(e -> cargarAlertas());
  }
@@ -223,7 +233,47 @@ public class MantenimientoController {
  alertasListView.setItems(alertas);
  }
 
- private void abrirModalMantenimiento(ActionEvent event) {
+  private void mostrarHistorial(Maquina m) {
+  MantenimientoDAO dao = new MantenimientoDAO();
+  var historial = dao.obtenerHistorial(m.getNombre());
+
+  if (historial.isEmpty()) {
+  mostrarMensaje("Historial", "No hay registros de mantenimiento para: " + m.getNombre());
+  return;
+  }
+
+  TableView<MantenimientoDAO.HistorialEntry> table = new TableView<>();
+  table.setPrefHeight(300);
+
+  TableColumn<MantenimientoDAO.HistorialEntry, String> fechaCol = new TableColumn<>("Fecha");
+  fechaCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().fecha()));
+  fechaCol.setPrefWidth(120);
+
+  TableColumn<MantenimientoDAO.HistorialEntry, String> descCol = new TableColumn<>("Descripción");
+  descCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().descripcion()));
+  descCol.setPrefWidth(300);
+
+  TableColumn<MantenimientoDAO.HistorialEntry, String> tecnicoCol = new TableColumn<>("Técnico");
+  tecnicoCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().tecnico()));
+  tecnicoCol.setPrefWidth(120);
+
+  TableColumn<MantenimientoDAO.HistorialEntry, String> proxCol = new TableColumn<>("Próximo");
+  proxCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().proximo() != null ? d.getValue().proximo() : ""));
+  proxCol.setPrefWidth(120);
+
+  table.getColumns().addAll(fechaCol, descCol, tecnicoCol, proxCol);
+  table.setItems(FXCollections.observableArrayList(historial));
+
+  Dialog<Void> dialog = new Dialog<>();
+  dialog.setTitle("Historial - " + m.getNombre());
+  dialog.setHeaderText("Registros de mantenimiento de: " + m.getNombre());
+  dialog.getDialogPane().setContent(new VBox(10, table));
+  dialog.getDialogPane().setPrefSize(700, 350);
+  dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+  dialog.showAndWait();
+  }
+
+  private void abrirModalMantenimiento(ActionEvent event) {
  abrirModalMantenimientoConMaquina(null);
  }
 

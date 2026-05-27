@@ -4,17 +4,20 @@
                xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
                name="Reporte_Factura_Dinamico" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" >
 	<parameter name="ID_FACTURA" class="java.lang.Integer"/>
-<queryString language="sql"><![CDATA[SELECT 
+<queryString language="sql"><![CDATA[SELECT
     p.id_pedido as id_factura,
     CAST(p.fecha_pedido AS DATE) as fecha_venta,
     CAST(p.fecha_entrega AS DATE) as fecha_entrega,
     p.estado,
     c.nombre + ' ' + c.apellido as nombre_cliente,
+    ISNULL(c.direccion, '') as direccion,
+    ISNULL(c.telefono, '') as telefono,
     pr.nombre as producto_nombre,
     p.libras as cantidad,
     CASE WHEN p.libras > 0 THEN p.total / p.libras ELSE 0 END as precio_unitario,
     p.total as subtotal,
-    p.total as total_pago
+    p.total as total_pago,
+    (SELECT TOP 1 metodo_pago FROM pagos WHERE id_pedido = p.id_pedido ORDER BY fecha_pago DESC) as metodo_pago
 FROM pedidos p
 INNER JOIN clientes c ON p.id_cliente = c.id_cliente
 INNER JOIN productos pr ON p.id_producto = pr.id_producto
@@ -25,11 +28,14 @@ ORDER BY p.id_pedido DESC]]></queryString>
 	<field name="fecha_entrega" class="java.sql.Date"/>
 	<field name="estado" class="java.lang.String"/>
 	<field name="nombre_cliente" class="java.lang.String"/>
+	<field name="direccion" class="java.lang.String"/>
+	<field name="telefono" class="java.lang.String"/>
 	<field name="producto_nombre" class="java.lang.String"/>
 	<field name="cantidad" class="java.math.BigDecimal"/>
 	<field name="precio_unitario" class="java.math.BigDecimal"/>
 	<field name="subtotal" class="java.math.BigDecimal"/>
 	<field name="total_pago" class="java.math.BigDecimal"/>
+	<field name="metodo_pago" class="java.lang.String"/>
 	<background>
 		<band height="140">
 			<rectangle>
@@ -53,14 +59,7 @@ ORDER BY p.id_pedido DESC]]></queryString>
         </textElement>
         <text><![CDATA[Fabricación y venta de productos de pastelería]]></text>
     </staticText>
-		<staticText>
-        <reportElement x="0" y="50" width="340" height="35" forecolor="#5D4037"/>
-        <textElement>
-            <font fontName="Arial" size="9.0"/>
-        </textElement>
-        <text><![CDATA[Calle Dionisio Delgallido #2 Primer nivel, Guayabal, Punal.
-Tel: (829) 889-0270 ]]></text>
-    </staticText>
+
 		<rectangle>
     <reportElement x="360" y="0" width="195" height="85" forecolor="#5D4037" backcolor="#FFF5F7"/>
 </rectangle>
@@ -154,6 +153,13 @@ Tel: (829) 889-0270 ]]></text>
         <text><![CDATA[Dirección:]]></text>
     </staticText>
 		<staticText>
+        <reportElement x="75" y="31" width="255" height="16"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <text><![CDATA[Calle Dionisio Delgallido #2, Guayabal, Punal]]></text>
+    </staticText>
+		<staticText>
         <reportElement x="348" y="31" width="82" height="16" forecolor="#5D4037"/>
         <textElement>
             <font fontName="Arial" size="9.0" isBold="true"/>
@@ -172,8 +178,15 @@ Tel: (829) 889-0270 ]]></text>
         <textElement>
             <font fontName="Arial" size="9.0" isBold="true"/>
         </textElement>
-        <text><![CDATA[Sucursal:]]></text>
+        <text><![CDATA[Teléfono:]]></text>
     </staticText>
+		<textField>
+        <reportElement x="75" y="57" width="255" height="16"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{telefono}]]></textFieldExpression>
+    </textField>
 		<staticText>
         <reportElement x="348" y="57" width="82" height="16" forecolor="#5D4037"/>
         <textElement>
@@ -202,6 +215,13 @@ Tel: (829) 889-0270 ]]></text>
         </textElement>
         <text><![CDATA[Tipo de Venta:]]></text>
     </staticText>
+		<textField>
+        <reportElement x="435" y="83" width="112" height="16"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{metodo_pago} != null ? $F{metodo_pago} : "Efectivo"]]></textFieldExpression>
+    </textField>
 	</band>
 	</pageHeader>
 	<columnHeader>

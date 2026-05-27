@@ -189,7 +189,7 @@ public class RecetaViewerController {
         grid.setHgap(20); grid.setVgap(8);
 
         grid.add(new Label("Costo Estimado:"), 0, 0);
-        grid.add(new Label("$" + String.format("%.2f", receta.getCostoEstimado())), 1, 0);
+        grid.add(new Label("RD$" + String.format("%.2f", receta.getCostoEstimado())), 1, 0);
         grid.add(new Label("Rendimiento:"), 0, 1);
         grid.add(new Label(receta.getRendimiento() + "%"), 1, 1);
         grid.add(new Label("Desperdicio:"), 0, 2);
@@ -198,7 +198,7 @@ public class RecetaViewerController {
         grid.add(new Label(receta.getCantidadProducida() + " unidades"), 1, 3);
         grid.add(new Label("Costo por Unidad:"), 0, 4);
         double costoUnidad = receta.getCantidadProducida() > 0 ? receta.getCostoEstimado() / receta.getCantidadProducida() : 0;
-        grid.add(new Label("$" + String.format("%.2f", costoUnidad)), 1, 4);
+        grid.add(new Label("RD$" + String.format("%.2f", costoUnidad)), 1, 4);
 
         for (var node : grid.getChildren()) {
             if (node instanceof Label) {

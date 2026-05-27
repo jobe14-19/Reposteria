@@ -22,29 +22,29 @@ public class UsuarioDAO {
  this.dbConnection = DatabaseConnection.getInstance();
  }
 
- public Optional<DatabaseConnection.Usuario> validarCredenciales(String usuario, String contrasena) {
- try (Connection conn = dbConnection.getConnection();
- PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR_USUARIO)) {
+  public Optional<DatabaseConnection.Usuario> validarCredenciales(String usuario, String contrasena) {
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR_USUARIO)) {
 
- stmt.setString(1, usuario);
- stmt.setString(2, contrasena);
+  stmt.setString(1, usuario);
+  stmt.setString(2, contrasena);
 
- try (ResultSet rs = stmt.executeQuery()) {
- if (rs.next()) {
- return Optional.of(new DatabaseConnection.Usuario(
- rs.getInt("id_usuario"),
- rs.getString("nombre"),
- rs.getString("perfil")
- ));
- }
- }
- } catch (SQLException e) {
- LOGGER.log(Level.INFO, "Modo offline: validando usuario localmente");
- return dbConnection.getUsuarioPorCredenciales(usuario, contrasena);
- }
+  try (ResultSet rs = stmt.executeQuery()) {
+  if (rs.next()) {
+  return Optional.of(new DatabaseConnection.Usuario(
+  rs.getInt("id_usuario"),
+  rs.getString("nombre"),
+  rs.getString("perfil")
+  ));
+  }
+  }
+  } catch (SQLException e) {
+  LOGGER.log(Level.INFO, "BD no disponible, usando validación offline: {0}", e.getMessage());
+  }
 
- return Optional.empty();
- }
+  // Fallback a validación offline si la BD no tiene los datos o no está disponible
+  return dbConnection.getUsuarioPorCredenciales(usuario, contrasena);
+  }
 
  public String obtenerAreaEmpleado(int idUsuario) {
  String sql = "SELECT area FROM empleados WHERE id_empleado = ?";

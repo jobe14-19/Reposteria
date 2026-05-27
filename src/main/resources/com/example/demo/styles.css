@@ -208,8 +208,8 @@
     -fx-border-radius: 24px;
     -fx-effect: -shadow-xl;
     -fx-padding: 40;
-    -fx-border-color: -border-light;
-    -fx-border-width: 1;
+    -fx-border-color: -accent-secondary;
+    -fx-border-width: 1.5;
 }
 
 .login-card-accent {
@@ -2610,28 +2610,28 @@
 }
 
 .top-bar-user {
-    -fx-text-fill: #e0d0c8;
+    -fx-text-fill: #f5ece8;
     -fx-font-size: 12px;
 }
 
 .top-bar-perfil {
-    -fx-text-fill: #e0d0c8;
+    -fx-text-fill: #f5ece8;
     -fx-font-size: 11px;
     -fx-padding: 0 0 0 10;
     -fx-font-style: italic;
 }
 
 .sub-bar-breadcrumb {
-    -fx-text-fill: #e0d0c8;
+    -fx-text-fill: #f5ece8;
     -fx-font-size: 13px;
 }
 
 .sub-bar-logout {
     -fx-background-color: transparent;
-    -fx-text-fill: #ffccb0;
+    -fx-text-fill: #fff5eb;
     -fx-font-size: 12px;
     -fx-cursor: hand;
-    -fx-border-color: #ffccb0;
+    -fx-border-color: #fff5eb;
     -fx-border-radius: 4;
     -fx-padding: 4 12;
 }

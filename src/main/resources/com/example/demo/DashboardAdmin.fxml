@@ -84,12 +84,27 @@
    <Label text="Prod. Atrasada" styleClass="kpi-label"/>
    <Label fx:id="atrasadaLabel" text="0" styleClass="kpi-value" style="-fx-text-fill: #d9534f;"/>
    </VBox>
-   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
-   <Label text="&#128101;" style="-fx-font-size: 28px;"/>
-   <Label text="Clientes Nuevos" styleClass="kpi-label"/>
-   <Label fx:id="clientesNuevosLabel" text="0" styleClass="kpi-value"/>
-   </VBox>
-   </FlowPane>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128101;" style="-fx-font-size: 28px;"/>
+    <Label text="Clientes Nuevos" styleClass="kpi-label"/>
+    <Label fx:id="clientesNuevosLabel" text="0" styleClass="kpi-value"/>
+    </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128176;" style="-fx-font-size: 28px;"/>
+    <Label text="Ingresos del Mes" styleClass="kpi-label"/>
+    <Label fx:id="ingresosMesAdminLabel" text="0.00" styleClass="kpi-value"/>
+    </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128722;" style="-fx-font-size: 28px;"/>
+    <Label text="Compras del Mes" styleClass="kpi-label"/>
+    <Label fx:id="comprasMesAdminLabel" text="0" styleClass="kpi-value"/>
+    </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128295;" style="-fx-font-size: 28px;"/>
+    <Label text="Próx. Mantenimiento" styleClass="kpi-label"/>
+    <Label fx:id="proxMantenimientoAdminLabel" text="0" styleClass="kpi-value"/>
+    </VBox>
+    </FlowPane>
 
   <!-- Charts Row: side by side -->
   <HBox spacing="20" alignment="CENTER">

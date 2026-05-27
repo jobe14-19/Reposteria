@@ -89,16 +89,29 @@
     </GridPane>
    </VBox>
 
-    <!-- Seccion 5: Pago -->
+     <!-- Seccion 5: Pago -->
     <VBox styleClass="card-bordered" spacing="10">
      <Label text="Informacion de Pago" styleClass="text-heading-sm"/>
     <GridPane hgap="12" vgap="10">
      <columnConstraints><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/></columnConstraints>
-     <Label text="Precio Venta:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-     <TextField fx:id="precioField" promptText="0.00" styleClass="form-field" prefWidth="150" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-     <Label text="Anticipo:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-     <TextField fx:id="anticipoField" promptText="0.00" styleClass="form-field" prefWidth="150" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
-    </GridPane>
+     <Label text="Tipo de Pago:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+     <ComboBox fx:id="tipoPagoCombo" editable="true" promptText="Efectivo" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+     <Label text="Estado del Pago:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+     <ComboBox fx:id="estadoPagoCombo" editable="true" promptText="Pendiente" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+      <Label text="Pago Inmediato:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+      <CheckBox fx:id="pagoInmediatoCheck" text="Pagar ahora con PayPal" styleClass="checkbox-accent" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+     </GridPane>
+
+     <VBox spacing="4" style="-fx-padding: 8 0 0 0;">
+      <Label text="Desglose de Precios" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+      <Separator/>
+      <Label fx:id="desgloseLabel" wrapText="true" style="-fx-font-size: 12px; -fx-font-family: monospace;"/>
+      <Separator/>
+      <HBox spacing="10">
+       <Label text="Total:" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+       <Label fx:id="totalLabel" text="0.00" style="-fx-text-fill: #2e7d32; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+      </HBox>
+     </VBox>
    </VBox>
 
   </VBox>

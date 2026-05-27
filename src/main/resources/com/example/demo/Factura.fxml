@@ -10,10 +10,11 @@
  <padding><Insets top="20" right="25" bottom="20" left="25"/></padding>
 
  <HBox alignment="CENTER_LEFT" spacing="15">
-  <Label text="Facturaci&oacute;n" styleClass="text-heading-lg"/>
+  <Label text="Facturación" styleClass="text-heading-lg"/>
   <Region HBox.hgrow="ALWAYS"/>
-  <Button text="Generar Factura" fx:id="generarBtn" styleClass="btn-success"/>
-  <Button text="Imprimir" fx:id="imprimirBtn" styleClass="btn-primary"/>
+   <Button text="Generar Factura" fx:id="generarBtn" styleClass="btn-success"/>
+   <Button text="Cambiar Estado" fx:id="estadoBtn" styleClass="btn-warning"/>
+   <Button text="Imprimir" fx:id="imprimirBtn" styleClass="btn-primary"/>
  </HBox>
 
  <Separator styleClass="separator-accent"/>
@@ -22,35 +23,60 @@
   <VBox spacing="10" HBox.hgrow="ALWAYS">
    <Label text="Datos de la Empresa" styleClass="text-heading-sm"/>
    <VBox styleClass="card-bordered" spacing="4">
-    <Label text="Reposter&iacute;a Rosato" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #e8476f;"/>
+    <Label text="Repostería Rosato" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #e8476f;"/>
     <Label text="RNC: 1-31-12345-6" styleClass="text-muted-sm"/>
-    <Label text="Direcci&oacute;n: Av. Principal #123, Santo Domingo" styleClass="text-muted-sm"/>
-    <Label text="Tel: (809) 555-1234" styleClass="text-muted-sm"/>
+    <Label text="Dirección: Calle Dionisio Delgallido #2, Guayabal, Punal" styleClass="text-muted-sm"/>
+    <Label text="Tel: (829) 889-0270" styleClass="text-muted-sm"/>
    </VBox>
   </VBox>
   <VBox spacing="10" HBox.hgrow="ALWAYS">
    <Label text="Buscar Orden" styleClass="text-heading-sm"/>
    <HBox spacing="10" alignment="CENTER_LEFT">
-    <TextField fx:id="buscarField" promptText="N&uacute;mero de orden o cliente..." styleClass="form-field" HBox.hgrow="ALWAYS"/>
+    <TextField fx:id="buscarField" promptText="Número de orden o cliente..." styleClass="form-field" HBox.hgrow="ALWAYS"/>
     <Button text="Buscar" fx:id="buscarBtn" styleClass="btn-primary"/>
    </HBox>
-   <Label fx:id="ordenInfoLabel" text="Seleccione una orden para facturar" styleClass="text-muted"/>
   </VBox>
  </HBox>
+
+ <VBox fx:id="detalleOrdenPanel" visible="false" managed="false" spacing="10" styleClass="card-bordered" padding="12">
+  <Label text="Datos del Cliente" styleClass="text-heading-sm"/>
+  <HBox spacing="15">
+   <VBox spacing="5" HBox.hgrow="ALWAYS">
+    <Label text="Cliente:" styleClass="text-muted-sm"/>
+    <Label fx:id="detClienteLabel" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+    <Label text="Teléfono:" styleClass="text-muted-sm"/>
+    <Label fx:id="detTelefonoLabel" style="-fx-font-weight: bold;"/>
+   </VBox>
+   <VBox spacing="5" HBox.hgrow="ALWAYS">
+    <Label text="Dirección:" styleClass="text-muted-sm"/>
+    <Label fx:id="detDireccionLabel" wrapText="true" style="-fx-font-weight: bold;"/>
+    <Label text="Total orden:" styleClass="text-muted-sm"/>
+    <Label fx:id="detTotalLabel" style="-fx-font-weight: bold; -fx-text-fill: #e8476f;"/>
+   </VBox>
+   <VBox spacing="5" HBox.hgrow="ALWAYS" alignment="BOTTOM_LEFT">
+    <Label text="Método de Pago:" styleClass="text-muted-sm"/>
+    <ComboBox fx:id="metodoPagoCombo" prefWidth="160" styleClass="form-field"/>
+   </VBox>
+  </HBox>
+ </VBox>
 
  <Separator styleClass="separator-accent"/>
 
  <TableView fx:id="facturasTable" VBox.vgrow="ALWAYS" prefHeight="300" styleClass="delivery-table">
   <columns>
-   <TableColumn fx:id="factIdColumn" text="Factura #" prefWidth="100"/>
-   <TableColumn fx:id="factClienteColumn" text="Cliente" prefWidth="180"/>
-   <TableColumn fx:id="factFechaColumn" text="Fecha" prefWidth="130"/>
+    <TableColumn fx:id="factIdColumn" text="Factura #" prefWidth="100"/>
+    <TableColumn fx:id="factClienteColumn" text="Cliente" prefWidth="180"/>
+    <TableColumn fx:id="factTelefonoColumn" text="Teléfono" prefWidth="110"/>
+    <TableColumn fx:id="factDireccionColumn" text="Dirección" prefWidth="200"/>
+    <TableColumn fx:id="factFechaColumn" text="Fecha" prefWidth="130"/>
    <TableColumn fx:id="factSubtotalColumn" text="Subtotal" prefWidth="110"/>
    <TableColumn fx:id="factDeliveryColumn" text="Delivery" prefWidth="90"/>
    <TableColumn fx:id="factImpuestoColumn" text="ITBIS" prefWidth="90"/>
    <TableColumn fx:id="factTotalColumn" text="Total" prefWidth="120"/>
-   <TableColumn fx:id="factEstadoColumn" text="Estado" prefWidth="100"/>
-  </columns>
+    <TableColumn fx:id="factMetodoColumn" text="M. Pago" prefWidth="90"/>
+    <TableColumn fx:id="factPagadoColumn" text="Pagado" prefWidth="90"/>
+    <TableColumn fx:id="factEstadoColumn" text="Estado" prefWidth="100"/>
+   </columns>
   <placeholder><Label text="No hay facturas generadas." styleClass="text-muted"/></placeholder>
  </TableView>
 </VBox>

@@ -39,10 +39,10 @@
   <ScrollPane fitToWidth="true" styleClass="scroll-pane bg-primary">
  <VBox style="-fx-padding: 25; -fx-spacing: 25;" alignment="TOP_CENTER">
 
- <VBox styleClass="welcome-card" alignment="CENTER_LEFT" spacing="15">
-  <Label fx:id="welcomeLabel" text="¡Bienvenido de vuelta!" styleClass="text-heading-lg"/>
-  <Label text="Aquí puedes ver el resumen de tus pedidos y gestionar tu cuenta" style="-fx-font-size: 14px;" styleClass="text-muted"/>
- </VBox>
+  <VBox styleClass="welcome-card" alignment="CENTER_LEFT" spacing="15">
+   <Label fx:id="welcomeLabel" text="¡Bienvenido de vuelta!" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 20px;"/>
+   <Label text="Aquí puedes ver el resumen de tus pedidos y gestionar tu cuenta" style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.85);"/>
+  </VBox>
 
  <VBox spacing="15">
   <Label text="Tu Resumen" style="-fx-font-size: 16px;" styleClass="text-heading"/>
@@ -88,9 +88,11 @@
  <TableColumn fx:id="productoColumn" text="Producto" prefWidth="200"/>
  <TableColumn fx:id="librasColumn" text="Libras" prefWidth="80"/>
  <TableColumn fx:id="fechaColumn" text="Fecha Entrega" prefWidth="120"/>
- <TableColumn fx:id="totalColumn" text="Total" prefWidth="100"/>
- <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="100"/>
- </columns>
+  <TableColumn fx:id="totalColumn" text="Total" prefWidth="90"/>
+  <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="90"/>
+   <TableColumn fx:id="estadoPagoColumn" text="Pago" prefWidth="80"/>
+   <TableColumn fx:id="accionColumn" text="Acción" prefWidth="100"/>
+   </columns>
  </TableView>
  </VBox>
 

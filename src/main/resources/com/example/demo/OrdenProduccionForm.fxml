@@ -107,6 +107,18 @@
    </TableView>
   </VBox>
 
+  <!-- Informacion de Pago -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
+   <Label text="Informacion de Pago" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <GridPane hgap="10" vgap="6">
+    <columnConstraints><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/></columnConstraints>
+    <Label text="Forma de Pago:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <ComboBox fx:id="tipoPagoCombo" maxWidth="Infinity" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="Estado del Pago:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+    <ComboBox fx:id="estadoPagoCombo" maxWidth="Infinity" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+   </GridPane>
+  </VBox>
+
   <!-- Costos -->
   <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
    <Label text="Costos y Totales" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>

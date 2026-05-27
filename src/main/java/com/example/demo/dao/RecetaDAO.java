@@ -82,11 +82,84 @@ public class RecetaDAO {
         }
     }
 
-    public List<Receta> listarTodas() {
-        List<Receta> lista = new ArrayList<>();
-        String sql = "SELECT r.*, p.nombre as nombre_producto "
-                   + "FROM recetas r INNER JOIN productos p ON r.id_producto = p.id_producto "
-                   + "WHERE r.estado = 'Activo' ORDER BY ISNULL(r.nombre_receta, p.nombre)";
+  public List<Receta> buscarRecetas(String query) {
+  List<Receta> lista = new ArrayList<>();
+  String sql = "SELECT r.*, p.nombre as nombre_producto "
+             + "FROM recetas r INNER JOIN productos p ON r.id_producto = p.id_producto "
+             + "WHERE r.estado = 'Activo' AND (r.nombre_receta LIKE ? OR p.nombre LIKE ?) "
+             + "ORDER BY ISNULL(r.nombre_receta, p.nombre)";
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(sql)) {
+  String like = "%" + query + "%";
+  stmt.setString(1, like);
+  stmt.setString(2, like);
+  try (ResultSet rs = stmt.executeQuery()) {
+  while (rs.next()) {
+  Receta receta = mapearReceta(rs);
+  receta.setIngredientes(obtenerIngredientes(conn, rs.getInt("id_receta")));
+  receta.setPasos(obtenerPasos(conn, rs.getInt("id_receta")));
+  lista.add(receta);
+  }
+  }
+  } catch (SQLException e) {
+  LOGGER.log(Level.SEVERE, "Error al buscar recetas: {0}", e.getMessage());
+  }
+  return lista;
+  }
+
+  public List<Receta> listarPorCategoria(String categoria) {
+  List<Receta> lista = new ArrayList<>();
+  String sql = "SELECT r.*, p.nombre as nombre_producto "
+             + "FROM recetas r INNER JOIN productos p ON r.id_producto = p.id_producto "
+             + "WHERE r.estado = 'Activo' AND r.categoria = ? ORDER BY ISNULL(r.nombre_receta, p.nombre)";
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(sql)) {
+  stmt.setString(1, categoria);
+  try (ResultSet rs = stmt.executeQuery()) {
+  while (rs.next()) {
+  Receta receta = mapearReceta(rs);
+  receta.setIngredientes(obtenerIngredientes(conn, rs.getInt("id_receta")));
+  receta.setPasos(obtenerPasos(conn, rs.getInt("id_receta")));
+  lista.add(receta);
+  }
+  }
+  } catch (SQLException e) {
+  LOGGER.log(Level.SEVERE, "Error al listar recetas por categoria: {0}", e.getMessage());
+  }
+  return lista;
+  }
+
+  public List<String> obtenerCategorias() {
+  List<String> categorias = new ArrayList<>();
+  String sql = "SELECT DISTINCT categoria FROM recetas WHERE estado = 'Activo' AND categoria IS NOT NULL ORDER BY categoria";
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(sql);
+  ResultSet rs = stmt.executeQuery()) {
+  while (rs.next()) categorias.add(rs.getString("categoria"));
+  } catch (SQLException e) {
+  LOGGER.log(Level.WARNING, "Error al obtener categorias: {0}", e.getMessage());
+  }
+  return categorias;
+  }
+
+  public int duplicarReceta(int idReceta) {
+  Receta original = obtenerPorId(idReceta);
+  if (original == null) return -1;
+  Receta copia = new Receta(0, original.getIdProducto(), original.getNombreProducto(),
+  original.getNombreReceta() + " (Copia)", original.getDescripcion(),
+  original.getCategoria(), original.getTiempoPreparacion(),
+  original.getCantidadProducida(), original.getImagenRef(), original.getPorciones(),
+  original.getCostoEstimado(), original.getRendimiento(), original.getDesperdicio(), "Activo");
+  copia.setIngredientes(original.getIngredientes());
+  copia.setPasos(original.getPasos());
+  return insertar(copia, copia.getIngredientes(), copia.getPasos());
+  }
+
+  public List<Receta> listarTodas() {
+  List<Receta> lista = new ArrayList<>();
+  String sql = "SELECT r.*, p.nombre as nombre_producto "
+             + "FROM recetas r INNER JOIN productos p ON r.id_producto = p.id_producto "
+             + "WHERE r.estado = 'Activo' ORDER BY ISNULL(r.nombre_receta, p.nombre)";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -123,6 +196,28 @@ public class RecetaDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al obtener receta: {0}", e.getMessage());
+        }
+        return null;
+    }
+
+    public Receta obtenerPorNombreProducto(String nombreProducto) {
+        String sql = "SELECT TOP 1 r.*, p.nombre as nombre_producto "
+                   + "FROM recetas r INNER JOIN productos p ON r.id_producto = p.id_producto "
+                   + "WHERE p.nombre LIKE ? AND r.estado = 'Activo' ORDER BY r.id_receta";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + nombreProducto + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("id_receta");
+                    Receta receta = mapearReceta(rs);
+                    receta.setIngredientes(obtenerIngredientes(conn, id));
+                    receta.setPasos(obtenerPasos(conn, id));
+                    return receta;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener receta por producto: {0}", e.getMessage());
         }
         return null;
     }

@@ -4,7 +4,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import java.net.URL?>
-<?import java.net.URL?>
 
 <BorderPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.DashboardEmpleadoController">
  <stylesheets>
@@ -24,9 +23,10 @@
  <Button fx:id="btnEntregas" text="Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
  <Button fx:id="btnInventario" text="Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
  <Button fx:id="btnHigiene" text="Higiene" onAction="#mostrarHigiene" styleClass="nav-button"/>
-   <Button fx:id="btnOrdenesProduccion" text="&Oacute;rdenes" onAction="#mostrarOrdenesProduccion" styleClass="nav-button"/>
-  <Button fx:id="btnChefsBox" text="Chef's Box" onAction="#mostrarChefsBox" styleClass="nav-button"/>
-  <Button fx:id="btnPerfil" text="Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
+    <Button fx:id="btnOrdenesProduccion" text="Órdenes" onAction="#mostrarOrdenesProduccion" styleClass="nav-button"/>
+   <Button fx:id="btnChefsBox" text="Chef's Box" onAction="#mostrarChefsBox" styleClass="nav-button"/>
+   <Button fx:id="btnFacturacion" text="Facturación" onAction="#mostrarFacturacion" styleClass="nav-button" visible="false" managed="false"/>
+   <Button fx:id="btnPerfil" text="Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
  </HBox>
 
  <Region HBox.hgrow="ALWAYS"/>
@@ -70,15 +70,30 @@
    <Label text="Prod. Activa" styleClass="kpi-label"/>
    <Label fx:id="prodActivaEmpLabel" text="0" styleClass="kpi-value"/>
    </VBox>
-   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
-   <Label text="&#128200;" style="-fx-font-size: 28px;"/>
-   <Label text="Stock Crítico" styleClass="kpi-label"/>
-   <Label fx:id="stockCriticoEmpLabel" text="0" styleClass="kpi-value" style="-fx-text-fill: #d9534f;"/>
-   </VBox>
-   </FlowPane>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128200;" style="-fx-font-size: 28px;"/>
+    <Label text="Stock Crítico" styleClass="kpi-label"/>
+    <Label fx:id="stockCriticoEmpLabel" text="0" styleClass="kpi-value" style="-fx-text-fill: #d9534f;"/>
+    </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128176;" style="-fx-font-size: 28px;"/>
+    <Label text="Ingresos del Mes" styleClass="kpi-label"/>
+    <Label fx:id="ingresosMesLabel" text="0.00" styleClass="kpi-value"/>
+    </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128722;" style="-fx-font-size: 28px;"/>
+    <Label text="Compras del Mes" styleClass="kpi-label"/>
+    <Label fx:id="comprasMesLabel" text="0" styleClass="kpi-value"/>
+    </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128295;" style="-fx-font-size: 28px;"/>
+    <Label text="Próx. Mantenimiento" styleClass="kpi-label"/>
+    <Label fx:id="proxMantenimientoLabel" text="0" styleClass="kpi-value"/>
+    </VBox>
+    </FlowPane>
 
  <VBox styleClass="table-container" spacing="10">
-  <Label text="Lista R&aacute;pida de &Oacute;rdenes" styleClass="text-heading-sm"/>
+  <Label text="Lista Rápida de Órdenes" styleClass="text-heading-sm"/>
  <ListView fx:id="pedidosRapidosList" prefHeight="150" styleClass="orders-list"/>
  </VBox>
  </VBox>
@@ -134,14 +149,30 @@
  </TableView>
  </VBox>
 
- <!-- Calendar -->
- <VBox fx:id="sectionCalendario" spacing="15">
-  <Label text="Calendario Semanal de Producción" style="-fx-font-size: 16px;" styleClass="text-heading"/>
+  <!-- Recent Facturas -->
+  <VBox fx:id="sectionFacturas" spacing="15">
+   <Label text="Últimas Facturas" style="-fx-font-size: 16px;" styleClass="text-heading"/>
 
- <VBox styleClass="calendar-container" spacing="10">
- <GridPane fx:id="calendarGrid" hgap="10" vgap="10" alignment="CENTER"/>
- </VBox>
- </VBox>
+  <TableView fx:id="facturasEmpTable" prefHeight="200" styleClass="delivery-table">
+  <columns>
+  <TableColumn fx:id="factEmpIdColumn" text="Factura #" prefWidth="80"/>
+  <TableColumn fx:id="factEmpClienteColumn" text="Cliente" prefWidth="160"/>
+  <TableColumn fx:id="factEmpFechaColumn" text="Fecha" prefWidth="100"/>
+  <TableColumn fx:id="factEmpTotalColumn" text="Total" prefWidth="100"/>
+  <TableColumn fx:id="factEmpEstadoColumn" text="Estado" prefWidth="90"/>
+  </columns>
+  <placeholder><Label text="No hay facturas recientes." styleClass="text-muted"/></placeholder>
+  </TableView>
+  </VBox>
+
+  <!-- Calendar -->
+  <VBox fx:id="sectionCalendario" spacing="15">
+   <Label text="Calendario Semanal de Producción" style="-fx-font-size: 16px;" styleClass="text-heading"/>
+
+  <VBox styleClass="calendar-container" spacing="10">
+  <GridPane fx:id="calendarGrid" hgap="10" vgap="10" alignment="CENTER"/>
+  </VBox>
+  </VBox>
 
  </VBox>
  </ScrollPane>

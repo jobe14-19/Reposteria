@@ -18,14 +18,18 @@
  <Separator styleClass="separator-accent"/>
 
  <TableView fx:id="pedidosTable" VBox.vgrow="ALWAYS" styleClass="client-orders-table">
-  <columns>
-   <TableColumn fx:id="idColumn" text="#" prefWidth="60"/>
-   <TableColumn fx:id="productoColumn" text="Producto" prefWidth="200"/>
-   <TableColumn fx:id="librasColumn" text="Libras" prefWidth="80"/>
-   <TableColumn fx:id="fechaColumn" text="Fecha Entrega" prefWidth="130"/>
-   <TableColumn fx:id="totalColumn" text="Total" prefWidth="100"/>
-   <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="120"/>
-  </columns>
+   <columns>
+    <TableColumn fx:id="idColumn" text="#" prefWidth="50"/>
+    <TableColumn fx:id="productoColumn" text="Producto" prefWidth="150"/>
+    <TableColumn fx:id="librasColumn" text="Libras" prefWidth="60"/>
+    <TableColumn fx:id="fechaColumn" text="Fecha Entrega" prefWidth="110"/>
+    <TableColumn fx:id="totalColumn" text="Total" prefWidth="80"/>
+    <TableColumn fx:id="saldoColumn" text="Saldo" prefWidth="100"/>
+    <TableColumn fx:id="tipoPagoColumn" text="Tipo Pago" prefWidth="110"/>
+    <TableColumn fx:id="estadoPagoColumn" text="Estado Pago" prefWidth="100"/>
+    <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="100"/>
+    <TableColumn fx:id="accionesColumn" text="" prefWidth="80"/>
+   </columns>
    <placeholder><Label text="No tienes pedidos registrados. Haz clic en 'Nuevo Pedido' para comenzar." styleClass="text-muted"/></placeholder>
  </TableView>
 

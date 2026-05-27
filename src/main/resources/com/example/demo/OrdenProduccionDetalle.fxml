@@ -95,6 +95,28 @@
    </HBox>
   </VBox>
 
+   <!-- Pago -->
+   <VBox styleClass="detail-section">
+    <Label text="Informacion de Pago" styleClass="detail-header"/>
+   <HBox spacing="20">
+    <Label text="Forma:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+    <Label fx:id="tipoPagoLabel" text="-" style="-fx-font-weight: bold;"/>
+    <Label text="Estado:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+    <Label fx:id="estadoPagoLabel" text="-" />
+   </HBox>
+  </VBox>
+
+   <!-- Fechas Produccion -->
+   <VBox styleClass="detail-section">
+    <Label text="Fechas de Produccion" styleClass="detail-header"/>
+   <HBox spacing="20">
+    <Label text="Inicio:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+    <Label fx:id="fechaInicioLabel" text="-" style="-fx-text-fill: #555;"/>
+    <Label text="Completado:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+    <Label fx:id="fechaCompletadoLabel" text="-" style="-fx-text-fill: #555;"/>
+   </HBox>
+  </VBox>
+
   <!-- Fases -->
   <VBox spacing="8">
    <Label text="Fases de Produccion" styleClass="text-heading-sm" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>

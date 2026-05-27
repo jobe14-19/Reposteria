@@ -20,9 +20,17 @@ public class ProductoDAO {
     }
 
     private void asegurarTablas() {
-        String alterEstado = "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('productos') AND name = 'estado') ALTER TABLE productos ADD estado NVARCHAR(10) DEFAULT 'Activo'";
+        String[] alters = {
+            "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('productos') AND name = 'estado') ALTER TABLE productos ADD estado NVARCHAR(10) DEFAULT 'Activo'",
+            "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('productos') AND name = 'precio_base') ALTER TABLE productos ADD precio_base DECIMAL(12,2) DEFAULT 0",
+            "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('productos') AND name = 'precio_unitario') ALTER TABLE productos ADD precio_unitario DECIMAL(12,2) DEFAULT 0",
+            "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('productos') AND name = 'costo_disenio') ALTER TABLE productos ADD costo_disenio DECIMAL(12,2) DEFAULT 0",
+            "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('productos') AND name = 'descripcion') ALTER TABLE productos ADD descripcion NVARCHAR(MAX)"
+        };
         try (Connection conn = dbConnection.getConnection(); Statement stmt = conn.createStatement()) {
-            try { stmt.execute(alterEstado); } catch (SQLException ignored) {}
+            for (String sql : alters) {
+                try { stmt.execute(sql); } catch (SQLException ignored) {}
+            }
             try { stmt.execute("UPDATE productos SET estado = 'Activo' WHERE estado IS NULL"); } catch (SQLException ignored) {}
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "No se pudo verificar tabla productos: {0}", e.getMessage());
@@ -106,15 +114,49 @@ public class ProductoDAO {
         }
     }
 
-    public boolean eliminar(int id) {
-        String sql = "UPDATE productos SET estado = 'Inactivo' WHERE id_producto = ?";
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al eliminar producto: {0}", e.getMessage());
-            return false;
-        }
-    }
+  public boolean eliminar(int id) {
+  String sql = "UPDATE productos SET estado = 'Inactivo' WHERE id_producto = ?";
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(sql)) {
+  stmt.setInt(1, id);
+  return stmt.executeUpdate() > 0;
+  } catch (SQLException e) {
+  LOGGER.log(Level.SEVERE, "Error al eliminar producto: {0}", e.getMessage());
+  return false;
+  }
+  }
+
+  public boolean toggleEstado(int id) {
+  String sql = "UPDATE productos SET estado = CASE WHEN estado = 'Activo' THEN 'Inactivo' ELSE 'Activo' END WHERE id_producto = ?";
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(sql)) {
+  stmt.setInt(1, id);
+  return stmt.executeUpdate() > 0;
+  } catch (SQLException e) {
+  LOGGER.log(Level.SEVERE, "Error al toggle estado producto: {0}", e.getMessage());
+  return false;
+  }
+  }
+
+  public List<Producto> listarTodosIncluyendoInactivos() {
+  List<Producto> lista = new ArrayList<>();
+  String sql = "SELECT p.id_producto, p.nombre, p.precio_base, p.precio_unitario, p.costo_disenio, "
+             + "p.descripcion, p.estado, "
+             + "(SELECT COUNT(*) FROM recetas r WHERE r.id_producto = p.id_producto AND r.estado = 'Activo') as total_recetas "
+             + "FROM productos p ORDER BY p.nombre";
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(sql);
+  ResultSet rs = stmt.executeQuery()) {
+  while (rs.next()) {
+  lista.add(new Producto(
+  rs.getInt("id_producto"), rs.getString("nombre"),
+  rs.getDouble("precio_base"), rs.getDouble("precio_unitario"),
+  rs.getDouble("costo_disenio"), rs.getString("descripcion"),
+  rs.getString("estado"), rs.getInt("total_recetas")));
+  }
+  } catch (SQLException e) {
+  LOGGER.log(Level.SEVERE, "Error al listar productos: {0}", e.getMessage());
+  }
+  return lista;
+  }
 }

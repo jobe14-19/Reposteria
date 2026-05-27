@@ -45,9 +45,14 @@ public class EntregaModalController {
  """;
 
  private static final String SQL_REGISTRAR_ACTIVIDAD = """
- INSERT INTO actividad (fecha_hora, usuario, accion, detalle)
- VALUES (CURRENT_TIMESTAMP, ?, ?, ?)
- """;
+  INSERT INTO actividad (fecha_hora, usuario, accion, detalle)
+  VALUES (CURRENT_TIMESTAMP, ?, ?, ?)
+  """;
+
+ private static final String SQL_INSERTAR_FACTURA_PEDIDO = """
+  INSERT INTO facturas (id_orden, cliente, telefono, direccion, fecha, subtotal, costo_delivery, itbis, descuento, total, estado, detalles, usuario_genera, fecha_generacion)
+  VALUES (NULL, ?, ?, ?, CAST(GETDATE() AS DATE), ?, ?, ?, 0, ?, 'EMITIDA', ?, ?, GETDATE())
+  """;
 
  // Constantes
  private static final double BASE_DELIVERY_COST = 5.0;
@@ -266,15 +271,15 @@ public class EntregaModalController {
  registrarActividad("REGISTRAR ENTREGA",
  "Entrega registrada para pedido #" + pedidoActual.getId() + " - Monto: $" + montoCobrarField.getText());
 
- conn.commit();
+  generarFacturaPedido(conn);
+  conn.commit();
 
- generarFacturaSimulada();
- enviarWhatsAppSimulado();
+  enviarWhatsAppSimulado();
 
- mostrarMensaje("Entrega Registrada",
- "La entrega ha sido registrada correctamente.\n\n" + 
- "Factura generada: factura_pedido_" + pedidoActual.getId() + ".pdf\n" + 
- "Comprobante enviado por WhatsApp.");
+  mostrarMensaje("Entrega Registrada",
+  "La entrega ha sido registrada correctamente.\n\n" + 
+  "Factura generada automáticamente.\n" + 
+  "Comprobante enviado por WhatsApp.");
 
  cerrarModal();
 
@@ -375,10 +380,41 @@ public class EntregaModalController {
  return field.getText() == null ? "" : field.getText().trim();
  }
 
- private void generarFacturaSimulada() {
- LOGGER.log(Level.INFO, "Generando factura PDF para pedido #{0}", pedidoActual.getId());
- LOGGER.log(Level.INFO, "Archivo: factura_pedido_{0}.pdf", pedidoActual.getId());
- }
+  private void generarFacturaPedido(Connection conn) throws SQLException {
+  if (pedidoActual == null) return;
+  String cliSql = "SELECT c.nombre + ' ' + ISNULL(c.apellido, '') as nombre_completo, ISNULL(c.telefono, '') as telefono, ISNULL(c.direccion, '') as direccion FROM clientes c INNER JOIN pedidos p ON c.id_cliente = p.id_cliente WHERE p.id_pedido = ?";
+  String cliNombre = pedidoActual.getNombreCliente();
+  String cliTelefono = "";
+  String cliDireccion = pedidoActual.getDireccion();
+  try (PreparedStatement stmt = conn.prepareStatement(cliSql)) {
+    stmt.setInt(1, pedidoActual.getId());
+    try (ResultSet rs = stmt.executeQuery()) {
+      if (rs.next()) {
+        cliNombre = rs.getString("nombre_completo");
+        cliTelefono = rs.getString("telefono");
+        cliDireccion = rs.getString("direccion");
+      }
+    }
+  }
+  double subtotal = pedidoActual.getTotal();
+  double delivery = costoDelivery;
+  if (delivery < 0) delivery = 0;
+  double itbis = (subtotal + delivery) * 0.18;
+  double total = subtotal + delivery + itbis;
+  String detalles = "Pedido #" + pedidoActual.getId() + " - " + (localRadioButton.isSelected() ? "Retiro en Local" : "Delivery");
+  try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR_FACTURA_PEDIDO)) {
+    stmt.setString(1, cliNombre);
+    stmt.setString(2, cliTelefono);
+    stmt.setString(3, cliDireccion);
+    stmt.setDouble(4, subtotal);
+    stmt.setDouble(5, delivery);
+    stmt.setDouble(6, itbis);
+    stmt.setDouble(7, total);
+    stmt.setString(8, detalles);
+    stmt.setString(9, sessionManager.getUsuarioActual());
+    stmt.executeUpdate();
+  }
+  }
 
  private void enviarWhatsAppSimulado() {
  LOGGER.log(Level.INFO, "Enviando comprobante por WhatsApp para pedido #{0}", pedidoActual.getId());

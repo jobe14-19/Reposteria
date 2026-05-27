@@ -309,7 +309,7 @@ public class CompraModalController {
  requiereRefrigeracionCheckBox.setSelected(false);
  productosList.clear();
  productosTable.refresh();
- subtotalItemLabel.setText("$0.00");
+ subtotalItemLabel.setText("RD$0.00");
  subtotalField.clear();
  totalDescuentoField.clear();
  impuestosField.clear();

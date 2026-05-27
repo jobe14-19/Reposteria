@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.CapacitacionesController">
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
+
+ <VBox styleClass="bg-card border-light" style="-fx-border-width: 0 0 1 0;">
+ <padding><Insets top="20" right="20" bottom="15" left="20"/></padding>
+ <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Capacitaciones" style="-fx-font-size: 24px; -fx-font-weight: bold;" styleClass="text-heading"/>
+  <Region HBox.hgrow="ALWAYS"/>
+  <TextField fx:id="buscarField" promptText="Buscar por empleado, tema o capacitador..." styleClass="form-field" prefWidth="300"/>
+ </HBox>
+ </VBox>
+
+ <ScrollPane fitToWidth="true" styleClass="bg-primary">
+ <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+
+  <VBox spacing="15" alignment="TOP_CENTER">
+  <HBox alignment="CENTER_LEFT" spacing="15">
+   <Label text="Historial de Capacitaciones" style="-fx-font-size: 18px; -fx-font-weight: bold;" styleClass="text-heading"/>
+   <Region HBox.hgrow="ALWAYS"/>
+   <Label fx:id="totalLabel" text="Total: 0 capacitaciones" style="-fx-font-size: 14px;" styleClass="text-muted"/>
+  </HBox>
+
+  <TableView fx:id="capacitacionesTable" styleClass="personnel-table">
+  <columns>
+   <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+   <TableColumn fx:id="colEmpleado" text="Empleado" prefWidth="150"/>
+   <TableColumn fx:id="colTema" text="Tema" prefWidth="200"/>
+   <TableColumn fx:id="colFecha" text="Fecha" prefWidth="100"/>
+   <TableColumn fx:id="colDuracion" text="Duración (hrs)" prefWidth="100"/>
+   <TableColumn fx:id="colCapacitador" text="Capacitador" prefWidth="150"/>
+   <TableColumn fx:id="colRegistra" text="Registró" prefWidth="120"/>
+  </columns>
+  <placeholder><Label text="No hay capacitaciones registradas." styleClass="text-muted"/></placeholder>
+  </TableView>
+  </VBox>
+ </VBox>
+ </ScrollPane>
+</VBox>

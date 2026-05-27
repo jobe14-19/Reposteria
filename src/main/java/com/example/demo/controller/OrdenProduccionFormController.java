@@ -29,6 +29,7 @@ public class OrdenProduccionFormController {
     @FXML private TextField librasField, pisosField, lustresField, camuflajesField, floresField;
     @FXML private TextField mensajeField, adornosField, rellenosField;
     @FXML private TextField costoEstField, costoRealField, precioField, anticipoField, saldoField;
+    @FXML private ComboBox<String> tipoPagoCombo, estadoPagoCombo;
     @FXML private TextArea observacionesArea, decoracionArea;
     @FXML private TableView<IngredienteResumen> ingredientesTable;
     @FXML private TableColumn<IngredienteResumen, String> ingNombreCol, ingUnidadCol, ingCantidadCol;
@@ -55,6 +56,11 @@ public class OrdenProduccionFormController {
         baseCombo.getItems().addAll("Bizcocho Vainilla", "Bizcocho Chocolate", "Bizcocho Red Velvet", "Bizcocho Zanahoria", "Bizcocho Limon", "Base Galleta");
         masaCombo.getItems().addAll("Masa Suave", "Masa Firme", "Masa Quebrada", "Masa Hojaldre", "Masa Choux");
         formaCombo.getItems().addAll("Redonda", "Cuadrada", "Rectangular", "Corazon", "Personalizada");
+
+        tipoPagoCombo.getItems().addAll("Efectivo","Tarjeta de Credito","Tarjeta de Debito","Cheque","Transferencia","PayPal");
+        tipoPagoCombo.getSelectionModel().select("Efectivo");
+        estadoPagoCombo.getItems().addAll("Pendiente","Pagado","En Proceso","Reembolsado");
+        estadoPagoCombo.getSelectionModel().select("Pendiente");
 
         configurarTablaIngredientes();
         configurarRecetaCombo();
@@ -152,6 +158,8 @@ public class OrdenProduccionFormController {
         precioField.setText(String.valueOf(ordenEdicion.getPrecioVenta()));
         anticipoField.setText(String.valueOf(ordenEdicion.getAnticipo()));
         saldoField.setText(String.format("%.2f", ordenEdicion.getPrecioVenta() - ordenEdicion.getAnticipo()));
+        if (ordenEdicion.getTipoPago() != null) tipoPagoCombo.setValue(ordenEdicion.getTipoPago());
+        if (ordenEdicion.getEstadoPago() != null) estadoPagoCombo.setValue(ordenEdicion.getEstadoPago());
     }
 
     @FXML
@@ -194,6 +202,8 @@ public class OrdenProduccionFormController {
         try { o.setAnticipo(Double.parseDouble(anticipoField.getText().trim())); } catch (NumberFormatException e) { o.setAnticipo(0); }
         try { o.setSaldo(Double.parseDouble(saldoField.getText().trim())); } catch (NumberFormatException e) { o.setSaldo(0); }
         if (recetaCombo.getValue() != null) o.setIdReceta(recetaCombo.getValue().getId());
+        o.setTipoPago(tipoPagoCombo.getValue());
+        o.setEstadoPago(estadoPagoCombo.getValue());
 
         List<OrdenIngrediente> ingredientes = null;
         if (ingredientesTable.getItems() != null && !ingredientesTable.getItems().isEmpty()) {

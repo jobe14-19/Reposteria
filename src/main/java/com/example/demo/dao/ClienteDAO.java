@@ -41,29 +41,30 @@ public class ClienteDAO {
  this.dbConnection = DatabaseConnection.getInstance();
  }
 
- public Optional<DatabaseConnection.Usuario> validarCredenciales(String usuario, String contrasena) {
- try (Connection conn = dbConnection.getConnection();
- PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR_CLIENTE)) {
+  public Optional<DatabaseConnection.Usuario> validarCredenciales(String usuario, String contrasena) {
+  try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR_CLIENTE)) {
 
- stmt.setString(1, usuario);
- stmt.setString(2, contrasena);
+  stmt.setString(1, usuario);
+  stmt.setString(2, contrasena);
 
- try (ResultSet rs = stmt.executeQuery()) {
- if (rs.next()) {
- String nombreCompleto = rs.getString("nombre") + " " + rs.getString("apellido");
- return Optional.of(new DatabaseConnection.Usuario(
- rs.getInt("id_cliente"),
- nombreCompleto.trim(),
- SessionManager.PERFIL_CLIENTE
- ));
- }
- }
- } catch (SQLException e) {
- LOGGER.log(Level.INFO, "Modo offline: validando cliente localmente");
- return dbConnection.getUsuarioPorCredenciales(usuario, contrasena);
- }
- return Optional.empty();
- }
+  try (ResultSet rs = stmt.executeQuery()) {
+  if (rs.next()) {
+  String nombreCompleto = rs.getString("nombre") + " " + rs.getString("apellido");
+  return Optional.of(new DatabaseConnection.Usuario(
+  rs.getInt("id_cliente"),
+  nombreCompleto.trim(),
+  SessionManager.PERFIL_CLIENTE
+  ));
+  }
+  }
+  } catch (SQLException e) {
+  LOGGER.log(Level.INFO, "BD no disponible, usando validación offline: {0}", e.getMessage());
+  }
+
+  // Fallback a validación offline
+  return dbConnection.getUsuarioPorCredenciales(usuario, contrasena);
+  }
 
  public List<Cliente> obtenerTodosLosClientes() {
  List<Cliente> clientes = new ArrayList<>();

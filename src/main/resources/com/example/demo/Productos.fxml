@@ -25,23 +25,25 @@
  <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
 
  <VBox spacing="15">
- <HBox alignment="CENTER_LEFT" spacing="15">
-  <Label text="Catalogo de Productos" style="-fx-font-size: 18px;" styleClass="text-heading"/>
- <Region HBox.hgrow="ALWAYS"/>
-  <Label fx:id="totalLabel" text="Total: 0 productos" style="-fx-font-size: 14px;" styleClass="text-muted"/>
- </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="15">
+   <Label text="Catalogo de Productos" style="-fx-font-size: 18px;" styleClass="text-heading"/>
+   <TextField fx:id="buscarField" promptText="Buscar producto..." styleClass="bg-input border-light" prefWidth="250"/>
+  <Region HBox.hgrow="ALWAYS"/>
+   <Label fx:id="totalLabel" text="Total: 0 productos" style="-fx-font-size: 14px;" styleClass="text-muted"/>
+  </HBox>
 
- <TableView fx:id="productosTable" styleClass="inventory-table">
- <columns>
- <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
- <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="200"/>
- <TableColumn fx:id="precioBaseColumn" text="Precio Base" prefWidth="100"/>
- <TableColumn fx:id="precioUnitarioColumn" text="Precio Unit." prefWidth="100"/>
- <TableColumn fx:id="costoDisenioColumn" text="Costo Diseno" prefWidth="100"/>
- <TableColumn fx:id="recetasColumn" text="Recetas" prefWidth="80"/>
- <TableColumn fx:id="accionesColumn" text="Acciones" prefWidth="180"/>
- </columns>
- </TableView>
+  <TableView fx:id="productosTable" styleClass="inventory-table">
+  <columns>
+  <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+  <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="160"/>
+  <TableColumn fx:id="descripcionColumn" text="Descripcion" prefWidth="150"/>
+  <TableColumn fx:id="precioUnitarioColumn" text="Precio Unit." prefWidth="90"/>
+  <TableColumn fx:id="costoDisenioColumn" text="Costo Diseno" prefWidth="90"/>
+  <TableColumn fx:id="recetasColumn" text="Recetas" prefWidth="70"/>
+  <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="90"/>
+  <TableColumn fx:id="accionesColumn" text="Acciones" prefWidth="180"/>
+  </columns>
+  </TableView>
  </VBox>
  </VBox>
  </ScrollPane>

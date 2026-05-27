@@ -1,10 +1,12 @@
 package com.example.demo.controller;
 
 import com.example.demo.dao.OrdenProduccionDAO;
+import com.example.demo.dao.RecetaDAO;
 import com.example.demo.model.OrdenProduccion;
 import com.example.demo.model.OrdenProduccion.OrdenFase;
 import com.example.demo.model.OrdenProduccion.OrdenHistorial;
 import com.example.demo.model.OrdenProduccion.OrdenIngrediente;
+import com.example.demo.model.Receta;
 import com.example.demo.service.ReportService;
 import com.example.demo.service.SessionManager;
 
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -24,8 +27,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class OrdenProduccionDetalleController {
 
@@ -46,6 +48,7 @@ public class OrdenProduccionDetalleController {
     @FXML private Label decoracionLabel, lustresLabel, camuflajesLabel, floresLabel;
     @FXML private Label mensajeLabel, adornosLabel, rellenosLabel, observacionesLabel;
     @FXML private Label progresoLabel, pausadoLabel;
+    @FXML private Label tipoPagoLabel, estadoPagoLabel, fechaInicioLabel, fechaCompletadoLabel;
 
     @FXML private ProgressBar progresoBar;
     @FXML private ComboBox<String> estadoCombo;
@@ -122,14 +125,38 @@ public class OrdenProduccionDetalleController {
         fechaLabel.setText(orden.getFechaEntrega());
         horaLabel.setText(orden.getHoraEntrega());
         vendedorLabel.setText(orden.getVendedor());
-        recetaLabel.setText(orden.getNombreReceta() != null ? orden.getNombreReceta() : "-");
+        boolean tieneReceta = orden.getIdReceta() > 0;
+        if (tieneReceta) {
+            recetaLabel.setText("\u2713 " + orden.getNombreReceta());
+            recetaLabel.setStyle("-fx-text-fill: #28A745; -fx-font-weight: bold;");
+        } else {
+            recetaLabel.setText("\u25CB Sin receta");
+            recetaLabel.setStyle("-fx-text-fill: #DC3545; -fx-font-style: italic;");
+        }
+        descontarStockBtn.setDisable(!tieneReceta);
+        verRecetaBtn.setText(tieneReceta ? "Ver Receta" : "Asignar Receta");
         direccionLabel.setText(orden.getDireccion());
         telefonoLabel.setText(orden.getTelefono());
-        costoEstLabel.setText("$" + String.format("%.2f", orden.getCostoEstimado()));
-        costoRealLabel.setText("$" + String.format("%.2f", orden.getCostoReal()));
-        precioLabel.setText("$" + String.format("%.2f", orden.getPrecioVenta()));
-        anticipoLabel.setText("$" + String.format("%.2f", orden.getAnticipo()));
-        saldoLabel.setText("$" + String.format("%.2f", orden.getSaldo()));
+        costoEstLabel.setText("RD$" + String.format("%.2f", orden.getCostoEstimado()));
+        costoRealLabel.setText("RD$" + String.format("%.2f", orden.getCostoReal()));
+        precioLabel.setText("RD$" + String.format("%.2f", orden.getPrecioVenta()));
+        anticipoLabel.setText("RD$" + String.format("%.2f", orden.getAnticipo()));
+        saldoLabel.setText("RD$" + String.format("%.2f", orden.getSaldo()));
+
+        tipoPagoLabel.setText(orden.getTipoPago() != null ? orden.getTipoPago() : "Efectivo");
+        String ep = orden.getEstadoPago() != null ? orden.getEstadoPago() : "Pendiente";
+        estadoPagoLabel.setText(ep);
+        String epBg;
+        switch (ep) {
+            case "Pagado": epBg = "#28A745"; break;
+            case "En Proceso": epBg = "#FF9800"; break;
+            case "Pendiente": epBg = "#DC3545"; break;
+            default: epBg = "#6C757D";
+        }
+        estadoPagoLabel.setStyle("-fx-background-color: " + epBg + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2 8; -fx-background-radius: 4;");
+
+        fechaInicioLabel.setText(orden.getFechaInicioStr());
+        fechaCompletadoLabel.setText(orden.getFechaCompletadoStr());
         baseLabel.setText(orden.getBaseTipo());
         masoLabel.setText(orden.getMaso());
         formaLabel.setText(orden.getForma());
@@ -310,14 +337,17 @@ public class OrdenProduccionDetalleController {
     }
 
     private void verReceta() {
-        if (orden.getIdReceta() <= 0) {
-            mostrarMensaje("Sin receta", "Esta orden no tiene una receta asociada.");
-            return;
+        if (orden.getIdReceta() > 0) {
+            abrirVisorReceta(orden.getIdReceta());
+        } else {
+            mostrarDialogoAsignarOcrear();
         }
+    }
+
+    private void abrirVisorReceta(int idReceta) {
         try {
-            RecetaViewerController controller = new RecetaViewerController();
-            com.example.demo.dao.RecetaDAO recetaDAO = new com.example.demo.dao.RecetaDAO();
-            com.example.demo.model.Receta receta = recetaDAO.obtenerPorId(orden.getIdReceta());
+            RecetaDAO recetaDAO = new RecetaDAO();
+            Receta receta = recetaDAO.obtenerPorId(idReceta);
             if (receta == null) { mostrarError("Error", "No se encontro la receta."); return; }
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/RecetaViewer.fxml"));
@@ -333,6 +363,133 @@ public class OrdenProduccionDetalleController {
             stage.showAndWait();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error ver receta: {0}", e.getMessage());
+        }
+    }
+
+    private void mostrarDialogoAsignarOcrear() {
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Asignar Receta");
+        dialog.setHeaderText("La orden " + orden.getNumeroOrden() + " no tiene receta asociada.");
+
+        Button asignarBtn = new Button("Asignar receta existente");
+        asignarBtn.setMaxWidth(Double.MAX_VALUE);
+        asignarBtn.setStyle("-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12; -fx-font-size: 14px; -fx-cursor: hand;");
+        asignarBtn.setOnAction(e -> { dialog.setResult("ASIGNAR"); dialog.close(); });
+
+        Button crearBtn = new Button("Crear nueva receta");
+        crearBtn.setMaxWidth(Double.MAX_VALUE);
+        crearBtn.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12; -fx-font-size: 14px; -fx-cursor: hand;");
+        crearBtn.setOnAction(e -> { dialog.setResult("CREAR"); dialog.close(); });
+
+        VBox content = new VBox(15, new Label("Selecciona una opcion:"), asignarBtn, crearBtn);
+        content.setPadding(new Insets(20));
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+        dialog.getDialogPane().setPrefWidth(400);
+
+        dialog.showAndWait().ifPresent(r -> {
+            if ("ASIGNAR".equals(r)) mostrarDialogoAsignarReceta();
+            else if ("CREAR".equals(r)) abrirCrearReceta();
+        });
+    }
+
+    private void mostrarDialogoAsignarReceta() {
+        RecetaDAO recetaDAO = new RecetaDAO();
+        List<Receta> todas = recetaDAO.listarTodas();
+        if (todas.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Sin recetas");
+            alert.setHeaderText("No hay recetas disponibles.");
+            alert.setContentText("Deseas crear una nueva receta ahora?");
+            if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                abrirCrearReceta();
+            }
+            return;
+        }
+
+        Dialog<Receta> dialog = new Dialog<>();
+        dialog.setTitle("Asignar receta existente");
+        dialog.setHeaderText("Selecciona una receta para la orden " + orden.getNumeroOrden());
+
+        TextField searchField = new TextField();
+        searchField.setPromptText("Buscar receta...");
+
+        ListView<Receta> listView = new ListView<>();
+        ObservableList<Receta> items = FXCollections.observableArrayList(todas);
+        listView.setItems(items);
+        listView.getSelectionModel().selectFirst();
+        listView.setCellFactory(lv -> new ListCell<>() {
+            @Override protected void updateItem(Receta r, boolean empty) {
+                super.updateItem(r, empty);
+                if (empty || r == null) { setText(null); return; }
+                setText(r.getNombreReceta() + "  (" + (r.getCategoria() != null ? r.getCategoria() : "Sin categoria") + ")");
+            }
+        });
+
+        searchField.textProperty().addListener((obs, o, n) -> {
+            if (n == null || n.trim().isEmpty()) {
+                listView.setItems(items);
+            } else {
+                String q = n.toLowerCase().trim();
+                listView.setItems(FXCollections.observableArrayList(
+                    todas.stream().filter(r -> r.getNombreReceta().toLowerCase().contains(q)
+                        || (r.getCategoria() != null && r.getCategoria().toLowerCase().contains(q))
+                        || (r.getNombreProducto() != null && r.getNombreProducto().toLowerCase().contains(q)))
+                        .collect(Collectors.toList())
+                ));
+            }
+        });
+
+        VBox content = new VBox(10, searchField, listView);
+        VBox.setVgrow(listView, Priority.ALWAYS);
+        content.setPadding(new Insets(15));
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().setPrefSize(450, 350);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(btn -> btn == ButtonType.OK ? listView.getSelectionModel().getSelectedItem() : null);
+
+        dialog.showAndWait().ifPresent(receta -> {
+            if (receta == null) return;
+            if (ordenDAO.asignarReceta(orden.getId(), receta.getId())) {
+                orden.setIdReceta(receta.getId());
+                orden.setNombreReceta(receta.getNombreReceta());
+                orden.setIngredientes(new java.util.ArrayList<>());
+                cargarOrden();
+                mostrarMensaje("Receta asignada", "Receta \"" + receta.getNombreReceta() + "\" asignada correctamente.");
+            } else {
+                mostrarError("Error", "No se pudo asignar la receta.");
+            }
+        });
+    }
+
+    private void abrirCrearReceta() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/RecetaModal.fxml"));
+            Parent root = loader.load();
+            RecetaModalController modalController = loader.getController();
+            modalController.setRecetaDAO(new RecetaDAO());
+
+            Stage stage = new Stage();
+            stage.setTitle("Nueva Receta");
+            stage.setScene(new Scene(root, 600, 500));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+
+            RecetaDAO recetaDAO = new RecetaDAO();
+            List<Receta> recetas = recetaDAO.listarTodas();
+            if (!recetas.isEmpty()) {
+                Receta ultima = recetas.get(0);
+                if (ordenDAO.asignarReceta(orden.getId(), ultima.getId())) {
+                    orden = ordenDAO.obtenerPorId(ordenId);
+                    cargarOrden();
+                    mostrarMensaje("Receta creada y asignada",
+                        "La nueva receta \"" + ultima.getNombreReceta() + "\" se ha creado y asignado a la orden.");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al crear receta", e);
+            mostrarError("Error", "No se pudo abrir el formulario de creacion de receta.");
         }
     }
 

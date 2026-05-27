@@ -43,9 +43,10 @@ private static final String SQL_ELIMINAR_EMPLEADO = "UPDATE empleados SET estado
  "INSERT INTO actividad (fecha_hora, usuario, accion, detalle) VALUES (GETDATE(), ?, ?, ?)";
 
  // Constantes para estilos
- private static final String BUTTON_EDITAR_STYLE = "-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
- private static final String BUTTON_CAPACITACION_STYLE = "-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
- private static final String BUTTON_ELIMINAR_STYLE = "-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
+  private static final String BUTTON_EDITAR_STYLE = "-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
+  private static final String BUTTON_CAPACITACION_STYLE = "-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
+  private static final String BUTTON_ELIMINAR_STYLE = "-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
+  private static final String BUTTON_VER_CAP_STYLE = "-fx-background-color: #17A2B8; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
 
  private static final String BADGE_STYLE_BASE = "-fx-background-radius: 12; -fx-padding: 4 8 4 8; -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white;";
  private static final String BADGE_ACTIVO_STYLE = "-fx-background-color: #28A745;";
@@ -186,45 +187,52 @@ private static final String SQL_ELIMINAR_EMPLEADO = "UPDATE empleados SET estado
  boolean puedeEliminar = sessionManager.tienePermiso(Permiso.PERSONAL_ELIMINAR);
  boolean puedeCapacitar = sessionManager.tienePermiso(Permiso.CAPACITACIONES_CREAR);
 
- accionesColumn.setCellFactory(param -> new TableCell<Empleado, Void>() {
+  accionesColumn.setCellFactory(param -> new TableCell<Empleado, Void>() {
 private final Button editarButton = new Button("Editar");
 private final Button capacitacionButton = new Button("Capacitar");
+private final Button verCapButton = new Button("Ver Cap.");
 private final Button eliminarButton = new Button("Eliminar");
- private final HBox hbox = new HBox(5);
+  private final HBox hbox = new HBox(5);
 
- {
- editarButton.setStyle(BUTTON_EDITAR_STYLE);
- capacitacionButton.setStyle(BUTTON_CAPACITACION_STYLE);
- eliminarButton.setStyle(BUTTON_ELIMINAR_STYLE);
+  {
+  editarButton.setStyle(BUTTON_EDITAR_STYLE);
+  capacitacionButton.setStyle(BUTTON_CAPACITACION_STYLE);
+  verCapButton.setStyle(BUTTON_VER_CAP_STYLE);
+  eliminarButton.setStyle(BUTTON_ELIMINAR_STYLE);
 
- editarButton.setOnAction(event -> {
- Empleado empleado = getTableView().getItems().get(getIndex());
- editarEmpleado(empleado);
- });
- capacitacionButton.setOnAction(event -> {
- Empleado empleado = getTableView().getItems().get(getIndex());
- registrarCapacitacion(empleado);
- });
- eliminarButton.setOnAction(event -> {
- Empleado empleado = getTableView().getItems().get(getIndex());
- eliminarEmpleado(empleado);
- });
- }
+  editarButton.setOnAction(event -> {
+  Empleado empleado = getTableView().getItems().get(getIndex());
+  editarEmpleado(empleado);
+  });
+  capacitacionButton.setOnAction(event -> {
+  Empleado empleado = getTableView().getItems().get(getIndex());
+  registrarCapacitacion(empleado);
+  });
+  verCapButton.setOnAction(event -> {
+  Empleado empleado = getTableView().getItems().get(getIndex());
+  verCapacitaciones(empleado);
+  });
+  eliminarButton.setOnAction(event -> {
+  Empleado empleado = getTableView().getItems().get(getIndex());
+  eliminarEmpleado(empleado);
+  });
+  }
 
- @Override
- protected void updateItem(Void item, boolean empty) {
- super.updateItem(item, empty);
- if (empty) {
- setGraphic(null);
- } else {
- hbox.getChildren().clear();
- if (puedeEditar) hbox.getChildren().add(editarButton);
- if (puedeCapacitar) hbox.getChildren().add(capacitacionButton);
- if (puedeEliminar) hbox.getChildren().add(eliminarButton);
- setGraphic(!hbox.getChildren().isEmpty() ? hbox : null);
- }
- }
- });
+  @Override
+  protected void updateItem(Void item, boolean empty) {
+  super.updateItem(item, empty);
+  if (empty) {
+  setGraphic(null);
+  } else {
+  hbox.getChildren().clear();
+  if (puedeEditar) hbox.getChildren().add(editarButton);
+  if (puedeCapacitar) hbox.getChildren().add(capacitacionButton);
+  hbox.getChildren().add(verCapButton);
+  if (puedeEliminar) hbox.getChildren().add(eliminarButton);
+  setGraphic(!hbox.getChildren().isEmpty() ? hbox : null);
+  }
+  }
+  });
  }
 
  private String obtenerEstiloEstado(String estado) {
@@ -386,9 +394,65 @@ private final Button eliminarButton = new Button("Eliminar");
  abrirModalEmpleado(empleado);
  }
 
- private void registrarCapacitacion(Empleado empleado) {
- abrirModalCapacitacion(empleado);
- }
+  private void registrarCapacitacion(Empleado empleado) {
+  abrirModalCapacitacion(empleado);
+  }
+
+  private void verCapacitaciones(Empleado empleado) {
+  String sql = "SELECT c.id_capacitacion, c.tema, c.fecha, c.duracion, c.capacitador, c.usuario_registra FROM capacitaciones c WHERE c.id_empleado = ? ORDER BY c.fecha DESC";
+  try (Connection conn = dbConnection.getConnection();
+    PreparedStatement stmt = conn.prepareStatement(sql)) {
+    stmt.setInt(1, empleado.getId());
+    try (ResultSet rs = stmt.executeQuery()) {
+      TableView<CapacitacionHistorial> table = new TableView<>();
+      TableColumn<CapacitacionHistorial, String> colTema = new TableColumn<>("Tema");
+      colTema.setPrefWidth(200);
+      colTema.setCellValueFactory(new PropertyValueFactory<>("tema"));
+      TableColumn<CapacitacionHistorial, String> colFecha = new TableColumn<>("Fecha");
+      colFecha.setPrefWidth(100);
+      colFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
+      TableColumn<CapacitacionHistorial, Integer> colDur = new TableColumn<>("Horas");
+      colDur.setPrefWidth(60);
+      colDur.setCellValueFactory(new PropertyValueFactory<>("duracion"));
+      TableColumn<CapacitacionHistorial, String> colCap = new TableColumn<>("Capacitador");
+      colCap.setPrefWidth(150);
+      colCap.setCellValueFactory(new PropertyValueFactory<>("capacitador"));
+      table.getColumns().addAll(colTema, colFecha, colDur, colCap);
+      ObservableList<CapacitacionHistorial> items = FXCollections.observableArrayList();
+      while (rs.next()) {
+        items.add(new CapacitacionHistorial(
+          rs.getString("tema"),
+          rs.getString("fecha") != null ? rs.getString("fecha") : "",
+          rs.getInt("duracion"),
+          rs.getString("capacitador")
+        ));
+      }
+      table.setItems(items);
+      Dialog<Void> dialog = new Dialog<>();
+      dialog.setTitle("Capacitaciones - " + empleado.getNombre());
+      dialog.setHeaderText("Historial de Capacitaciones: " + empleado.getNombre());
+      dialog.getDialogPane().setContent(table);
+      dialog.getDialogPane().setPrefSize(550, 400);
+      dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+      dialog.showAndWait();
+    }
+  } catch (SQLException e) {
+    LOGGER.log(Level.SEVERE, "Error al cargar capacitaciones: {0}", e.getMessage());
+    mostrarError("Error", "No se pudieron cargar las capacitaciones.");
+  }
+  }
+
+  public static class CapacitacionHistorial {
+    private String tema, fecha, capacitador;
+    private int duracion;
+    public CapacitacionHistorial(String t, String f, int d, String c) {
+      this.tema = t; this.fecha = f; this.duracion = d; this.capacitador = c;
+    }
+    public String getTema() { return tema; }
+    public String getFecha() { return fecha; }
+    public int getDuracion() { return duracion; }
+    public String getCapacitador() { return capacitador; }
+  }
 
  private void eliminarEmpleado(Empleado empleado) {
  Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

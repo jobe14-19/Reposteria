@@ -124,6 +124,7 @@ public class AppShellController {
         modulos.put("entregas",        new ModuloInfo("Entregas",          "Entregas.fxml",            "entregas",  Permiso.ENTREGAS_LEER, "\uD83D\uDE9A", "Entregas y Cobros"));
 
         modulos.put("personal",        new ModuloInfo("Personal",          "Personal.fxml",            "personal",  Permiso.PERSONAL_LEER, "\uD83D\uDC64", "Personal"));
+        modulos.put("capacitaciones",  new ModuloInfo("Capacitaciones",     "Capacitaciones.fxml",      "personal",  Permiso.CAPACITACIONES_LEER, "\uD83C\uDF93", "Personal > Capacitaciones"));
 
         modulos.put("limpieza",        new ModuloInfo("Limpieza",          "Limpieza.fxml",            "operaciones", Permiso.LIMPIEZA_LEER, "\uD83E\uDDF9", "Operaciones > Limpieza"));
         modulos.put("mantenimiento",   new ModuloInfo("Mantenimiento",     "Mantenimiento.fxml",       "operaciones", Permiso.MANTENIMIENTO_LEER, "\uD83D\uDD27", "Operaciones > Mantenimiento"));

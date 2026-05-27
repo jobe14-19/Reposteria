@@ -1,20 +1,27 @@
 package com.example.demo.controller;
 import com.example.demo.model.OrdenProduccion;
+import com.example.demo.model.Pago;
+import com.example.demo.service.PayPalConfig;
+import com.example.demo.service.PayPalService;
+import com.example.demo.service.PreciosConfig;
 import com.example.demo.service.SessionManager;
 import com.example.demo.util.DatabaseConnection;
 import com.example.demo.dao.OrdenProduccionDAO;
+import com.example.demo.dao.PagoDAO;
+import com.example.demo.dao.PedidoDAO;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import java.awt.Desktop;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.SpinnerValueFactory;
@@ -24,11 +31,9 @@ public class ClientePedidoFormController {
     private static final Logger LOGGER = Logger.getLogger(ClientePedidoFormController.class.getName());
 
     private static final String SQL_INSERTAR_PEDIDO =
-        "INSERT INTO pedidos (id_cliente, username, fecha_pedido, fecha_entrega, producto, libras, diseno, total, adelanto, observaciones, estado) VALUES (?, ?, GETDATE(), ?, ?, ?, ?, ?, ?, ?, 'Pendiente')";
+        "INSERT INTO pedidos (id_cliente, username, fecha_pedido, fecha_entrega, producto, libras, diseno, total, adelanto, observaciones, estado, tipo_pago, estado_pago) VALUES (?, ?, GETDATE(), ?, ?, ?, ?, ?, ?, ?, 'Pendiente', ?, ?)";
     private static final String SQL_OBTENER_ID_CLIENTE =
-        "SELECT id_cliente FROM clientes WHERE username = ?";
-    private static final String SQL_INSERTAR_PAGO =
-        "INSERT INTO pagos (id_pedido, monto, fecha_pago, estado) VALUES (?, ?, GETDATE(), 'Pagado')";
+        "SELECT id_cliente FROM clientes WHERE usuario = ?";
     private static final String SQL_REGISTRAR_ACTIVIDAD =
         "INSERT INTO actividad (fecha_hora, usuario, accion, detalle) VALUES (GETDATE(), ?, ?, ?)";
 
@@ -37,6 +42,8 @@ public class ClientePedidoFormController {
     private static final String[] BASES = {"Bizcocho","Galleta","Brownie","Base Crujiente","Sin Base"};
     private static final String[] MASAS = {"Tradicional","Esponjosa","Hojaldrada","Genovesa","Queque"};
     private static final String[] FORMAS = {"Redonda","Cuadrada","Rectangular","Corazon","Hexagonal","Personalizada"};
+    private static final String[] TIPOS_PAGO = {"Efectivo","Tarjeta de Credito","Tarjeta de Debito","Cheque","Transferencia","PayPal"};
+    private static final String[] ESTADOS_PAGO = {"Pendiente","Pagado","En Proceso","Reembolsado"};
 
     @FXML private TextField clienteField;
     @FXML private TextField telefonoField;
@@ -57,9 +64,12 @@ public class ClientePedidoFormController {
     @FXML private TextField rellenosField;
     @FXML private TextField mensajeField;
     @FXML private TextArea observacionesArea;
-    @FXML private TextField precioField;
-    @FXML private TextField anticipoField;
+    @FXML private ComboBox<String> tipoPagoCombo;
+    @FXML private ComboBox<String> estadoPagoCombo;
     @FXML private Button guardarBtn;
+    @FXML private Label totalLabel;
+    @FXML private Label desgloseLabel;
+    @FXML private CheckBox pagoInmediatoCheck;
 
     private SessionManager session;
     private DatabaseConnection dbConnection;
@@ -85,13 +95,67 @@ public class ClientePedidoFormController {
 
         fechaPicker.setValue(LocalDate.now().plusDays(1));
 
+        tipoPagoCombo.getItems().addAll(TIPOS_PAGO);
+        tipoPagoCombo.getSelectionModel().select("Efectivo");
+        estadoPagoCombo.getItems().addAll(ESTADOS_PAGO);
+        estadoPagoCombo.getSelectionModel().select("Pendiente");
+
+        pagoInmediatoCheck.setVisible(PayPalConfig.isConfigured());
+        pagoInmediatoCheck.setManaged(PayPalConfig.isConfigured());
+        pagoInmediatoCheck.setSelected(false);
+
         setupValidation();
+        setupPriceListeners();
+        actualizarTotalLabel();
     }
 
     private void setupValidation() {
         categoriaCombo.valueProperty().addListener((obs, o, n) -> validar());
         fechaPicker.valueProperty().addListener((obs, o, n) -> validar());
         librasSpinner.valueProperty().addListener((obs, o, n) -> validar());
+    }
+
+    private void setupPriceListeners() {
+        categoriaCombo.valueProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        baseCombo.valueProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        masaCombo.valueProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        formaCombo.valueProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        pisosSpinner.valueProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        librasSpinner.valueProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        lustresField.textProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        camuflajesField.textProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        floresField.textProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        adornosField.textProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+        rellenosField.textProperty().addListener((obs, o, n) -> actualizarTotalLabel());
+    }
+
+    private void actualizarTotalLabel() {
+        String cat = categoriaCombo.getValue();
+        String base = baseCombo.getValue();
+        String masa = masaCombo.getValue();
+        String forma = formaCombo.getValue();
+        int pisos = pisosSpinner.getValue() != null ? pisosSpinner.getValue() : 1;
+        double libras = librasSpinner.getValue() != null ? librasSpinner.getValue() : 0;
+
+        double total = PreciosConfig.calcularTotal(cat, base, masa, forma, pisos, libras,
+            lustresField.getText(), camuflajesField.getText(), floresField.getText(),
+            adornosField.getText(), rellenosField.getText());
+
+        if (total <= 0) {
+            totalLabel.setText("RD$0.00");
+            desgloseLabel.setText("Selecciona una categoria y libras para ver el desglose.");
+            return;
+        }
+
+        totalLabel.setText(String.format("RD$%.2f", total));
+
+        StringBuilder sb = new StringBuilder();
+        for (PreciosConfig.DesgloseItem item : PreciosConfig.calcularDesglose(cat, base, masa, forma, pisos, libras,
+            lustresField.getText(), camuflajesField.getText(), floresField.getText(),
+            adornosField.getText(), rellenosField.getText())) {
+            sb.append(String.format("  %s ................... $%.2f\n", item.concepto, item.valor));
+        }
+        desgloseLabel.setText(sb.toString());
     }
 
     private void validar() {
@@ -108,37 +172,130 @@ public class ClientePedidoFormController {
 
         String categoria = categoriaCombo.getValue();
         double libras = librasSpinner.getValue();
-        String diseno = decoracionArea.getText();
-        double total = parseDouble(precioField.getText());
-        double anticipo = parseDouble(anticipoField.getText());
+        double total = recalcularPrecio();
+        double anticipo = 0.0;
+        boolean pagoInmediato = pagoInmediatoCheck.isSelected();
+
+        if (pagoInmediato) {
+            totalLabel.setText(String.format("RD$%.2f", total));
+            tipoPagoCombo.setValue("PayPal");
+        }
+
+        String username = session.getUsuarioActual();
 
         try (Connection conn = dbConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 int idCliente = obtenerIdCliente(conn);
-                String username = session.getUsuarioActual();
+                int idPedido = insertarPedido(conn, idCliente, username, categoria, libras, null, total, anticipo);
 
-                int idPedido = insertarPedido(conn, idCliente, username, categoria, libras, diseno, total, anticipo);
-
-                if (idPedido > 0) {
-                    if (anticipo > 0) registrarPago(conn, idPedido, anticipo);
-                    registrarActividad("CREAR PEDIDO", "Nuevo pedido creado por cliente: #" + idPedido);
-                    crearOrdenProduccion();
-                    conn.commit();
-                    mostrarMensaje("Pedido Creado", "Tu pedido se ha registrado correctamente.");
-                    cerrar();
-                } else {
+                if (idPedido <= 0) {
                     conn.rollback();
                     mostrarError("Error", "No se pudo crear el pedido.");
+                    return;
+                }
+
+                crearOrdenProduccion(conn, idPedido, username, total);
+                registrarActividad(conn, "CREAR PEDIDO", "Nuevo pedido creado por cliente: #" + idPedido);
+                conn.commit();
+
+                if (pagoInmediato) {
+                    procesarPagoPayPal(idPedido, total, username);
+                } else {
+                    mostrarMensaje("Pedido Creado", "Tu pedido se ha registrado correctamente.");
+                    cerrar();
                 }
             } catch (Exception e) {
                 conn.rollback();
-                throw e;
+                LOGGER.log(Level.SEVERE, "Error al guardar pedido", e);
+                mostrarError("Error", "No se pudo crear el pedido: " + e.getMessage());
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al guardar pedido: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error de BD al guardar pedido: {0}", e.getMessage());
             mostrarError("Error de Base de Datos", "No se pudo procesar el pedido: " + e.getMessage());
         }
+    }
+
+    private double recalcularPrecio() {
+        String cat = categoriaCombo.getValue();
+        String base = baseCombo.getValue();
+        String masa = masaCombo.getValue();
+        String forma = formaCombo.getValue();
+        int pisos = pisosSpinner.getValue() != null ? pisosSpinner.getValue() : 1;
+        double libras = librasSpinner.getValue() != null ? librasSpinner.getValue() : 0;
+        if (cat == null || libras <= 0) return 0.0;
+        return PreciosConfig.calcularTotal(cat, base, masa, forma, pisos, libras,
+            lustresField.getText(), camuflajesField.getText(), floresField.getText(),
+            adornosField.getText(), rellenosField.getText());
+    }
+
+    private void procesarPagoPayPal(int idPedido, double total, String username) {
+        guardarBtn.setDisable(true);
+        new Thread(() -> {
+            try {
+                PayPalService paypal = new PayPalService();
+                PayPalService.PayPalCheckoutResult result = paypal.crearCheckoutSession(total,
+                    "Pedido #" + idPedido + " - Pastel Personalizado", null, idPedido);
+
+                if (!result.ok) {
+                    Platform.runLater(() -> {
+                        mostrarMensaje("Pedido Creado, Pago no disponible",
+                            "El pedido #" + idPedido + " se creo correctamente, pero no se pudo iniciar el pago con PayPal:\n"
+                            + result.url + "\n\nPuedes pagar mas tarde desde tu perfil.");
+                        cerrar();
+                    });
+                    return;
+                }
+
+                Platform.runLater(() -> {
+                    mostrarMensaje("Redirigiendo a PayPal",
+                        "Se abrira el navegador para completar el pago.\nEspera mientras confirmamos el pago...");
+                });
+
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().browse(new URI(result.url));
+                } else {
+                    Platform.runLater(() -> {
+                        mostrarMensaje("Abrir navegador",
+                            "Abre este enlace en tu navegador:\n" + result.url);
+                    });
+                }
+
+                boolean confirmado = false;
+                for (int i = 0; i < 100; i++) {
+                    Thread.sleep(3000);
+                    if (paypal.verificarPago(result.sessionId)) {
+                        new PedidoDAO().actualizarAdelantoYEstadoPago(idPedido, total, "Pagado");
+                        new OrdenProduccionDAO().actualizarPagoPorIdPedido(idPedido, total, "Pagado");
+                        Pago pago = new Pago(0, idPedido, total, null, "PayPal", "PayPal Checkout", "Pagado");
+                        new PagoDAO().insertar(pago);
+                        confirmado = true;
+                        Platform.runLater(() -> {
+                            mostrarMensaje("Pago Exitoso",
+                                "Pago de $" + String.format("%.2f", total) + " confirmado.\nPedido #" + idPedido + " creado correctamente.");
+                            cerrar();
+                        });
+                        break;
+                    }
+                }
+
+                if (!confirmado) {
+                    Platform.runLater(() -> {
+                        mostrarMensaje("Pago Pendiente",
+                            "Tu pedido #" + idPedido + " se creo pero el pago no se confirmo en el tiempo esperado.\nPuedes pagar desde tu perfil mas tarde.");
+                        cerrar();
+                    });
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error en pago PayPal: {0}", e.getMessage());
+                Platform.runLater(() -> {
+                    mostrarError("Pedido Creado, Error de Pago",
+                        "El pedido #" + idPedido + " se creo correctamente, pero ocurrio un error al procesar el pago:\n" + e.getMessage()
+                        + "\n\nPuedes pagar mas tarde desde tu perfil.");
+                    cerrar();
+                });
+            }
+        }).start();
     }
 
     private int insertarPedido(Connection conn, int idCliente, String username, String categoria,
@@ -154,6 +311,8 @@ public class ClientePedidoFormController {
             stmt.setDouble(7, total);
             stmt.setDouble(8, anticipo);
             stmt.setString(9, observacionesArea.getText());
+            stmt.setString(10, tipoPagoCombo.getValue());
+            stmt.setString(11, estadoPagoCombo.getValue());
             stmt.executeUpdate();
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) return rs.getInt(1);
@@ -162,7 +321,7 @@ public class ClientePedidoFormController {
         return 0;
     }
 
-    private void crearOrdenProduccion() {
+    private void crearOrdenProduccion(Connection conn, int idPedido, String username, double total) {
         try {
             OrdenProduccion orden = new OrdenProduccion();
             orden.setCliente(clienteField.getText());
@@ -184,15 +343,22 @@ public class ClientePedidoFormController {
             orden.setRellenos(rellenosField.getText());
             orden.setMensaje(mensajeField.getText());
             orden.setObservaciones(observacionesArea.getText());
-            orden.setPrecioVenta(parseDouble(precioField.getText()));
-            orden.setAnticipo(parseDouble(anticipoField.getText()));
-            orden.setSaldo(parseDouble(precioField.getText()) - parseDouble(anticipoField.getText()));
-            orden.setUsuarioCrea(session.getUsuarioActual());
+            orden.setPrecioVenta(total);
+            orden.setAnticipo(0.0);
+            orden.setSaldo(total);
+            orden.setUsuarioCrea(username);
             orden.setProgreso(0);
             orden.setPausado(false);
-            new OrdenProduccionDAO().insertar(orden);
+            orden.setTipoPago(tipoPagoCombo.getValue());
+            orden.setEstadoPago(estadoPagoCombo.getValue());
+            orden.setIdPedido(idPedido);
+            int idOrden = new OrdenProduccionDAO().insertarEnTransaccion(conn, orden);
+            if (idOrden <= 0) {
+                throw new SQLException("insertarEnTransaccion devolvio " + idOrden);
+            }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error al generar orden de produccion: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error al generar orden de produccion", e);
+            throw new RuntimeException("Error al crear orden de produccion", e);
         }
     }
 
@@ -208,17 +374,8 @@ public class ClientePedidoFormController {
         }
     }
 
-    private void registrarPago(Connection conn, int idPedido, double monto) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR_PAGO)) {
-            stmt.setInt(1, idPedido);
-            stmt.setDouble(2, monto);
-            stmt.executeUpdate();
-        }
-    }
-
-    private void registrarActividad(String accion, String detalle) {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_REGISTRAR_ACTIVIDAD)) {
+    private void registrarActividad(Connection conn, String accion, String detalle) {
+        try (PreparedStatement stmt = conn.prepareStatement(SQL_REGISTRAR_ACTIVIDAD)) {
             stmt.setString(1, session.getUsuarioActual());
             stmt.setString(2, accion);
             stmt.setString(3, detalle);
@@ -240,12 +397,6 @@ public class ClientePedidoFormController {
 
     private void cerrar() {
         ((Stage) guardarBtn.getScene().getWindow()).close();
-    }
-
-    private double parseDouble(String text) {
-        if (text == null || text.trim().isEmpty()) return 0.0;
-        try { return Double.parseDouble(text.replace("$", "").replace(",", "").trim()); }
-        catch (NumberFormatException e) { return 0.0; }
     }
 
     private void mostrarError(String t, String m) { alerta(Alert.AlertType.ERROR, t, m); }

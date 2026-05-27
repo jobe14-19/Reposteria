@@ -10,6 +10,8 @@ public class Pedido {
  private double total;
  private double adelanto;
  private String estado;
+  private String tipoPago;
+  private String estadoPago;
  
  // Constantes para estados
  public static final String ESTADO_PENDIENTE = "Pendiente";
@@ -19,8 +21,17 @@ public class Pedido {
  public static final String ESTADO_ENTREGADO = "Entregado";
  public static final String ESTADO_CANCELADO = "Cancelado";
 
+ public static final String[] TIPOS_PAGO = {"Efectivo","Tarjeta de Credito","Tarjeta de Debito","Cheque","Transferencia","PayPal"};
+ public static final String[] ESTADOS_PAGO = {"Pendiente","Pagado","En Proceso","Reembolsado"};
+
  public Pedido(int id, String nombreCliente, String fechaPedido, String fechaEntrega,
  String producto, double libras, double total, double adelanto, String estado) {
+ this(id, nombreCliente, fechaPedido, fechaEntrega, producto, libras, total, adelanto, estado, null, null);
+ }
+
+ public Pedido(int id, String nombreCliente, String fechaPedido, String fechaEntrega,
+ String producto, double libras, double total, double adelanto, String estado,
+  String tipoPago, String estadoPago) {
  this.id = id;
  this.nombreCliente = nombreCliente;
  this.fechaPedido = fechaPedido;
@@ -30,6 +41,8 @@ public class Pedido {
  this.total = total;
  this.adelanto = adelanto;
  this.estado = estado;
+ this.tipoPago = tipoPago;
+ this.estadoPago = estadoPago;
  }
 
  public int getId() { return id; }
@@ -50,6 +63,10 @@ public class Pedido {
  public void setAdelanto(double adelanto) { this.adelanto = adelanto; }
  public String getEstado() { return estado; }
  public void setEstado(String estado) { this.estado = estado; }
+ public String getTipoPago() { return tipoPago; }
+ public void setTipoPago(String tipoPago) { this.tipoPago = tipoPago; }
+ public String getEstadoPago() { return estadoPago; }
+ public void setEstadoPago(String estadoPago) { this.estadoPago = estadoPago; }
 
  public boolean estaPendiente() { return ESTADO_PENDIENTE.equalsIgnoreCase(estado); }
  public boolean estaConfirmado() { return ESTADO_CONFIRMADO.equalsIgnoreCase(estado); }

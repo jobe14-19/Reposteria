@@ -24,17 +24,22 @@
  </HBox>
 
  <TableView fx:id="ordenesTable" VBox.vgrow="ALWAYS" prefHeight="500" styleClass="production-table">
-  <columns>
-   <TableColumn fx:id="numColumn" text="Orden" prefWidth="100"/>
-   <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="130"/>
-   <TableColumn fx:id="clienteColumn" text="Cliente" prefWidth="180"/>
-   <TableColumn fx:id="fechaColumn" text="Entrega" prefWidth="110"/>
-   <TableColumn fx:id="categoriaColumn" text="Categoria" prefWidth="120"/>
-   <TableColumn fx:id="vendedorColumn" text="Vendedor" prefWidth="120"/>
-   <TableColumn fx:id="librasColumn" text="Libras" prefWidth="80"/>
-   <TableColumn fx:id="totalColumn" text="Total" prefWidth="100"/>
-   <TableColumn fx:id="accionesColumn" text="Accion" prefWidth="80"/>
-  </columns>
+   <columns>
+    <TableColumn fx:id="numColumn" text="Orden" prefWidth="85"/>
+    <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="100"/>
+    <TableColumn fx:id="clienteColumn" text="Cliente" prefWidth="130"/>
+    <TableColumn fx:id="fechaColumn" text="Entrega" prefWidth="85"/>
+    <TableColumn fx:id="horaInicioColumn" text="Hora Inicio" prefWidth="90"/>
+    <TableColumn fx:id="fechaFinColumn" text="Fin" prefWidth="90"/>
+    <TableColumn fx:id="tipoPagoColumn" text="Tipo Pago" prefWidth="100"/>
+    <TableColumn fx:id="estadoPagoColumn" text="Estado Pago" prefWidth="90"/>
+    <TableColumn fx:id="recetaColumn" text="Receta" prefWidth="130"/>
+    <TableColumn fx:id="categoriaColumn" text="Categoria" prefWidth="90"/>
+    <TableColumn fx:id="vendedorColumn" text="Vendedor" prefWidth="90"/>
+    <TableColumn fx:id="librasColumn" text="Libras" prefWidth="65"/>
+    <TableColumn fx:id="totalColumn" text="Total" prefWidth="80"/>
+    <TableColumn fx:id="accionesColumn" text="Accion" prefWidth="65"/>
+   </columns>
    <placeholder><Label text="No hay ordenes de produccion registradas." styleClass="text-muted"/></placeholder>
  </TableView>
 </VBox>
