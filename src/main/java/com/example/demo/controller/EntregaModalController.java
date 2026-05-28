@@ -1,4 +1,5 @@
 package com.example.demo.controller;
+import com.example.demo.dao.OrdenProduccionDAO;
 import com.example.demo.service.SessionManager;
 import com.example.demo.util.DatabaseConnection;
 
@@ -18,416 +19,464 @@ import java.util.logging.Logger;
 
 public class EntregaModalController {
 
-    private static final Logger LOGGER = Logger.getLogger(EntregaModalController.class.getName());
+ private static final Logger LOGGER = Logger.getLogger(EntregaModalController.class.getName());
 
-    // Constantes SQL usando Text Blocks (Java 15+)
-    private static final String SQL_PEDIDOS_PENDIENTES = """
-        SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente,
-               c.direccion, p.total, p.adelanto,
-               p.total - p.adelanto as saldo,
-               CASE WHEN p.tipo_entrega = 'L' THEN 'Local' ELSE 'Delivery' END as tipo
-        FROM pedidos p
-        INNER JOIN clientes c ON p.id_cliente = c.id_cliente
-        WHERE p.estado IN ('Confirmado', 'Pendiente', 'Listo para entregar')
-          AND (p.total - p.adelanto) > 0
-        ORDER BY p.fecha_entrega
-        """;
+ private static final String SQL_PEDIDOS_PENDIENTES = """
+ SELECT o.id_orden, o.numero_orden, o.cliente as nombre_cliente,
+ ISNULL(o.direccion, '') as direccion, o.precio_venta as total, o.anticipo as adelanto,
+ o.saldo,
+ CASE WHEN ISNULL(o.tipo_entrega, 'L') = 'L' THEN 'Local' ELSE 'Delivery' END as tipo
+  FROM ordenes_produccion o
+  WHERE o.estado IN ('LISTO_PARA_ENTREGAR', 'COMPLETADA')
+  ORDER BY o.fecha_entrega
+ """;
 
-    private static final String SQL_INSERTAR_PAGO = """
-        INSERT INTO pagos (id_pedido, monto, fecha_pago, metodo_pago, referencia, estado)
-        VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, 'Pagado')
-        """;
+ private static final String SQL_INSERTAR_PAGO = """
+ INSERT INTO pagos (id_pedido, monto, fecha_pago, metodo_pago, referencia, estado)
+ VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, 'Pagado')
+ """;
 
-    private static final String SQL_ACTUALIZAR_PEDIDO = """
-        UPDATE pedidos SET estado = 'Entregado', fecha_entrega_real = CURRENT_TIMESTAMP,
-        tipo_entrega = ?, direccion_entrega = ?, costo_delivery = ?
-        WHERE id_pedido = ?
-        """;
+ private static final String SQL_ACTUALIZAR_PEDIDO = """
+ UPDATE pedidos SET estado = 'Entregado', fecha_entrega_real = CURRENT_TIMESTAMP,
+ tipo_entrega = ?, direccion_entrega = ?, costo_delivery = ?,
+ adelanto = adelanto + ?, total = ?
+ WHERE id_pedido = ?
+ """;
 
-    private static final String SQL_REGISTRAR_ACTIVIDAD = """
-        INSERT INTO actividad (fecha_hora, usuario, accion, detalle)
-        VALUES (CURRENT_TIMESTAMP, ?, ?, ?)
-        """;
+ private static final String SQL_ACTUALIZAR_ORDEN = """
+ UPDATE ordenes_produccion SET estado = 'ENTREGADA', fecha_completado = GETDATE(), fecha_entregado = GETDATE(),
+ anticipo = anticipo + ?, saldo = saldo - ?, estado_pago = ?, tipo_pago = ?
+ WHERE id_orden = ?
+ """;
 
-    // Constantes
-    private static final double BASE_DELIVERY_COST = 5.0;
-    private static final double COST_PER_KM = 2.0;
-    private static final String TIPO_ENTREGA_LOCAL = "L";
-    private static final String TIPO_ENTREGA_DELIVERY = "D";
-    private static final String PAGO_EFECTIVO = "Efectivo";
-    private static final String REFERENCIA_DISABLED_STYLE = "-fx-background-color: #FAFAFA; -fx-border-color: #E0E0E0; -fx-border-width: 1;";
-    private static final String REFERENCIA_ENABLED_STYLE = "-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1;";
+ private static final String SQL_ACTUALIZAR_FACTURA = """
+ UPDATE facturas SET estado = 'PAGADA', pagado = 'SI', metodo_pago = ?
+ WHERE id_orden = ?
+ """;
 
-    // UI Components
-    @FXML private Label tituloLabel;
-    @FXML private ComboBox<String> pedidoComboBox;
-    @FXML private Label pedidoIdLabel;
-    @FXML private Label clienteLabel;
-    @FXML private Label totalLabel;
-    @FXML private Label adelantoLabel;
-    @FXML private Label saldoLabel;
-    @FXML private RadioButton localRadioButton;
-    @FXML private RadioButton deliveryRadioButton;
-    @FXML private ToggleGroup tipoEntregaGroup;
-    @FXML private VBox deliveryDetails;
-    @FXML private TextField direccionField;
-    @FXML private TextField distanciaField;
-    @FXML private TextField costoDeliveryField;
-    @FXML private TextField montoCobrarField;
-    @FXML private ComboBox<String> metodoPagoComboBox;
-    @FXML private TextField referenciaField;
-    @FXML private Button limpiarButton;
-    @FXML private Button cancelarButton;
-    @FXML private Button guardarResultado;
+ private static final String SQL_REGISTRAR_ACTIVIDAD = """
+  INSERT INTO actividad (fecha_hora, usuario, accion, detalle)
+  VALUES (CURRENT_TIMESTAMP, ?, ?, ?)
+  """;
 
-    // Services and Managers
-    private DatabaseConnection dbConnection;
-    private SessionManager sessionManager;
-    private EntregasController.PedidoPendiente pedidoActual;
-    private double costoDelivery = 0.0;
-    private Map<String, EntregasController.PedidoPendiente> pedidoMap = new HashMap<>();
 
-    @FXML
-    public void initialize() {
-        dbConnection = DatabaseConnection.getInstance();
-        sessionManager = SessionManager.getInstance();
 
-        initializeRadioButtons();
-        initializePaymentCombo();
-        setupEventHandlers();
-        deliveryDetails.setVisible(false);
-        cargarPedidosPendientes();
-    }
+ // Constantes
+ private static final double BASE_DELIVERY_COST = 5.0;
+ private static final double COST_PER_KM = 2.0;
+ private static final String TIPO_ENTREGA_LOCAL = "L";
+ private static final String TIPO_ENTREGA_DELIVERY = "D";
+ private static final String PAGO_EFECTIVO = "Efectivo";
+ private static final String REFERENCIA_DISABLED_STYLE = "-fx-background-color: #FAFAFA; -fx-border-color: #E0E0E0; -fx-border-width: 1;";
+ private static final String REFERENCIA_ENABLED_STYLE = "-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1;";
 
-    private void initializeRadioButtons() {
-        localRadioButton.setToggleGroup(tipoEntregaGroup);
-        deliveryRadioButton.setToggleGroup(tipoEntregaGroup);
-        localRadioButton.setSelected(true);
-    }
+ // UI Components
+ @FXML private Label tituloLabel;
+ @FXML private ComboBox<String> pedidoComboBox;
+ @FXML private Label pedidoIdLabel;
+ @FXML private Label clienteLabel;
+ @FXML private Label totalLabel;
+ @FXML private Label adelantoLabel;
+ @FXML private Label saldoLabel;
+ @FXML private RadioButton localRadioButton;
+ @FXML private RadioButton deliveryRadioButton;
+ @FXML private ToggleGroup tipoEntregaGroup;
+ @FXML private VBox deliveryDetails;
+ @FXML private TextField direccionField;
+ @FXML private TextField distanciaField;
+ @FXML private TextField costoDeliveryField;
+ @FXML private TextField montoCobrarField;
+ @FXML private ComboBox<String> metodoPagoComboBox;
+ @FXML private TextField referenciaField;
+ @FXML private Button limpiarButton;
+ @FXML private Button cancelarButton;
+ @FXML private Button guardarResultado;
 
-    private void initializePaymentCombo() {
-        metodoPagoComboBox.getItems().addAll(PAGO_EFECTIVO, "Tarjeta", "Transferencia");
-        metodoPagoComboBox.getSelectionModel().selectFirst();
-        referenciaField.setDisable(true);
-        referenciaField.setStyle(REFERENCIA_DISABLED_STYLE);
-    }
+ // Services and Managers
+ private DatabaseConnection dbConnection;
+ private SessionManager sessionManager;
+ private OrdenProduccionDAO ordenDAO;
+ private EntregasController.PedidoPendiente pedidoActual;
+ private double costoDelivery = 0.0;
+ private Map<String, EntregasController.PedidoPendiente> pedidoMap = new HashMap<>();
+ private int idPedidoVinculado = 0;
 
-    private void cargarPedidosPendientes() {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_PEDIDOS_PENDIENTES);
-             ResultSet rs = stmt.executeQuery()) {
+  @FXML
+  public void initialize() {
+  dbConnection = DatabaseConnection.getInstance();
+  sessionManager = SessionManager.getInstance();
+  ordenDAO = new OrdenProduccionDAO();
 
-            pedidoComboBox.getItems().clear();
-            pedidoMap.clear();
+ initializeRadioButtons();
+ initializePaymentCombo();
+ setupEventHandlers();
+ deliveryDetails.setVisible(false);
+ cargarPedidosPendientes();
+ }
 
-            while (rs.next()) {
-                int id = rs.getInt("id_pedido");
-                String nombre = rs.getString("nombre_cliente");
-                String direccion = rs.getString("direccion");
-                double total = rs.getDouble("total");
-                double adelanto = rs.getDouble("adelanto");
-                double saldo = rs.getDouble("saldo");
-                String tipo = rs.getString("tipo");
+ private void initializeRadioButtons() {
+ localRadioButton.setToggleGroup(tipoEntregaGroup);
+ deliveryRadioButton.setToggleGroup(tipoEntregaGroup);
+ localRadioButton.setSelected(true);
+ }
 
-                EntregasController.PedidoPendiente pedido = new EntregasController.PedidoPendiente(id, nombre, direccion, total, adelanto, saldo, tipo);
-                String display = "#" + id + " - " + nombre + " ($" + String.format("%.2f", saldo) + ")";
-                pedidoComboBox.getItems().add(display);
-                pedidoMap.put(display, pedido);
-            }
+ private void initializePaymentCombo() {
+ metodoPagoComboBox.getItems().addAll(PAGO_EFECTIVO, "Tarjeta", "Transferencia");
+ metodoPagoComboBox.getSelectionModel().selectFirst();
+ referenciaField.setDisable(true);
+ referenciaField.setStyle(REFERENCIA_DISABLED_STYLE);
+ }
 
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar pedidos pendientes: {0}", e.getMessage());
-        }
-    }
+ private void cargarPedidosPendientes() {
+ try (Connection conn = dbConnection.getConnection();
+ PreparedStatement stmt = conn.prepareStatement(SQL_PEDIDOS_PENDIENTES);
+ ResultSet rs = stmt.executeQuery()) {
 
-    private void seleccionarPedido() {
-        String selected = pedidoComboBox.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            EntregasController.PedidoPendiente pedido = pedidoMap.get(selected);
-            if (pedido != null) {
-                setPedido(pedido);
-                return;
-            }
-        }
-        limpiarDetalles();
-    }
+ pedidoComboBox.getItems().clear();
+ pedidoMap.clear();
 
-    private void limpiarDetalles() {
-        pedidoActual = null;
-        pedidoIdLabel.setText("-");
-        clienteLabel.setText("-");
-        totalLabel.setText("-");
-        adelantoLabel.setText("-");
-        saldoLabel.setText("-");
-        localRadioButton.setSelected(true);
-        direccionField.clear();
-        distanciaField.clear();
-        costoDeliveryField.clear();
-        montoCobrarField.clear();
-        metodoPagoComboBox.getSelectionModel().selectFirst();
-        referenciaField.clear();
-    }
+  while (rs.next()) {
+  int id = rs.getInt("id_orden");
+  String nombre = rs.getString("nombre_cliente");
+  String direccion = rs.getString("direccion");
+  double total = rs.getDouble("total");
+  double adelanto = rs.getDouble("adelanto");
+  double saldo = rs.getDouble("saldo");
+  String tipo = rs.getString("tipo");
 
-    private void setupEventHandlers() {
-        // Pedido selection handler
-        pedidoComboBox.setOnAction(event -> seleccionarPedido());
+  EntregasController.PedidoPendiente pedido = new EntregasController.PedidoPendiente(id, nombre, direccion, total, adelanto, saldo, tipo);
+  String display = "#" + id + " - " + nombre + " ($" + String.format("%.2f", saldo) + ")";
+  pedidoComboBox.getItems().add(display);
+  pedidoMap.put(display, pedido);
+  }
 
-        // Delivery type change handler
-        tipoEntregaGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
-            boolean isDelivery = newVal == deliveryRadioButton;
-            deliveryDetails.setVisible(isDelivery);
-            costoDelivery = isDelivery ? calcularCostoDeliveryDesdeDistancia() : 0.0;
-            actualizarCostoDeliveryField();
-            actualizarMontoCobrar();
-        });
+ } catch (SQLException e) {
+ LOGGER.log(Level.SEVERE, "Error al cargar pedidos pendientes: {0}", e.getMessage());
+ }
+ }
 
-        // Distance change handler
-        distanciaField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && !newVal.isBlank()) {
-                costoDelivery = calcularCostoDeliveryDesdeDistancia();
-                actualizarCostoDeliveryField();
-                actualizarMontoCobrar();
-            }
-        });
+ private void seleccionarPedido() {
+ String selected = pedidoComboBox.getSelectionModel().getSelectedItem();
+ if (selected != null) {
+ EntregasController.PedidoPendiente pedido = pedidoMap.get(selected);
+ if (pedido != null) {
+ setPedido(pedido);
+ return;
+ }
+ }
+ limpiarDetalles();
+ }
 
-        // Payment method change handler
-        metodoPagoComboBox.setOnAction(event -> actualizarReferencia());
-    }
+ private void limpiarDetalles() {
+ pedidoActual = null;
+ pedidoIdLabel.setText("-");
+ clienteLabel.setText("-");
+ totalLabel.setText("-");
+ adelantoLabel.setText("-");
+ saldoLabel.setText("-");
+ localRadioButton.setSelected(true);
+ direccionField.clear();
+ distanciaField.clear();
+ costoDeliveryField.clear();
+ montoCobrarField.clear();
+ metodoPagoComboBox.getSelectionModel().selectFirst();
+ referenciaField.clear();
+ }
 
-    public void setPedido(EntregasController.PedidoPendiente pedido) {
-        this.pedidoActual = pedido;
+ private void setupEventHandlers() {
+ // Pedido selection handler
+ pedidoComboBox.setOnAction(event -> seleccionarPedido());
 
-        if (pedido != null) {
-            pedidoIdLabel.setText(String.valueOf(pedido.getId()));
-            clienteLabel.setText(pedido.getNombreCliente());
-            totalLabel.setText(String.format("%.2f", pedido.getTotal()));
-            adelantoLabel.setText(String.format("%.2f", pedido.getAdelanto()));
-            saldoLabel.setText(String.format("%.2f", pedido.getSaldo()));
-            montoCobrarField.setText(String.format("%.2f", pedido.getSaldo()));
-            direccionField.setText(pedido.getDireccion());
-        }
-    }
+ // Delivery type change handler
+ tipoEntregaGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
+ boolean isDelivery = newVal == deliveryRadioButton;
+ deliveryDetails.setVisible(isDelivery);
+ costoDelivery = isDelivery ? calcularCostoDeliveryDesdeDistancia() : 0.0;
+ actualizarCostoDeliveryField();
+ actualizarMontoCobrar();
+ });
 
-    private double calcularCostoDeliveryDesdeDistancia() {
-        try {
-            String distanciaTexto = distanciaField.getText();
-            if (distanciaTexto == null || distanciaTexto.isBlank()) {
-                return 0.0;
-            }
-            double distancia = Double.parseDouble(distanciaTexto);
-            return BASE_DELIVERY_COST + (distancia * COST_PER_KM);
-        } catch (NumberFormatException e) {
-            LOGGER.log(Level.WARNING, "Error en formato de distancia: {0}", e.getMessage());
-            return 0.0;
-        }
-    }
+ // Distance change handler
+ distanciaField.textProperty().addListener((obs, oldVal, newVal) -> {
+ if (newVal != null && !newVal.isBlank()) {
+ costoDelivery = calcularCostoDeliveryDesdeDistancia();
+ actualizarCostoDeliveryField();
+ actualizarMontoCobrar();
+ }
+ });
 
-    private void actualizarCostoDeliveryField() {
-        costoDeliveryField.setText(String.format("%.2f", costoDelivery));
-    }
+ // Payment method change handler
+ metodoPagoComboBox.setOnAction(event -> actualizarReferencia());
+ }
 
-    private void actualizarMontoCobrar() {
-        if (pedidoActual != null) {
-            double monto = pedidoActual.getSaldo();
-            if (deliveryRadioButton.isSelected()) {
-                monto += costoDelivery;
-            }
-            montoCobrarField.setText(String.format("%.2f", monto));
-        }
-    }
+ public void setPedido(EntregasController.PedidoPendiente pedido) {
+ this.pedidoActual = pedido;
 
-    private void actualizarReferencia() {
-        String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
-        boolean esEfectivo = PAGO_EFECTIVO.equals(metodo);
+ if (pedido != null) {
+ pedidoIdLabel.setText(String.valueOf(pedido.getId()));
+ clienteLabel.setText(pedido.getNombreCliente());
+ totalLabel.setText(String.format("%.2f", pedido.getTotal()));
+ adelantoLabel.setText(String.format("%.2f", pedido.getAdelanto()));
+ saldoLabel.setText(String.format("%.2f", pedido.getSaldo()));
+ montoCobrarField.setText(String.format("%.2f", pedido.getSaldo()));
+ direccionField.setText(pedido.getDireccion());
+ }
+ }
 
-        referenciaField.setDisable(esEfectivo);
-        if (esEfectivo) {
-            referenciaField.clear();
-            referenciaField.setStyle(REFERENCIA_DISABLED_STYLE);
-        } else {
-            referenciaField.setStyle(REFERENCIA_ENABLED_STYLE);
-        }
-    }
+ private double calcularCostoDeliveryDesdeDistancia() {
+ try {
+ String distanciaTexto = distanciaField.getText();
+ if (distanciaTexto == null || distanciaTexto.isBlank()) {
+ return 0.0;
+ }
+ double distancia = Double.parseDouble(distanciaTexto);
+ return BASE_DELIVERY_COST + (distancia * COST_PER_KM);
+ } catch (NumberFormatException e) {
+ LOGGER.log(Level.WARNING, "Error en formato de distancia: {0}", e.getMessage());
+ return 0.0;
+ }
+ }
 
-    @FXML
-    private void guardarResultado(ActionEvent event) {
-        if (!sonCamposValidos()) {
-            mostrarError("Campos Requeridos", "Por favor complete todos los campos obligatorios (*).");
-            return;
-        }
+ private void actualizarCostoDeliveryField() {
+ costoDeliveryField.setText(String.format("%.2f", costoDelivery));
+ }
 
-        Connection conn = null;
-        try {
-            conn = dbConnection.getConnection();
-            conn.setAutoCommit(false);
+ private void actualizarMontoCobrar() {
+ if (pedidoActual != null) {
+ double monto = pedidoActual.getSaldo();
+ if (deliveryRadioButton.isSelected()) {
+ monto += costoDelivery;
+ }
+ montoCobrarField.setText(String.format("%.2f", monto));
+ }
+ }
 
-            registrarPago(conn);
-            actualizarPedido(conn);
-            registrarActividad("REGISTRAR ENTREGA",
-                    "Entrega registrada para pedido #" + pedidoActual.getId() + " - Monto: $" + montoCobrarField.getText());
+ private void actualizarReferencia() {
+ String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
+ boolean esEfectivo = PAGO_EFECTIVO.equals(metodo);
 
-            conn.commit();
+ referenciaField.setDisable(esEfectivo);
+ if (esEfectivo) {
+ referenciaField.clear();
+ referenciaField.setStyle(REFERENCIA_DISABLED_STYLE);
+ } else {
+ referenciaField.setStyle(REFERENCIA_ENABLED_STYLE);
+ }
+ }
 
-            generarFacturaSimulada();
-            enviarWhatsAppSimulado();
+ @FXML
+ private void guardarResultado(ActionEvent event) {
+ if (!sonCamposValidos()) {
+ mostrarError("Campos Requeridos", "Por favor complete todos los campos obligatorios (*).");
+ return;
+ }
 
-            mostrarMensaje("Entrega Registrada",
-                    "La entrega ha sido registrada correctamente.\n\n" +
-                            "Factura generada: factura_pedido_" + pedidoActual.getId() + ".pdf\n" +
-                            "Comprobante enviado por WhatsApp.");
+ Connection conn = null;
+ try {
+ conn = dbConnection.getConnection();
+ conn.setAutoCommit(false);
 
-            cerrarModal();
+  // Asegurar que exista un pedido vinculado a la orden de producción
+  int idOrden = pedidoActual.getId();
+  String usuario = sessionManager.getUsuarioActual();
+  idPedidoVinculado = ordenDAO.asegurarPedidoVinculadoConConex(conn, idOrden);
+  if (idPedidoVinculado <= 0) {
+  throw new SQLException("No se pudo crear/vincular un pedido para la orden #" + idOrden);
+  }
 
-        } catch (SQLException e) {
-            realizarRollback(conn);
-            LOGGER.log(Level.SEVERE, "Error al registrar entrega: {0}", e.getMessage());
-            mostrarError("Error de Base de Datos", "No se pudo registrar la entrega: " + e.getMessage());
-        }
-    }
+  registrarPago(conn);
+  actualizarPedido(conn);
+  actualizarOrdenProduccion(conn, idOrden);
+  actualizarFactura(conn, idOrden);
+  registrarActividad("REGISTRAR ENTREGA",
+  "Entrega registrada para orden #" + idOrden + " - Monto: $" + montoCobrarField.getText());
 
-    private void registrarPago(Connection conn) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR_PAGO)) {
-            String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
-            String referencia = PAGO_EFECTIVO.equals(metodo) ? null : obtenerTexto(referenciaField);
+  conn.commit();
 
-            stmt.setInt(1, pedidoActual.getId());
-            stmt.setDouble(2, obtenerMontoCobrar());
-            stmt.setString(3, metodo);
-            stmt.setString(4, referencia);
-            stmt.executeUpdate();
-        }
-    }
+  enviarWhatsAppSimulado();
 
-    private void actualizarPedido(Connection conn) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_PEDIDO)) {
-            String tipoEntrega = localRadioButton.isSelected() ? TIPO_ENTREGA_LOCAL : TIPO_ENTREGA_DELIVERY;
-            String direccion = deliveryRadioButton.isSelected() ? obtenerTexto(direccionField) : null;
-            double deliveryCost = deliveryRadioButton.isSelected() ? costoDelivery : 0.0;
+  mostrarMensaje("Entrega Registrada",
+  "La entrega ha sido registrada correctamente.\n\n" + 
+  "La factura fue generada al completar la producción.\n" + 
+  "Comprobante enviado por WhatsApp.");
 
-            stmt.setString(1, tipoEntrega);
-            stmt.setString(2, direccion);
-            stmt.setDouble(3, deliveryCost);
-            stmt.setInt(4, pedidoActual.getId());
-            stmt.executeUpdate();
-        }
-    }
+ cerrarModal();
 
-    @FXML
-    private void cancelarResultado(ActionEvent event) {
-        cerrarModal();
-    }
+ } catch (SQLException e) {
+ realizarRollback(conn);
+ LOGGER.log(Level.SEVERE, "Error al registrar entrega: {0}", e.getMessage());
+ mostrarError("Error de Base de Datos", "No se pudo registrar la entrega: " + e.getMessage());
+ }
+ }
 
-    @FXML
-    private void limpiarCampos(ActionEvent event) {
-        pedidoComboBox.getSelectionModel().clearSelection();
-        limpiarDetalles();
-    }
+ private void registrarPago(Connection conn) throws SQLException {
+ try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR_PAGO)) {
+ String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
+ String referencia = PAGO_EFECTIVO.equals(metodo) ? null : obtenerTexto(referenciaField);
 
-    private boolean sonCamposValidos() {
-        if (pedidoActual == null) {
-            return false;
-        }
+  stmt.setInt(1, idPedidoVinculado);
+ stmt.setDouble(2, obtenerMontoCobrar());
+ stmt.setString(3, metodo);
+ stmt.setString(4, referencia);
+ stmt.executeUpdate();
+ }
+ }
 
-        String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
-        if (metodo == null) {
-            return false;
-        }
+ private void actualizarPedido(Connection conn) throws SQLException {
+ try (PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_PEDIDO)) {
+ String tipoEntrega = localRadioButton.isSelected() ? TIPO_ENTREGA_LOCAL : TIPO_ENTREGA_DELIVERY;
+ String direccion = deliveryRadioButton.isSelected() ? obtenerTexto(direccionField) : null;
+ double deliveryCost = deliveryRadioButton.isSelected() ? costoDelivery : 0.0;
+ double monto = obtenerMontoCobrar();
+ double total = pedidoActual.getTotal();
 
-        // Validate reference for non-cash payments
-        if (!PAGO_EFECTIVO.equals(metodo)) {
-            String referencia = referenciaField.getText();
-            if (referencia == null || referencia.isBlank()) {
-                return false;
-            }
-        }
+ stmt.setString(1, tipoEntrega);
+ stmt.setString(2, direccion);
+ stmt.setDouble(3, deliveryCost);
+ stmt.setDouble(4, monto);
+ stmt.setDouble(5, total);
+ stmt.setInt(6, idPedidoVinculado);
+ stmt.executeUpdate();
+ }
+ }
 
-        // Validate delivery details if selected
-        if (deliveryRadioButton.isSelected()) {
-            String direccion = direccionField.getText();
-            String distancia = distanciaField.getText();
+ private void actualizarOrdenProduccion(Connection conn, int idOrden) throws SQLException {
+ double monto = obtenerMontoCobrar();
+ double nuevoAnticipo = pedidoActual.getAdelanto() + monto;
+ double nuevoSaldo = pedidoActual.getTotal() - nuevoAnticipo;
+ String estadoPago = nuevoSaldo <= 0 ? "PAGADO" : "PAGADO_PARCIAL";
+ String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
 
-            if (direccion == null || direccion.isBlank()) {
-                return false;
-            }
-            if (distancia == null || distancia.isBlank()) {
-                return false;
-            }
-            try {
-                Double.parseDouble(distancia);
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
+ try (PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_ORDEN)) {
+ stmt.setDouble(1, monto);
+ stmt.setDouble(2, monto);
+ stmt.setString(3, estadoPago);
+ stmt.setString(4, metodo);
+ stmt.setInt(5, idOrden);
+ stmt.executeUpdate();
+ }
+ }
 
-        return true;
-    }
+ private void actualizarFactura(Connection conn, int idOrden) throws SQLException {
+ String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
+ try (PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_FACTURA)) {
+ stmt.setString(1, metodo);
+ stmt.setInt(2, idOrden);
+ stmt.executeUpdate();
+ }
+ }
 
-    private double obtenerMontoCobrar() {
-        try {
-            String texto = montoCobrarField.getText();
-            return (texto != null && !texto.isBlank()) ? Double.parseDouble(texto) : 0.0;
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
-    }
+ @FXML
+ private void cancelarResultado(ActionEvent event) {
+ cerrarModal();
+ }
 
-    private String obtenerTexto(TextField field) {
-        return field.getText() == null ? "" : field.getText().trim();
-    }
+ @FXML
+ private void limpiarCampos(ActionEvent event) {
+ pedidoComboBox.getSelectionModel().clearSelection();
+ limpiarDetalles();
+ }
 
-    private void generarFacturaSimulada() {
-        LOGGER.log(Level.INFO, "Generando factura PDF para pedido #{0}", pedidoActual.getId());
-        LOGGER.log(Level.INFO, "Archivo: factura_pedido_{0}.pdf", pedidoActual.getId());
-    }
+ private boolean sonCamposValidos() {
+ if (pedidoActual == null) {
+ return false;
+ }
 
-    private void enviarWhatsAppSimulado() {
-        LOGGER.log(Level.INFO, "Enviando comprobante por WhatsApp para pedido #{0}", pedidoActual.getId());
-        LOGGER.log(Level.INFO, "Mensaje: Su pedido #{0} ha sido entregado. Total: ${1}",
-                new Object[]{pedidoActual.getId(), montoCobrarField.getText()});
-    }
+ String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
+ if (metodo == null) {
+ return false;
+ }
 
-    private void realizarRollback(Connection conn) {
-        if (conn != null) {
-            try {
-                conn.rollback();
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error en rollback: {0}", e.getMessage());
-            }
-        }
-    }
+ // Validate reference for non-cash payments
+ if (!PAGO_EFECTIVO.equals(metodo)) {
+ String referencia = referenciaField.getText();
+ if (referencia == null || referencia.isBlank()) {
+ return false;
+ }
+ }
 
-    private void registrarActividad(String accion, String detalle) {
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_REGISTRAR_ACTIVIDAD)) {
+ // Validate delivery details if selected
+ if (deliveryRadioButton.isSelected()) {
+ String direccion = direccionField.getText();
+ String distancia = distanciaField.getText();
 
-            stmt.setString(1, sessionManager.getUsuarioActual());
-            stmt.setString(2, accion);
-            stmt.setString(3, detalle);
-            stmt.executeUpdate();
+ if (direccion == null || direccion.isBlank()) {
+ return false;
+ }
+ if (distancia == null || distancia.isBlank()) {
+ return false;
+ }
+ try {
+ Double.parseDouble(distancia);
+ } catch (NumberFormatException e) {
+ return false;
+ }
+ }
 
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Error al registrar actividad: {0}", e.getMessage());
-        }
-    }
+ return true;
+ }
 
-    private void cerrarModal() {
-        Stage stage = (Stage) guardarResultado.getScene().getWindow();
-        stage.close();
-    }
+ private double obtenerMontoCobrar() {
+ try {
+ String texto = montoCobrarField.getText();
+ return (texto != null && !texto.isBlank()) ? Double.parseDouble(texto) : 0.0;
+ } catch (NumberFormatException e) {
+ return 0.0;
+  }
+ }
 
-    private void mostrarError(String titulo, String mensaje) {
-        mostrarAlerta(Alert.AlertType.ERROR, titulo, mensaje);
-    }
+ private String obtenerTexto(TextField field) {
+ return field.getText() == null ? "" : field.getText().trim();
+ }
 
-    private void mostrarMensaje(String titulo, String mensaje) {
-        mostrarAlerta(Alert.AlertType.INFORMATION, titulo, mensaje);
-    }
+ private void enviarWhatsAppSimulado() {
+ LOGGER.log(Level.INFO, "Enviando comprobante por WhatsApp para pedido #{0}", pedidoActual.getId());
+ LOGGER.log(Level.INFO, "Mensaje: Su pedido #{0} ha sido entregado. Total: ${1}",
+ new Object[]{pedidoActual.getId(), montoCobrarField.getText()});
+ }
 
-    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
-    }
+ private void realizarRollback(Connection conn) {
+ if (conn != null) {
+ try {
+ conn.rollback();
+ } catch (SQLException e) {
+ LOGGER.log(Level.SEVERE, "Error en rollback: {0}", e.getMessage());
+ }
+ }
+ }
+
+ private void registrarActividad(String accion, String detalle) {
+ try (Connection conn = dbConnection.getConnection();
+ PreparedStatement stmt = conn.prepareStatement(SQL_REGISTRAR_ACTIVIDAD)) {
+
+ stmt.setString(1, sessionManager.getUsuarioActual());
+ stmt.setString(2, accion);
+ stmt.setString(3, detalle);
+ stmt.executeUpdate();
+
+ } catch (SQLException e) {
+ LOGGER.log(Level.WARNING, "Error al registrar actividad: {0}", e.getMessage());
+ }
+ }
+
+ private void cerrarModal() {
+ Stage stage = (Stage) guardarResultado.getScene().getWindow();
+ stage.close();
+ }
+
+ private void mostrarError(String titulo, String mensaje) {
+ mostrarAlerta(Alert.AlertType.ERROR, titulo, mensaje);
+ }
+
+ private void mostrarMensaje(String titulo, String mensaje) {
+ mostrarAlerta(Alert.AlertType.INFORMATION, titulo, mensaje);
+ }
+
+ private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
+ Alert alert = new Alert(tipo);
+ alert.setTitle(titulo);
+ alert.setHeaderText(null);
+ alert.setContentText(mensaje);
+ alert.showAndWait();
+ }
 }

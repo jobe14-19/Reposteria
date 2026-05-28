@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox styleClass="root" spacing="15" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.UsuariosModalController">
+ <stylesheets><URL value="@styles.css"/></stylesheets>
+ <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+ <Label fx:id="tituloLabel" text="Nuevo Usuario" style="-fx-font-size: 20px; -fx-font-weight: bold;" styleClass="text-heading-xl"/>
+
+ <GridPane hgap="15" vgap="12">
+  <Label text="Usuario:" style="-fx-font-size: 14px; -fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+  <TextField fx:id="usuarioField" promptText="Nombre de usuario" prefWidth="280" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+  <Label text="Contraseña:" style="-fx-font-size: 14px; -fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+  <PasswordField fx:id="contrasenaField" promptText="Contraseña" prefWidth="280" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+  <Label text="Nombre:" style="-fx-font-size: 14px; -fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+  <TextField fx:id="nombreField" promptText="Nombre completo" prefWidth="280" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+  <Label text="Perfil:" style="-fx-font-size: 14px; -fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+  <ComboBox fx:id="perfilCombo" prefWidth="280" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+ </GridPane>
+
+ <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding-top: 20;">
+  <Button text="Cancelar" onAction="#cancelar" style="-fx-background-color: #b0a8a5; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22; -fx-background-radius: 8; -fx-cursor: hand;"/>
+  <Button fx:id="guardarButton" text="Guardar" onAction="#guardar" style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22; -fx-background-radius: 8; -fx-cursor: hand;"/>
+ </HBox>
+</VBox>

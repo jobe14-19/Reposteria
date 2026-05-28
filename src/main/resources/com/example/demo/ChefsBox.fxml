@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.ChefsBoxController">
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
+
+ <VBox styleClass="bg-card border-light" style="-fx-border-width: 0 0 1 0;">
+ <padding>
+ <Insets top="20" right="20" bottom="15" left="20"/>
+ </padding>
+ <HBox alignment="CENTER_LEFT" spacing="15">
+ <Label text="Chef's Box - Cajas Especiales" style="-fx-font-size: 24px; -fx-font-weight: bold;" styleClass="text-heading-xl"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button fx:id="nuevaBoxButton" text="Nueva Caja" onAction="#nuevaBox" style="-fx-background-color: #f55580; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+ </HBox>
+ </VBox>
+
+ <ScrollPane fitToWidth="true" styleClass="bg-primary">
+ <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+
+ <VBox spacing="15" alignment="TOP_CENTER">
+ <HBox alignment="CENTER_LEFT" spacing="15">
+ <Label text="Cajas Especiales" style="-fx-font-size: 18px; -fx-font-weight: bold;" styleClass="text-heading-lg"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Label fx:id="totalLabel" text="Total: 0 cajas" style="-fx-font-size: 14px;" styleClass="text-muted-sm"/>
+ </HBox>
+
+ <TableView fx:id="chefsBoxTable" styleClass="inventory-table">
+ <columns>
+ <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+ <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="180"/>
+ <TableColumn fx:id="descripcionColumn" text="Descripcion" prefWidth="250"/>
+ <TableColumn fx:id="precioColumn" text="Precio" prefWidth="100"/>
+ <TableColumn fx:id="productosColumn" text="Productos" prefWidth="80"/>
+ <TableColumn fx:id="disponibleColumn" text="Disponible" prefWidth="90"/>
+ <TableColumn fx:id="accionesColumn" text="Acciones" prefWidth="180"/>
+ </columns>
+ </TableView>
+ </VBox>
+ </VBox>
+ </ScrollPane>
+</VBox>

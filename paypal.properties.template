@@ -1,0 +1,5 @@
+# PayPal API Credentials
+# Obtener en: https://developer.paypal.com/dashboard/applications
+# Usar SIMULATE / SIMULATE para modo simulacion sin credenciales reales
+paypal.client_id=SIMULATE
+paypal.secret=SIMULATE

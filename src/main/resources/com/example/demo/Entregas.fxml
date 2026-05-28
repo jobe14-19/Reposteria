@@ -7,106 +7,106 @@
 <?import java.net.URL?>
 
 <VBox styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.EntregasController">
-    <stylesheets>
-        <URL value="@styles.css"/>
-    </stylesheets>
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
 
-    <!-- Header -->
-    <VBox style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">
-        <padding>
-            <Insets top="20" right="20" bottom="15" left="20"/>
-        </padding>
+  <!-- Header -->
+  <VBox styleClass="bg-card border-bottom-light">
+  <padding>
+  <Insets top="20" right="20" bottom="15" left="20"/>
+  </padding>
 
-        <HBox alignment="CENTER_LEFT" spacing="15">
-            <Label text="Entregas y Cobros" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="actualizarButton" text="🔄 Actualizar" style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
-        </HBox>
-    </VBox>
+  <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Entregas y Cobros" style="-fx-font-size: 24px;" styleClass="text-heading"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button fx:id="actualizarButton" text="Actualizar" style="-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+ </HBox>
+ </VBox>
 
-    <!-- Main Content -->
-    <ScrollPane fitToWidth="true" style="-fx-background-color: #FAFAFA;">
-        <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+ <!-- Main Content -->
+  <ScrollPane fitToWidth="true" styleClass="bg-primary">
+ <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
 
-            <TabPane fx:id="tabPane" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 8;">
+  <TabPane fx:id="tabPane" style="-fx-border-width: 1; -fx-border-radius: 8;" styleClass="bg-card border-light">
 
-                <!-- Tab 1: Pending Deliveries -->
-                <Tab text="📋 Pedidos Pendientes">
-                    <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
-                        <HBox alignment="CENTER_LEFT" spacing="15">
-                            <Label text="Pedidos Listos para Entregar" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Label fx:id="totalPendientesLabel" text="Total: 0 pedidos" style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
-                        </HBox>
+ <!-- Tab 1: Pending Deliveries -->
+ <Tab text="Pedidos Pendientes">
+ <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+ <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Pedidos Listos para Entregar" style="-fx-font-size: 18px;" styleClass="text-heading"/>
+ <Region HBox.hgrow="ALWAYS"/>
+  <Label fx:id="totalPendientesLabel" text="Total: 0 pedidos" style="-fx-font-size: 14px;" styleClass="text-muted"/>
+ </HBox>
 
-                        <TableView fx:id="pedidosPendientesTable" styleClass="delivery-table">
-                            <columns>
-                                <TableColumn fx:id="pendienteIdColumn" text="ID Pedido" prefWidth="80"/>
-                                <TableColumn fx:id="pendienteClienteColumn" text="Cliente" prefWidth="150"/>
-                                <TableColumn fx:id="pendienteDireccionColumn" text="Dirección" prefWidth="200"/>
-                                <TableColumn fx:id="pendienteTotalColumn" text="Total" prefWidth="100"/>
-                                <TableColumn fx:id="pendienteAdelantoColumn" text="Adelanto" prefWidth="100"/>
-                                <TableColumn fx:id="pendienteSaldoColumn" text="Saldo" prefWidth="100"/>
-                                <TableColumn fx:id="pendienteTipoColumn" text="Tipo" prefWidth="100"/>
-                                <TableColumn fx:id="pendienteAccionesColumn" text="Acciones" prefWidth="150"/>
-                            </columns>
-                        </TableView>
-                    </VBox>
-                </Tab>
+ <TableView fx:id="pedidosPendientesTable" styleClass="delivery-table">
+ <columns>
+  <TableColumn fx:id="pendienteIdColumn" text="ID Orden" prefWidth="80"/>
+ <TableColumn fx:id="pendienteClienteColumn" text="Cliente" prefWidth="150"/>
+ <TableColumn fx:id="pendienteDireccionColumn" text="Dirección" prefWidth="200"/>
+ <TableColumn fx:id="pendienteTotalColumn" text="Total" prefWidth="100"/>
+ <TableColumn fx:id="pendienteAdelantoColumn" text="Adelanto" prefWidth="100"/>
+ <TableColumn fx:id="pendienteSaldoColumn" text="Saldo" prefWidth="100"/>
+ <TableColumn fx:id="pendienteTipoColumn" text="Tipo" prefWidth="100"/>
+ <TableColumn fx:id="pendienteAccionesColumn" text="Acciones" prefWidth="150"/>
+ </columns>
+ </TableView>
+ </VBox>
+ </Tab>
 
-                <!-- Tab 2: Delivery History -->
-                <Tab text="Historial de Entregas">
-                    <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
+ <!-- Tab 2: Delivery History -->
+ <Tab text="Historial de Entregas">
+ <VBox style="-fx-padding: 20; -fx-spacing: 20;" alignment="TOP_CENTER">
 
-                        <!-- Filters -->
-                        <HBox style="-fx-background-color: #F8F9FA; -fx-background-radius: 12; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-padding: 15;" alignment="CENTER_LEFT" spacing="20">
-                            <VBox spacing="10" alignment="CENTER_LEFT">
-                                <Label text="Filtros" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                                <HBox spacing="10" alignment="CENTER">
-                                    <VBox spacing="5">
-                                        <Label text="Fecha Desde:" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
-                                        <DatePicker fx:id="fechaDesdePicker" styleClass="form-field" prefWidth="150"/>
-                                    </VBox>
+ <!-- Filters -->
+  <HBox style="-fx-background-radius: 12; -fx-padding: 15;" styleClass="bg-input border-light" alignment="CENTER_LEFT" spacing="20">
+  <VBox spacing="10" alignment="CENTER_LEFT">
+  <Label text="Filtros" style="-fx-font-size: 14px;" styleClass="text-heading"/>
+ <HBox spacing="10" alignment="CENTER">
+ <VBox spacing="5">
+ <Label text="Fecha Desde:" styleClass="text-muted-sm"/>
+ <DatePicker fx:id="fechaDesdePicker" styleClass="form-field" prefWidth="150"/>
+ </VBox>
 
-                                    <VBox spacing="5">
-                                        <Label text="Fecha Hasta:" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
-                                        <DatePicker fx:id="fechaHastaPicker" styleClass="form-field" prefWidth="150"/>
-                                    </VBox>
+ <VBox spacing="5">
+ <Label text="Fecha Hasta:" styleClass="text-muted-sm"/>
+ <DatePicker fx:id="fechaHastaPicker" styleClass="form-field" prefWidth="150"/>
+ </VBox>
 
-                                    <VBox spacing="5">
-                                        <Label text="Tipo Entrega:" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
-                                        <ComboBox fx:id="tipoEntregaFilter" styleClass="form-field" prefWidth="150"/>
-                                    </VBox>
-                                </HBox>
+ <VBox spacing="5">
+ <Label text="Tipo Entrega:" styleClass="text-muted-sm"/>
+ <ComboBox fx:id="tipoEntregaFilter" styleClass="form-field" prefWidth="150"/>
+ </VBox>
+ </HBox>
 
-                                <HBox spacing="10" alignment="CENTER">
-                                    <Button fx:id="filtrarButton" text="Filtrar" style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
-                                    <Button fx:id="limpiarFiltrosButton" text="Limpiar Filtros" style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
-                                </HBox>
-                            </VBox>
-                        </HBox>
+ <HBox spacing="10" alignment="CENTER">
+ <Button fx:id="filtrarButton" text="Filtrar" style="-fx-background-color: #f55580; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+ <Button fx:id="limpiarFiltrosButton" text="Limpiar Filtros" style="-fx-background-color: #b0a8a5; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15 8 15;"/>
+ </HBox>
+ </VBox>
+ </HBox>
 
-                        <HBox alignment="CENTER_LEFT" spacing="15">
-                            <Label text="Historial de Entregas" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Label fx:id="totalHistorialLabel" text="Total: 0 entregas" style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
-                        </HBox>
+ <HBox alignment="CENTER_LEFT" spacing="15">
+  <Label text="Historial de Entregas" style="-fx-font-size: 18px;" styleClass="text-heading"/>
+ <Region HBox.hgrow="ALWAYS"/>
+  <Label fx:id="totalHistorialLabel" text="Total: 0 entregas" style="-fx-font-size: 14px;" styleClass="text-muted"/>
+ </HBox>
 
-                        <TableView fx:id="historialTable" styleClass="delivery-table">
-                            <columns>
-                                <TableColumn fx:id="historialIdColumn" text="ID Pedido" prefWidth="80"/>
-                                <TableColumn fx:id="historialClienteColumn" text="Cliente" prefWidth="150"/>
-                                <TableColumn fx:id="historialFechaColumn" text="Fecha Entrega" prefWidth="120"/>
-                                <TableColumn fx:id="historialTipoColumn" text="Tipo" prefWidth="100"/>
-                                <TableColumn fx:id="historialTotalColumn" text="Total" prefWidth="100"/>
-                                <TableColumn fx:id="historialPagadoColumn" text="Pagado" prefWidth="100"/>
-                                <TableColumn fx:id="historialMetodoColumn" text="Método Pago" prefWidth="120"/>
-                                <TableColumn fx:id="historialAccionesColumn" text="Acciones" prefWidth="150"/>
-                            </columns>
-                        </TableView>
-                    </VBox>
-                </Tab>
-            </TabPane>
-        </VBox>
-    </ScrollPane>
+ <TableView fx:id="historialTable" styleClass="delivery-table">
+ <columns>
+ <TableColumn fx:id="historialIdColumn" text="ID Pedido" prefWidth="80"/>
+ <TableColumn fx:id="historialClienteColumn" text="Cliente" prefWidth="150"/>
+ <TableColumn fx:id="historialFechaColumn" text="Fecha Entrega" prefWidth="120"/>
+ <TableColumn fx:id="historialTipoColumn" text="Tipo" prefWidth="100"/>
+ <TableColumn fx:id="historialTotalColumn" text="Total" prefWidth="100"/>
+ <TableColumn fx:id="historialPagadoColumn" text="Pagado" prefWidth="100"/>
+ <TableColumn fx:id="historialMetodoColumn" text="Método Pago" prefWidth="120"/>
+ <TableColumn fx:id="historialAccionesColumn" text="Acciones" prefWidth="150"/>
+ </columns>
+ </TableView>
+ </VBox>
+ </Tab>
+ </TabPane>
+ </VBox>
+ </ScrollPane>
 </VBox>

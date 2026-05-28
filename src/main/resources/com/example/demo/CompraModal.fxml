@@ -6,173 +6,173 @@
 <?import java.net.URL?>
 
 <ScrollPane fitToWidth="true" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.demo.controller.CompraModalController" styleClass="scroll-pane">
-    <stylesheets>
-        <URL value="@styles.css"/>
-    </stylesheets>
+ fx:controller="com.example.demo.controller.CompraModalController" styleClass="scroll-pane">
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
 
-    <VBox styleClass="root" spacing="15">
-        <padding>
-            <Insets top="20" right="25" bottom="20" left="25"/>
-        </padding>
+ <VBox styleClass="root" spacing="15">
+ <padding>
+ <Insets top="20" right="25" bottom="20" left="25"/>
+ </padding>
 
-        <!-- ===== HEADER ===== -->
-        <HBox alignment="CENTER_LEFT" spacing="15">
-            <Label fx:id="tituloLabel" text="🛒 Orden de Compra" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <VBox spacing="4" alignment="CENTER_RIGHT">
-                <Label text="N° Orden" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                <TextField fx:id="numeroOrdenField" promptText="Auto-generado" styleClass="form-field" prefWidth="150" editable="false"
-                           style="-fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-            </VBox>
-        </HBox>
+ <!-- ===== HEADER ===== -->
+ <HBox alignment="CENTER_LEFT" spacing="15">
+ <Label fx:id="tituloLabel" text="Orden de Compra" style="-fx-font-size: 22px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ <VBox spacing="4" alignment="CENTER_RIGHT">
+ <Label text="N° Orden" style="-fx-font-size: 11px;" styleClass="text-muted-sm"/>
+<TextField fx:id="numeroOrdenField" promptText="Auto-generado" styleClass="form-field text-heading-sm" prefWidth="150" editable="false"
+  style="-fx-font-weight: bold;"/>
+ </VBox>
+ </HBox>
 
-        <Separator/>
+ <Separator/>
 
-        <!-- ===== SUPPLIER + DATE + CONDITION ===== -->
-        <VBox spacing="10" style="-fx-background-color: #FFF8F0; -fx-border-color: #E8D5C0; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15;">
-            <Label text="📋 Datos de la Compra" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-            <GridPane hgap="15" vgap="10">
-                <Label text="Suplidor:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <ComboBox fx:id="proveedorComboBox" styleClass="form-field" prefWidth="220" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+ <!-- ===== SUPPLIER + DATE + CONDITION ===== -->
+ <VBox spacing="10" style="-fx-background-color: #FFF8F0; -fx-border-color: #E8D5C0; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15;">
+ <Label text="Datos de la Compra" style="-fx-font-size: 15px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <GridPane hgap="15" vgap="10">
+ <Label text="Suplidor:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <ComboBox fx:id="proveedorComboBox" styleClass="form-field" prefWidth="220" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                <Label text="Fecha Factura:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                <DatePicker fx:id="fechaCompraPicker" styleClass="form-field" prefWidth="180" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+ <Label text="Fecha Factura:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+ <DatePicker fx:id="fechaCompraPicker" styleClass="form-field" prefWidth="180" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
 
-                <Label text="Condición:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <HBox spacing="20" alignment="CENTER_LEFT" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2">
-                    <fx:define>
-                        <ToggleGroup fx:id="condicionGroup"/>
-                    </fx:define>
-                    <RadioButton fx:id="contadoRadio" text="💵 Contado" toggleGroup="$condicionGroup" selected="true"
-                                 style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2E7D32;"/>
-                    <RadioButton fx:id="creditoRadio" text="📄 Crédito" toggleGroup="$condicionGroup"
-                                 style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1565C0;"/>
-                </HBox>
+ <Label text="Condición:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+ <HBox spacing="20" alignment="CENTER_LEFT" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2">
+ <fx:define>
+ <ToggleGroup fx:id="condicionGroup"/>
+ </fx:define>
+ <RadioButton fx:id="contadoRadio" text="Contado" toggleGroup="$condicionGroup" selected="true"
+ style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #4caf50;"/>
+ <RadioButton fx:id="creditoRadio" text="Crédito" toggleGroup="$condicionGroup"
+ style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1565C0;"/>
+ </HBox>
 
-                <Label text="Vendedor:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
-                <TextField fx:id="vendedorField" promptText="Nombre del vendedor" styleClass="form-field" prefWidth="180" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
-            </GridPane>
-        </VBox>
+ <Label text="Vendedor:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+ <TextField fx:id="vendedorField" promptText="Nombre del vendedor" styleClass="form-field" prefWidth="180" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+ </GridPane>
+ </VBox>
 
-        <!-- ===== PRODUCTS TABLE ===== -->
-        <VBox spacing="10" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 15;">
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label text="📦 Lista de Insumos" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="➕ Agregar Insumo" onAction="#agregarProducto"
-                        style="-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 7 14 7 14; -fx-background-radius: 6; -fx-cursor: hand;"/>
-            </HBox>
+ <!-- ===== PRODUCTS TABLE ===== -->
+ <VBox spacing="10" style="-fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 15;" styleClass="bg-card border-light">
+ <HBox alignment="CENTER_LEFT" spacing="10">
+ <Label text="Lista de Insumos" style="-fx-font-size: 15px; -fx-font-weight: bold;" styleClass="text-heading"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button text="Agregar Insumo" onAction="#agregarProducto"
+ style="-fx-background-color: #f55580; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 7 14 7 14; -fx-background-radius: 6; -fx-cursor: hand;"/>
+ </HBox>
 
-            <TableView fx:id="productosTable" prefHeight="180" styleClass="purchase-table">
-                <columns>
-                    <TableColumn fx:id="productoColumn" text="Producto / Insumo" prefWidth="200"/>
-                    <TableColumn fx:id="cantidadColumn" text="Cantidad" prefWidth="90"/>
-                    <TableColumn fx:id="unidadColumn" text="Unidad" prefWidth="80"/>
-                    <TableColumn fx:id="precioUnitarioColumn" text="Precio Unit." prefWidth="100"/>
-                    <TableColumn fx:id="descuentoColumn" text="Descuento" prefWidth="90"/>
-                    <TableColumn fx:id="subtotalColumn" text="Subtotal" prefWidth="100"/>
-                    <TableColumn fx:id="accionesColumn" text="" prefWidth="60"/>
-                </columns>
-                <placeholder>
-                    <Label text="No hay insumos agregados. Haga clic en '➕ Agregar Insumo'."
-                           style="-fx-text-fill: #999; -fx-font-size: 13px;"/>
-                </placeholder>
-            </TableView>
+ <TableView fx:id="productosTable" prefHeight="180" styleClass="purchase-table">
+ <columns>
+ <TableColumn fx:id="productoColumn" text="Producto / Insumo" prefWidth="200"/>
+ <TableColumn fx:id="cantidadColumn" text="Cantidad" prefWidth="90"/>
+ <TableColumn fx:id="unidadColumn" text="Unidad" prefWidth="80"/>
+ <TableColumn fx:id="precioUnitarioColumn" text="Precio Unit." prefWidth="100"/>
+ <TableColumn fx:id="descuentoColumn" text="Descuento" prefWidth="90"/>
+ <TableColumn fx:id="subtotalColumn" text="Subtotal" prefWidth="100"/>
+ <TableColumn fx:id="accionesColumn" text="Acciones" prefWidth="60"/>
+ </columns>
+ <placeholder>
+ <Label text="No hay insumos agregados. Haga clic en ' Agregar Insumo'."
+ style="-fx-text-fill: #999; -fx-font-size: 13px;"/>
+ </placeholder>
+ </TableView>
 
-            <!-- Add Product Row -->
-            <VBox fx:id="addProductPanel" spacing="8"
-                  style="-fx-background-color: #F8F9FA; -fx-border-color: #DDDDDD; -fx-border-width: 1; -fx-border-radius: 6; -fx-padding: 12;">
-                <Label text="Nuevo insumo:" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #555;"/>
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <ComboBox fx:id="productoComboBox" styleClass="form-field" prefWidth="200"/>
-                    <TextField fx:id="cantidadField" promptText="Cant." styleClass="form-field" prefWidth="75"/>
-                    <TextField fx:id="unidadField" promptText="Unidad" styleClass="form-field" prefWidth="75"/>
-                    <TextField fx:id="precioUnitarioField" promptText="Precio Unit." styleClass="form-field" prefWidth="105"/>
-                    <TextField fx:id="descuentoField" promptText="Desc." styleClass="form-field" prefWidth="80"/>
-                    <Label fx:id="subtotalItemLabel" text="\$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2E7D32; -fx-min-width: 90;"/>
-                    <Button text="✅ Añadir" onAction="#confirmarAgregarProducto"
-                            style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-background-radius: 5; -fx-cursor: hand;"/>
-                </HBox>
-                <HBox spacing="20">
-                    <CheckBox fx:id="productoDelicadoCheckBox" text="⚠️ Producto delicado" style="-fx-font-size: 12px;"/>
-                    <CheckBox fx:id="requiereRefrigeracionCheckBox" text="❄️ Requiere refrigeración" style="-fx-font-size: 12px;"/>
-                </HBox>
-            </VBox>
-        </VBox>
+ <!-- Add Product Row -->
+ <VBox fx:id="addProductPanel" spacing="8"
+ style="-fx-border-color: #DDDDDD; -fx-border-width: 1; -fx-border-radius: 6; -fx-padding: 12;" styleClass="bg-input">
+ <Label text="Nuevo insumo:" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #555;"/>
+ <HBox spacing="10" alignment="CENTER_LEFT">
+ <ComboBox fx:id="productoComboBox" styleClass="form-field" prefWidth="200"/>
+ <TextField fx:id="cantidadField" promptText="Cant." styleClass="form-field" prefWidth="75"/>
+ <TextField fx:id="unidadField" promptText="Unidad" styleClass="form-field" prefWidth="75"/>
+ <TextField fx:id="precioUnitarioField" promptText="Precio Unit." styleClass="form-field" prefWidth="105"/>
+ <TextField fx:id="descuentoField" promptText="Desc." styleClass="form-field" prefWidth="80"/>
+ <Label fx:id="subtotalItemLabel" text="\$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #4caf50; -fx-min-width: 90;"/>
+ <Button text="Añadir" onAction="#confirmarAgregarProducto"
+ style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-background-radius: 5; -fx-cursor: hand;"/>
+ </HBox>
+ <HBox spacing="20">
+ <CheckBox fx:id="productoDelicadoCheckBox" text="Producto delicado" style="-fx-font-size: 12px;"/>
+ <CheckBox fx:id="requiereRefrigeracionCheckBox" text="Requiere refrigeración" style="-fx-font-size: 12px;"/>
+ </HBox>
+ </VBox>
+ </VBox>
 
-        <!-- ===== TOTALS BREAKDOWN ===== -->
-        <HBox spacing="15">
-            <!-- Left: Totals -->
-            <VBox spacing="8" HBox.hgrow="ALWAYS"
-                  style="-fx-background-color: #E8F5E9; -fx-border-color: #4CAF50; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 15;">
-                <Label text="💰 Resumen de Factura" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #2E7D32;"/>
-                <GridPane hgap="15" vgap="8">
-                    <Label text="Subtotal:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <TextField fx:id="subtotalField" styleClass="form-field" prefWidth="140" editable="false"
-                               style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+ <!-- ===== TOTALS BREAKDOWN ===== -->
+ <HBox spacing="15">
+ <!-- Left: Totals -->
+ <VBox spacing="8" HBox.hgrow="ALWAYS"
+ style="-fx-background-color: #E8F5E9; -fx-border-color: #4CAF50; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 15;">
+ <Label text="Resumen de Factura" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #4caf50;"/>
+ <GridPane hgap="15" vgap="8">
+ <Label text="Subtotal:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <TextField fx:id="subtotalField" styleClass="form-field" prefWidth="140" editable="false"
+ style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                    <Label text="Descuento:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <TextField fx:id="totalDescuentoField" promptText="0.00" styleClass="form-field" prefWidth="140"
-                               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+ <Label text="Descuento:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+ <TextField fx:id="totalDescuentoField" promptText="0.00" styleClass="form-field" prefWidth="140"
+ GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                    <Label text="Impuestos (%):" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextField fx:id="impuestosField" promptText="0.00" styleClass="form-field" prefWidth="140"
-                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+ <Label text="Impuestos (%):" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+ <TextField fx:id="impuestosField" promptText="0.00" styleClass="form-field" prefWidth="140"
+ GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                    <Label text="Monto:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <TextField fx:id="alquilerField" promptText="0.00" styleClass="form-field" prefWidth="140"
-                               GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+ <Label text="Monto:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+ <TextField fx:id="alquilerField" promptText="0.00" styleClass="form-field" prefWidth="140"
+ GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                    <Label text="Garantía:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                    <TextField fx:id="garantiaField" promptText="0.00" styleClass="form-field" prefWidth="140"
-                               GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+ <Label text="Garantía:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+ <TextField fx:id="garantiaField" promptText="0.00" styleClass="form-field" prefWidth="140"
+ GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-                    <Separator GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+ <Separator GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
 
-                    <Label text="TOTAL:" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-                    <TextField fx:id="totalField" styleClass="form-field" prefWidth="140" editable="false"
-                               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"
-                               GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-                </GridPane>
-            </VBox>
+ <Label text="TOTAL:" style="-fx-font-size: 15px; -fx-font-weight: bold;" styleClass="text-heading" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+<TextField fx:id="totalField" styleClass="form-field text-heading" prefWidth="140" editable="false"
+  style="-fx-font-size: 15px; -fx-font-weight: bold;"
+  GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+ </GridPane>
+ </VBox>
 
-            <!-- Right: Payment -->
-            <VBox spacing="8"
-                  style="-fx-background-color: #E3F2FD; -fx-border-color: #1565C0; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 15; -fx-min-width: 260;">
-                <Label text="🏦 Condición de Pago" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1565C0;"/>
-                <GridPane hgap="15" vgap="8">
-                    <Label text="Abono / Anticipo:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <TextField fx:id="abonoField" promptText="0.00" styleClass="form-field" prefWidth="130"
-                               GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+ <!-- Right: Payment -->
+ <VBox spacing="8"
+ style="-fx-background-color: #E3F2FD; -fx-border-color: #1565C0; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 15; -fx-min-width: 260;">
+ <Label text="Condición de Pago" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1565C0;"/>
+ <GridPane hgap="15" vgap="8">
+ <Label text="Abono / Anticipo:" style="-fx-font-size: 13px; -fx-text-fill: #444;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+ <TextField fx:id="abonoField" promptText="0.00" styleClass="form-field" prefWidth="130"
+ GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                    <Separator GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+ <Separator GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
 
-                    <Label text="Saldo Pendiente:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #C62828;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextField fx:id="saldoField" styleClass="form-field" prefWidth="130" editable="false"
-                               style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #C62828;"
-                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                </GridPane>
-                <Label fx:id="condicionLabel" text="✅ Pago en Contado"
-                       style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2E7D32; -fx-padding: 6 10 6 10; -fx-background-color: #C8E6C9; -fx-background-radius: 4;"/>
-            </VBox>
-        </HBox>
+ <Label text="Saldo Pendiente:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #C62828;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+ <TextField fx:id="saldoField" styleClass="form-field" prefWidth="130" editable="false"
+ style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #C62828;"
+ GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+ </GridPane>
+ <Label fx:id="condicionLabel" text="Pago en Contado"
+ style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4caf50; -fx-padding: 6 10 6 10; -fx-background-color: #C8E6C9; -fx-background-radius: 4;"/>
+ </VBox>
+ </HBox>
 
-        <!-- ===== NOTES ===== -->
-        <VBox spacing="6" style="-fx-background-color: #FFFDE7; -fx-border-color: #F9A825; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 12;">
-            <Label text="📝 Observaciones" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #F57F17;"/>
-            <TextArea fx:id="observacionesArea" promptText="Notas sobre la compra, condiciones especiales, etc."
-                      prefHeight="65" styleClass="form-field" wrapText="true"/>
-        </VBox>
+ <!-- ===== NOTES ===== -->
+ <VBox spacing="6" style="-fx-background-color: #FFFDE7; -fx-border-color: #F9A825; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 12;">
+ <Label text="Observaciones" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #F57F17;"/>
+ <TextArea fx:id="observacionesArea" promptText="Notas sobre la compra, condiciones especiales, etc."
+ prefHeight="65" styleClass="form-field" wrapText="true"/>
+ </VBox>
 
-        <!-- ===== ACTION BUTTONS ===== -->
-        <HBox alignment="CENTER_RIGHT" spacing="12">
-            <Button fx:id="limpiarButton" text="Limpiar"
-                    style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#limpiarCampos"/>
-            <Button fx:id="cancelarButton" text="Cancelar"
-                    style="-fx-background-color: #9e9e9e; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#cancelarResultado"/>
-            <Button fx:id="guardarResultado" text="💾 Registrar Compra"
-                    style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#guardarResultado"/>
-        </HBox>
-    </VBox>
+ <!-- ===== ACTION BUTTONS ===== -->
+ <HBox alignment="CENTER_RIGHT" spacing="12">
+ <Button fx:id="limpiarButton" text="Limpiar"
+ style="-fx-background-color: #b0a8a5; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#limpiarCampos"/>
+ <Button fx:id="cancelarButton" text="Cancelar"
+ style="-fx-background-color: #b0a8a5; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#cancelarResultado"/>
+ <Button fx:id="guardarResultado" text="Registrar Compra"
+ style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 22 10 22; -fx-background-radius: 8; -fx-cursor: hand;" onAction="#guardarResultado"/>
+ </HBox>
+ </VBox>
 </ScrollPane>

@@ -1,0 +1,161 @@
+﻿<!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+               name="Reporte_Ventas_Rosato" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" >
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="fechaInicio" class="java.sql.Date"/>
+	<parameter name="fechaFin" class="java.sql.Date"/>
+<queryString language="SQL"><![CDATA[SELECT 
+			p.id_pedido as id_factura,
+			CAST(p.fecha_pedido AS DATE) as fecha_venta,
+			c.nombre + ' ' + c.apellido as nombre_cliente,
+			c.rnc as rnc_cedula,
+			p.total as total_pago
+		FROM pedidos p
+		INNER JOIN clientes c ON p.id_cliente = c.id_cliente
+		WHERE CAST(p.fecha_pedido AS DATE) BETWEEN $P{fechaInicio} AND $P{fechaFin}
+		ORDER BY p.fecha_pedido ASC]]></queryString>
+	<field name="id_factura" class="java.lang.Integer"/>
+	<field name="fecha_venta" class="java.sql.Date"/>
+	<field name="nombre_cliente" class="java.lang.String"/>
+	<field name="rnc_cedula" class="java.lang.String"/>
+	<field name="total_pago" class="java.math.BigDecimal"/>
+	<variable name="totalGeneralVentas" calculation="Sum" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$F{total_pago}]]></variableExpression>
+	</variable>
+	<background/>
+	<title>
+		<band height="90" splitType="Stretch">
+		<staticText>
+        <reportElement x="0" y="5" width="555" height="26" forecolor="#5C3A21"/>
+        <textElement textAlignment="Center">
+            <font fontName="Arial" size="18.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[REPOSTERÍA ROSATO]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="0" y="31" width="555" height="16" forecolor="#8C6239"/>
+        <textElement textAlignment="Center">
+            <font fontName="Arial" size="11.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[REPORTE DE VENTAS POR FECHAS]]></text>
+    </staticText>
+		<textField>
+        <reportElement x="0" y="55" width="555" height="20" forecolor="#666666"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle">
+            <font fontName="Arial" size="10.0" isItalic="true"/>
+        </textElement>
+        <textFieldExpression><![CDATA["Período: " + new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{fechaInicio}) + " al " + new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{fechaFin})]]></textFieldExpression>
+    </textField>
+		<line>
+    <reportElement x="0" y="80" width="555" height="1" forecolor="#5C3A21"/>
+</line>
+	</band>
+	</title>
+	<columnHeader>
+		<band height="25" splitType="Stretch">
+		<rectangle>
+    <reportElement x="0" y="0" width="555" height="25" forecolor="#5C3A21" backcolor="#FFF0F5"/>
+</rectangle>
+		<staticText>
+        <reportElement x="5" y="0" width="75" height="25" forecolor="#5C3A21"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[FACTURA]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="85" y="0" width="90" height="25" forecolor="#5C3A21"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[FECHA VENTA]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="180" y="0" width="180" height="25" forecolor="#5C3A21"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[CLIENTE]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="365" y="0" width="100" height="25" forecolor="#5C3A21"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[RNC / CÉDULA]]></text>
+    </staticText>
+		<staticText>
+        <reportElement x="470" y="0" width="80" height="25" forecolor="#5C3A21"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[MONTO TOTAL]]></text>
+    </staticText>
+	</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField>
+        <reportElement x="5" y="1" width="75" height="20"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[String.format("%06d", $F{id_factura})]]></textFieldExpression>
+    </textField>
+			<textField pattern="dd/MM/yyyy">
+        <reportElement x="85" y="1" width="90" height="20"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{fecha_venta}]]></textFieldExpression>
+    </textField>
+			<textField>
+        <reportElement x="180" y="1" width="180" height="20"/>
+        <textElement verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{nombre_cliente} != null ? $F{nombre_cliente}.toUpperCase() : "PÚBLICO GENERAL"]]></textFieldExpression>
+    </textField>
+			<textField>
+        <reportElement x="365" y="1" width="100" height="20"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{rnc_cedula} != null ? $F{rnc_cedula} : "PÚBLICO GENERAL"]]></textFieldExpression>
+    </textField>
+			<textField pattern="RD$ #,##0.00">
+        <reportElement x="470" y="1" width="80" height="20"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="9.0"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$F{total_pago}]]></textFieldExpression>
+    </textField>
+			<line>
+    <reportElement x="0" y="21" width="555" height="1" forecolor="#F0F0F0"/>
+</line>
+		</band>
+	</detail>
+	<summary>
+		<band height="50" splitType="Stretch">
+		<rectangle>
+    <reportElement x="300" y="10" width="255" height="30" forecolor="#5C3A21" backcolor="#FAFAFA"/>
+</rectangle>
+		<staticText>
+        <reportElement x="305" y="15" width="135" height="20" forecolor="#5C3A21"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="10.0" isBold="true"/>
+        </textElement>
+        <text><![CDATA[TOTAL VENTAS PERÍODO:]]></text>
+    </staticText>
+		<textField pattern="RD$ #,##0.00">
+        <reportElement x="445" y="15" width="105" height="20" forecolor="#5C3A21"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle">
+            <font fontName="Arial" size="10.0" isBold="true"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$V{totalGeneralVentas} != null ? $V{totalGeneralVentas} : java.math.BigDecimal.ZERO]]></textFieldExpression>
+    </textField>
+	</band>
+	</summary>
+</jasperReport>

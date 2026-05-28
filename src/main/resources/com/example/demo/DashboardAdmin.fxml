@@ -5,152 +5,192 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import java.net.URL?>
+<?import javafx.scene.text.Text?>
 
 <BorderPane styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.DashboardAdminController">
-    <stylesheets>
-        <URL value="@styles.css"/>
-    </stylesheets>
+ <stylesheets>
+ <URL value="@styles.css"/>
+ </stylesheets>
 
-    <!-- Navigation Bar -->
-    <top>
-        <VBox>
-            <HBox styleClass="nav-bar" alignment="CENTER_LEFT">
-                <Label text="🍰 Panel Administrativo" styleClass="nav-logo"/>
-                <Region HBox.hgrow="ALWAYS"/>
+  <!-- Navigation Bar -->
+  <top>
+  <VBox fx:id="topBar">
+  <HBox styleClass="nav-bar-gradient" alignment="CENTER_LEFT">
+ <Label text="Panel Administrativo" styleClass="nav-logo"/>
+ <Region HBox.hgrow="ALWAYS"/>
+ <HBox spacing="3" alignment="CENTER">
+ <Button text="Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
+ <Button text="Clientes" onAction="#mostrarClientes" styleClass="nav-button"/>
+  <Button text="Órdenes" onAction="#mostrarPedidos" styleClass="nav-button"/>
+ <Button text="Producción" onAction="#mostrarProduccion" styleClass="nav-button"/>
+  <Button text="Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
+  <Button text="Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
+ <Button text="Reportes" onAction="#mostrarReportes" styleClass="nav-button"/>
+ <Button text="Personal" onAction="#mostrarPersonal" styleClass="nav-button"/>
+ </HBox>
+ <Region HBox.hgrow="ALWAYS"/>
+ <Button text="Cerrar Sesión" onAction="#cerrarSesion" styleClass="nav-logout"/>
+ </HBox>
 
-                <HBox spacing="3" alignment="CENTER">
-                    <Button text="🏠 Dashboard" onAction="#mostrarDashboard" styleClass="nav-button-active"/>
-                    <Button text="👥 Clientes" onAction="#mostrarClientes" styleClass="nav-button"/>
-                    <Button text="📦 Pedidos" onAction="#mostrarPedidos" styleClass="nav-button"/>
-                    <Button text="👩‍🍳 Producción" onAction="#mostrarProduccion" styleClass="nav-button"/>
-                    <Button text="📦 Inventario" onAction="#mostrarInventario" styleClass="nav-button"/>
-                    <Button text="🚚 Entregas" onAction="#mostrarEntregas" styleClass="nav-button"/>
-                    <Button text="🔧 Mantenimiento" onAction="#mostrarMantenimiento" styleClass="nav-button"/>
-                    <Button text="👔 Personal" onAction="#mostrarPersonal" styleClass="nav-button"/>
-                    <Button text="🧼 Higiene" onAction="#mostrarHigiene" styleClass="nav-button"/>
-                    <Button text="✨ Chef's Box" onAction="#mostrarChefsBox" styleClass="nav-button"/>
-                    <Button text="👤 Mi Perfil" onAction="#verMiPerfil" styleClass="nav-button"/>
-                </HBox>
+  <HBox style="-fx-padding: 8 20 8 20;" styleClass="bg-input" alignment="CENTER_LEFT">
+  <Label fx:id="userLabel" styleClass="text-heading-sm"/>
+  <Region HBox.hgrow="ALWAYS"/>
+  <Label fx:id="lastUpdateLabel" styleClass="text-muted-sm"/>
+ </HBox>
+ </VBox>
+ </top>
 
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Cerrar Sesión" onAction="#cerrarSesion" styleClass="nav-logout"/>
-            </HBox>
+ <center>
+  <ScrollPane fitToWidth="true" styleClass="scroll-pane bg-primary">
+ <VBox style="-fx-padding: 25; -fx-spacing: 25;" alignment="TOP_CENTER">
 
-            <HBox style="-fx-background-color: #F5F5F5; -fx-padding: 8 20 8 20;" alignment="CENTER_LEFT">
-                <Label fx:id="userLabel" style="-fx-text-fill: #8B5E3C; -fx-font-size: 14px; -fx-font-weight: bold;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lastUpdateLabel" style="-fx-text-fill: #666666; -fx-font-size: 12px;"/>
-            </HBox>
-        </VBox>
-    </top>
+  <!-- Title -->
+   <Label text="Panel de Control Administrativo" styleClass="text-heading-lg"/>
 
-    <center>
-        <ScrollPane fitToWidth="true" style="-fx-background-color: #FAFAFA;">
-            <VBox style="-fx-padding: 25; -fx-spacing: 25;" alignment="TOP_CENTER">
+   <!-- KPI Grid: 8 cards responsive -->
+   <FlowPane hgap="16" vgap="16" alignment="CENTER">
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128230;" style="-fx-font-size: 28px;"/>
+   <Label text="Órdenes Pendientes" styleClass="kpi-label"/>
+   <Label fx:id="prodPendientesLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128293;" style="-fx-font-size: 28px;"/>
+   <Label text="Producción Activa" styleClass="kpi-label"/>
+   <Label fx:id="prodActivaLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128197;" style="-fx-font-size: 28px;"/>
+   <Label text="Entrega Hoy" styleClass="kpi-label"/>
+   <Label fx:id="prodHoyLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128200;" style="-fx-font-size: 28px;"/>
+   <Label text="Stock Bajo" styleClass="kpi-label"/>
+   <Label fx:id="stockBajoLabel" text="0" styleClass="kpi-value" style="-fx-text-fill: #d9534f;"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128666;" style="-fx-font-size: 28px;"/>
+   <Label text="Entregas Hoy" styleClass="kpi-label"/>
+   <Label fx:id="entregasHoyLabel" text="0" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128176;" style="-fx-font-size: 28px;"/>
+   <Label text="Pagos Pendientes" styleClass="kpi-label"/>
+   <Label fx:id="saldoPendienteLabel" text="0.00" styleClass="kpi-value"/>
+   </VBox>
+   <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+   <Label text="&#128308;" style="-fx-font-size: 28px;"/>
+   <Label text="Prod. Atrasada" styleClass="kpi-label"/>
+   <Label fx:id="atrasadaLabel" text="0" styleClass="kpi-value" style="-fx-text-fill: #d9534f;"/>
+   </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128101;" style="-fx-font-size: 28px;"/>
+    <Label text="Clientes Nuevos" styleClass="kpi-label"/>
+    <Label fx:id="clientesNuevosLabel" text="0" styleClass="kpi-value"/>
+    </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128176;" style="-fx-font-size: 28px;"/>
+    <Label text="Ingresos del Mes" styleClass="kpi-label"/>
+    <Label fx:id="ingresosMesAdminLabel" text="0.00" styleClass="kpi-value"/>
+    </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128722;" style="-fx-font-size: 28px;"/>
+    <Label text="Compras del Mes" styleClass="kpi-label"/>
+    <Label fx:id="comprasMesAdminLabel" text="0" styleClass="kpi-value"/>
+    </VBox>
+    <VBox styleClass="kpi-card" alignment="CENTER" spacing="8">
+    <Label text="&#128295;" style="-fx-font-size: 28px;"/>
+    <Label text="Próx. Mantenimiento" styleClass="kpi-label"/>
+    <Label fx:id="proxMantenimientoAdminLabel" text="0" styleClass="kpi-value"/>
+    </VBox>
+    </FlowPane>
 
-                <!-- KPIs -->
-                <VBox spacing="20">
-                    <Label text="Panel de Control Administrativo" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                    <HBox spacing="20" alignment="CENTER">
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="📋" style="-fx-font-size: 40px;"/>
-                            <Label text="Pedidos Hoy" styleClass="kpi-label"/>
-                            <Label fx:id="pedidosHoyLabel" text="0" styleClass="kpi-value"/>
-                        </VBox>
+  <!-- Charts Row: side by side -->
+  <HBox spacing="20" alignment="CENTER">
+  <VBox spacing="10" HBox.hgrow="ALWAYS">
+  <HBox alignment="CENTER_LEFT" spacing="15">
+   <Label text="Producción Últimos 7 Días" style="-fx-font-size: 15px;" styleClass="text-heading"/>
+  </HBox>
+  <VBox styleClass="chart-container">
+  <LineChart fx:id="salesChart" title="" legendVisible="false" prefHeight="220" createSymbols="false">
+  <xAxis><CategoryAxis fx:id="xAxis" label=""/></xAxis>
+   <yAxis><NumberAxis fx:id="yAxis" label="Valor ($)"/></yAxis>
+  </LineChart>
+  </VBox>
+  </VBox>
+  <VBox spacing="10" HBox.hgrow="ALWAYS">
+  <HBox alignment="CENTER_LEFT" spacing="15">
+   <Label text="Categorías en Producción" style="-fx-font-size: 15px;" styleClass="text-heading"/>
+  </HBox>
+  <VBox styleClass="chart-container">
+  <BarChart fx:id="productsChart" title="" legendVisible="false" prefHeight="220" categoryGap="4" barGap="2">
+  <xAxis><CategoryAxis fx:id="productsXAxis" label=""/></xAxis>
+  <yAxis><NumberAxis fx:id="productsYAxis" label="Uds."/></yAxis>
+  </BarChart>
+  </VBox>
+  </VBox>
+  </HBox>
 
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="💰" style="-fx-font-size: 40px;"/>
-                            <Label text="Ingresos Mes" styleClass="kpi-label"/>
-                            <Label fx:id="ingresosMesLabel" text="\$0.00" styleClass="kpi-value"/>
-                        </VBox>
+  <!-- Tables Row 1: Entregas + Alertas -->
+  <HBox spacing="20" alignment="CENTER">
+  <VBox spacing="10" HBox.hgrow="ALWAYS">
+  <Label text="Próximas Entregas" style="-fx-font-size: 15px;" styleClass="text-heading"/>
+  <TableView fx:id="entregasProxTable" prefHeight="200" styleClass="delivery-table">
+  <columns>
+  <TableColumn fx:id="entProxHoraColumn" text="Hora" prefWidth="70"/>
+  <TableColumn fx:id="entProxClienteColumn" text="Cliente" prefWidth="150"/>
+  <TableColumn fx:id="entProxDireccionColumn" text="Dirección" prefWidth="200"/>
+  <TableColumn fx:id="entProxEstadoColumn" text="Estado" prefWidth="90"/>
+  </columns>
+  </TableView>
+  </VBox>
+  <VBox spacing="10" HBox.hgrow="ALWAYS">
+  <HBox alignment="CENTER_LEFT" spacing="15">
+   <Label text="Alertas Importantes" style="-fx-font-size: 15px;" styleClass="text-heading"/>
+  <Button text="Ver Todas" onAction="#mostrarAlertas" styleClass="view-all-button"/>
+  </HBox>
+  <TableView fx:id="alertasTable" prefHeight="200" styleClass="alerts-table">
+  <columns>
+  <TableColumn fx:id="alertTipoColumn" text="Tipo" prefWidth="90"/>
+  <TableColumn fx:id="alertDescripcionColumn" text="Descripción" prefWidth="200"/>
+  <TableColumn fx:id="alertFechaColumn" text="Fecha" prefWidth="100"/>
+  <TableColumn fx:id="alertEstadoColumn" text="Estado" prefWidth="80"/>
+  </columns>
+  </TableView>
+  </VBox>
+  </HBox>
 
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="💳" style="-fx-font-size: 40px;"/>
-                            <Label text="Saldo Pendiente" styleClass="kpi-label"/>
-                            <Label fx:id="saldoPendienteLabel" text="\$0.00" styleClass="kpi-value"/>
-                        </VBox>
+  <!-- Tables Row 2: Clientes + Actividad -->
+  <HBox spacing="20" alignment="CENTER">
+  <VBox spacing="10" HBox.hgrow="ALWAYS">
+  <Label text="Últimos Clientes" style="-fx-font-size: 15px;" styleClass="text-heading"/>
+  <TableView fx:id="clientesRecTable" prefHeight="180" styleClass="activity-table">
+  <columns>
+  <TableColumn fx:id="cliRecNombreColumn" text="Nombre" prefWidth="150"/>
+  <TableColumn fx:id="cliRecTelefonoColumn" text="Teléfono" prefWidth="110"/>
+  <TableColumn fx:id="cliRecFechaColumn" text="Registro" prefWidth="100"/>
+  <TableColumn fx:id="cliRecTotalColumn" text="Total Gastado" prefWidth="100"/>
+  </columns>
+  </TableView>
+  </VBox>
+  <VBox spacing="10" HBox.hgrow="ALWAYS">
+  <HBox alignment="CENTER_LEFT" spacing="15">
+   <Label text="Actividad Reciente" style="-fx-font-size: 15px;" styleClass="text-heading"/>
+  <Button text="Ver Logs" onAction="#mostrarLogs" styleClass="view-all-button"/>
+  </HBox>
+  <TableView fx:id="actividadesTable" prefHeight="180" styleClass="activity-table">
+  <columns>
+  <TableColumn fx:id="actFechaColumn" text="Fecha" prefWidth="100"/>
+  <TableColumn fx:id="actUsuarioColumn" text="Usuario" prefWidth="90"/>
+  <TableColumn fx:id="actAccionColumn" text="Acción" prefWidth="120"/>
+  <TableColumn fx:id="actDetalleColumn" text="Detalle" prefWidth="160"/>
+  </columns>
+  </TableView>
+  </VBox>
+  </HBox>
 
-                        <VBox styleClass="kpi-card" alignment="CENTER" spacing="10">
-                            <Label text="🔧" style="-fx-font-size: 40px;"/>
-                            <Label text="Máquinas en Mantenimiento" styleClass="kpi-label"/>
-                            <Label fx:id="mantenimientoLabel" text="0" styleClass="kpi-value"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-
-                <!-- Sales Chart -->
-                <VBox spacing="20">
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <Label text="Ventas Últimos 7 Días" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <Button text="Ver Reporte Completo" onAction="#mostrarReportes" styleClass="view-all-button"/>
-                    </HBox>
-
-                    <VBox styleClass="chart-container" spacing="10">
-                        <LineChart fx:id="salesChart" title="Evolución de Ventas" legendVisible="false" prefHeight="250">
-                            <xAxis>
-                                <CategoryAxis label="Días" fx:id="xAxis"/>
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis label="Ventas ($)" fx:id="yAxis"/>
-                            </yAxis>
-                        </LineChart>
-                    </VBox>
-                </VBox>
-
-                <!-- Products Chart -->
-                <VBox spacing="20">
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <Label text="Productos Más Vendidos" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <Button text="Ver Todos los Productos" onAction="#mostrarProductos" styleClass="view-all-button"/>
-                    </HBox>
-
-                    <VBox styleClass="chart-container" spacing="10">
-                        <BarChart fx:id="productsChart" title="Top 10 Productos" legendVisible="false" prefHeight="250">
-                            <xAxis>
-                                <CategoryAxis label="Productos" fx:id="productsXAxis"/>
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis label="Unidades Vendidas" fx:id="productsYAxis"/>
-                            </yAxis>
-                        </BarChart>
-                    </VBox>
-                </VBox>
-
-                <!-- Alerts Table -->
-                <VBox spacing="20">
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <Label text="Sistema de Alertas" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <Button text="Ver Todas las Alertas" onAction="#mostrarAlertas" styleClass="view-all-button"/>
-                    </HBox>
-
-                    <TableView fx:id="alertasTable" prefHeight="200" styleClass="alerts-table">
-                        <columns>
-                            <TableColumn fx:id="alertTipoColumn" text="Tipo" prefWidth="120"/>
-                            <TableColumn fx:id="alertDescripcionColumn" text="Descripción" prefWidth="200"/>
-                            <TableColumn fx:id="alertFechaColumn" text="Fecha/Hora" prefWidth="120"/>
-                            <TableColumn fx:id="alertEstadoColumn" text="Estado" prefWidth="100"/>
-                        </columns>
-                    </TableView>
-                </VBox>
-
-                <!-- Recent Activities -->
-                <VBox spacing="20">
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <Label text="Actividades Recientes" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B5E3C;"/>
-                        <Button text="Ver Todos los Logs" onAction="#mostrarLogs" styleClass="view-all-button"/>
-                    </HBox>
-
-                    <TableView fx:id="actividadesTable" prefHeight="180" styleClass="activity-table">
-                        <columns>
-                            <TableColumn fx:id="actFechaColumn" text="Fecha/Hora" prefWidth="120"/>
-                            <TableColumn fx:id="actUsuarioColumn" text="Usuario" prefWidth="100"/>
-                            <TableColumn fx:id="actAccionColumn" text="Acción" prefWidth="150"/>
-                            <TableColumn fx:id="actDetalleColumn" text="Detalle" prefWidth="200"/>
-                        </columns>
-                    </TableView>
-                </VBox>
-
-            </VBox>
-        </ScrollPane>
-    </center>
+ </VBox>
+ </ScrollPane>
+ </center>
 </BorderPane>

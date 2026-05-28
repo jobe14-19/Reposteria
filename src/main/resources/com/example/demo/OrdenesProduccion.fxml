@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox spacing="15" styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.OrdenesProduccionController">
+ <stylesheets><URL value="@styles.css"/></stylesheets>
+ <padding><Insets top="20" right="25" bottom="20" left="25"/></padding>
+
+ <HBox alignment="CENTER_LEFT" spacing="15">
+   <Label text="Ordenes de Produccion" styleClass="text-heading-lg"/>
+  <Region HBox.hgrow="ALWAYS"/>
+  <Button fx:id="nuevaOrdenButton" text="+ Nueva Orden" styleClass="btn-success"/>
+  <Button fx:id="refrescarButton" text="Refrescar" styleClass="btn-secondary"/>
+ </HBox>
+
+ <HBox spacing="15" alignment="CENTER_LEFT">
+  <ComboBox fx:id="filtroEstadoCombo" prefWidth="180" styleClass="form-field"/>
+  <TextField fx:id="buscarField" promptText="Buscar por orden, cliente, categoria..." maxWidth="350" styleClass="form-field"/>
+  <Region HBox.hgrow="ALWAYS"/>
+  <Label fx:id="totalLabel" text="Total: 0 ordenes" styleClass="text-muted" style="-fx-font-style: italic;"/>
+ </HBox>
+
+ <TableView fx:id="ordenesTable" VBox.vgrow="ALWAYS" prefHeight="500" styleClass="production-table">
+   <columns>
+    <TableColumn fx:id="numColumn" text="Orden" prefWidth="85"/>
+    <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="100"/>
+    <TableColumn fx:id="clienteColumn" text="Cliente" prefWidth="130"/>
+    <TableColumn fx:id="fechaColumn" text="Entrega" prefWidth="85"/>
+    <TableColumn fx:id="horaInicioColumn" text="Hora Inicio" prefWidth="90"/>
+    <TableColumn fx:id="fechaFinColumn" text="Fin" prefWidth="90"/>
+    <TableColumn fx:id="tipoPagoColumn" text="Tipo Pago" prefWidth="100"/>
+    <TableColumn fx:id="estadoPagoColumn" text="Estado Pago" prefWidth="90"/>
+    <TableColumn fx:id="recetaColumn" text="Receta" prefWidth="130"/>
+    <TableColumn fx:id="categoriaColumn" text="Categoria" prefWidth="90"/>
+    <TableColumn fx:id="vendedorColumn" text="Vendedor" prefWidth="90"/>
+    <TableColumn fx:id="librasColumn" text="Libras" prefWidth="65"/>
+    <TableColumn fx:id="totalColumn" text="Total" prefWidth="80"/>
+    <TableColumn fx:id="accionesColumn" text="Accion" prefWidth="200"/>
+   </columns>
+   <placeholder><Label text="No hay ordenes de produccion registradas." styleClass="text-muted"/></placeholder>
+ </TableView>
+</VBox>

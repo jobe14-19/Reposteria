@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox styleClass="root" spacing="15" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.ClientePedidoFormController">
+ <stylesheets><URL value="@styles.css"/></stylesheets>
+ <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+ <HBox alignment="CENTER_LEFT" spacing="12">
+  <Label text="Nuevo Pedido - Pastel Personalizado" styleClass="text-heading" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+  <Region HBox.hgrow="ALWAYS"/>
+ </HBox>
+
+  <Separator styleClass="separator-accent"/>
+
+  <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-bg">
+  <VBox spacing="16">
+
+    <!-- Seccion 1: Contacto -->
+    <VBox styleClass="card-bordered" spacing="10">
+     <Label text="Informacion de Contacto" styleClass="text-heading-sm"/>
+    <GridPane hgap="12" vgap="10">
+     <columnConstraints><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/></columnConstraints>
+     <Label text="Cliente:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+     <TextField fx:id="clienteField" editable="false" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+     <Label text="Telefono:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+     <TextField fx:id="telefonoField" promptText="Opcional" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+     <Label text="Direccion:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+     <TextField fx:id="direccionField" promptText="Opcional" styleClass="form-field" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+     <Label text="Fecha Entrega:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+     <DatePicker fx:id="fechaPicker" styleClass="form-field" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+     <Label text="Hora Entrega:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+     <ComboBox fx:id="horaCombo" editable="true" promptText="12:00" styleClass="form-field" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+    </GridPane>
+   </VBox>
+
+    <!-- Seccion 2: Especificaciones -->
+    <VBox styleClass="card-bordered" spacing="10">
+     <Label text="Especificaciones del Pastel" styleClass="text-heading-sm"/>
+    <GridPane hgap="12" vgap="10">
+     <columnConstraints><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/></columnConstraints>
+     <Label text="Categoria:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+     <ComboBox fx:id="categoriaCombo" promptText="Seleccione..." styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+     <Label text="Base:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+     <ComboBox fx:id="baseCombo" editable="true" promptText="Bizcocho" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+     <Label text="Masa:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+     <ComboBox fx:id="masaCombo" editable="true" promptText="Tipo de masa" styleClass="form-field" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+     <Label text="Forma:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+     <ComboBox fx:id="formaCombo" editable="true" promptText="Redonda" styleClass="form-field" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+     <Label text="Pisos:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+     <Spinner fx:id="pisosSpinner" prefWidth="120" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+     <Label text="Libras:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+     <Spinner fx:id="librasSpinner" prefWidth="120" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+    </GridPane>
+   </VBox>
+
+    <!-- Seccion 3: Decoracion -->
+    <VBox styleClass="card-bordered" spacing="10">
+     <Label text="Decoracion y Detalles" styleClass="text-heading-sm"/>
+    <GridPane hgap="12" vgap="10">
+     <columnConstraints><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/></columnConstraints>
+     <Label text="Decoracion:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+     <TextArea fx:id="decoracionArea" promptText="Describe la decoracion deseada" styleClass="form-field" prefHeight="60" prefWidth="200" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+     <Label text="Lustres:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+     <TextField fx:id="lustresField" promptText="Opcional" styleClass="form-field" prefWidth="200" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+     <Label text="Camuflajes:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+     <TextField fx:id="camuflajesField" promptText="Opcional" styleClass="form-field" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+     <Label text="Flores:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+     <TextField fx:id="floresField" promptText="Opcional" styleClass="form-field" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+     <Label text="Adornos:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+     <TextField fx:id="adornosField" promptText="Opcional" styleClass="form-field" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+     <Label text="Rellenos:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+     <TextField fx:id="rellenosField" promptText="Opcional" styleClass="form-field" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+    </GridPane>
+   </VBox>
+
+    <!-- Seccion 4: Personalizacion -->
+    <VBox styleClass="card-bordered" spacing="10">
+     <Label text="Personalizacion" styleClass="text-heading-sm"/>
+    <GridPane hgap="12" vgap="10">
+     <columnConstraints><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="85"/></columnConstraints>
+     <Label text="Mensaje:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+     <TextField fx:id="mensajeField" promptText="Texto que quieres en el pastel (opcional)" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+     <Label text="Observaciones:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+     <TextArea fx:id="observacionesArea" promptText="Notas adicionales sobre el pedido" styleClass="form-field" prefHeight="60" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    </GridPane>
+   </VBox>
+
+     <!-- Seccion 5: Pago -->
+    <VBox styleClass="card-bordered" spacing="10">
+     <Label text="Informacion de Pago" styleClass="text-heading-sm"/>
+    <GridPane hgap="12" vgap="10">
+     <columnConstraints><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/><ColumnConstraints percentWidth="15"/><ColumnConstraints percentWidth="35"/></columnConstraints>
+     <Label text="Tipo de Pago:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+     <ComboBox fx:id="tipoPagoCombo" editable="true" promptText="Efectivo" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+     <Label text="Estado del Pago:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+     <ComboBox fx:id="estadoPagoCombo" editable="true" promptText="Pendiente" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+      <Label text="Pago Inmediato:" styleClass="text-muted" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+      <CheckBox fx:id="pagoInmediatoCheck" text="Pagar ahora con PayPal" styleClass="checkbox-accent" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+     </GridPane>
+
+     <VBox spacing="4" style="-fx-padding: 8 0 0 0;">
+      <Label text="Desglose de Precios" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+      <Separator/>
+      <Label fx:id="desgloseLabel" wrapText="true" style="-fx-font-size: 12px; -fx-font-family: monospace;"/>
+      <Separator/>
+      <HBox spacing="10">
+       <Label text="Total:" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+       <Label fx:id="totalLabel" text="0.00" style="-fx-text-fill: #2e7d32; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+      </HBox>
+     </VBox>
+   </VBox>
+
+  </VBox>
+ </ScrollPane>
+
+  <Separator styleClass="separator-accent"/>
+
+ <HBox alignment="CENTER_RIGHT" spacing="10">
+  <Button text="Cancelar" styleClass="btn-secondary" onAction="#cancelar"/>
+  <Button fx:id="guardarBtn" text="Guardar Pedido" styleClass="btn-primary" onAction="#guardar"/>
+ </HBox>
+</VBox>

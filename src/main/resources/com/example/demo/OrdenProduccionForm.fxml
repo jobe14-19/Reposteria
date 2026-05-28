@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox spacing="12" styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.OrdenProduccionFormController">
+ <stylesheets><URL value="@styles.css"/></stylesheets>
+ <padding><Insets top="18" right="22" bottom="18" left="22"/></padding>
+
+ <HBox alignment="CENTER_LEFT" spacing="10">
+  <Label fx:id="tituloLabel" text="Nueva Orden de Produccion" styleClass="text-heading" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+  <Region HBox.hgrow="ALWAYS"/>
+  <Label fx:id="numOrdenLabel" text="" style="-fx-text-fill: #999; -fx-font-size: 13px; -fx-font-style: italic;"/>
+ </HBox>
+
+ <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background: transparent;">
+ <VBox spacing="15" maxWidth="Infinity">
+
+  <!-- Receta -->
+  <VBox style="-fx-background-color: #FFF8F0; -fx-border-color: #E8D5C0; -fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
+   <Label text="Receta Asociada" styleClass="text-heading-sm" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+   <HBox spacing="10" alignment="CENTER_LEFT">
+    <ComboBox fx:id="recetaCombo" promptText="Seleccionar receta..." maxWidth="500" HBox.hgrow="ALWAYS"/>
+    <Button fx:id="cargarRecetaButton" text="Cargar" styleClass="btn-primary"/>
+   </HBox>
+  </VBox>
+
+  <!-- Cliente -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
+   <Label text="Informacion del Cliente" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <GridPane hgap="10" vgap="6">
+    <columnConstraints><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/></columnConstraints>
+    <Label text="Cliente:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <TextField fx:id="clienteField" promptText="Nombre del cliente" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="Telefono:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+    <TextField fx:id="telefonoField" promptText="Telefono" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+    <Label text="Direccion:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <TextField fx:id="direccionField" promptText="Direccion de entrega" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <Label text="Vendedor:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+    <TextField fx:id="vendedorField" promptText="Vendedor" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+    <Label text="Sucursal:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <ComboBox fx:id="sucursalCombo" maxWidth="Infinity" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <Label text="Fecha Entrega:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+    <DatePicker fx:id="fechaPicker" maxWidth="Infinity" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+   </GridPane>
+  </VBox>
+
+  <!-- Especificaciones Producto -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
+   <Label text="Especificaciones del Producto" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <GridPane hgap="10" vgap="6">
+    <columnConstraints><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/></columnConstraints>
+    <Label text="Categoria:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <ComboBox fx:id="categoriaCombo" maxWidth="Infinity" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="Libras:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+    <TextField fx:id="librasField" promptText="0.00" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+    <Label text="Base:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <ComboBox fx:id="baseCombo" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <Label text="Masa:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+    <ComboBox fx:id="masaCombo" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+    <Label text="Forma:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <ComboBox fx:id="formaCombo" maxWidth="Infinity" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <Label text="Pisos:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+    <TextField fx:id="pisosField" promptText="1" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+    <Label text="Revestimiento:" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+    <ComboBox fx:id="revestimientoCombo" maxWidth="Infinity" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+    <Label text="Hora Entrega:" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+    <TextField fx:id="horaField" promptText="HH:mm" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+   </GridPane>
+  </VBox>
+
+  <!-- Decoracion y Adornos -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
+   <Label text="Decoracion y Adornos" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <GridPane hgap="10" vgap="6">
+    <columnConstraints><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/></columnConstraints>
+    <Label text="Decoracion:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
+    <TextArea fx:id="decoracionArea" promptText="Describe la decoracion..." prefRowCount="2" wrapText="true" maxWidth="Infinity" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="Lustres:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <TextField fx:id="lustresField" promptText="Tipo de lustre" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <Label text="Camuflajes:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+    <TextField fx:id="camuflajesField" promptText="Camuflajes" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+    <Label text="Flores:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <TextField fx:id="floresField" promptText="Tipo de flores" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <Label text="Adornos:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+    <TextField fx:id="adornosField" promptText="Adornos" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+    <Label text="Rellenos:" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+    <TextField fx:id="rellenosField" promptText="Rellenos" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+    <Label text="Mensaje:" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+    <TextField fx:id="mensajeField" promptText="Mensaje personalizado" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+   </GridPane>
+  </VBox>
+
+  <!-- Ingredientes -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
+   <Label text="Ingredientes (desde receta)" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <Label fx:id="stockWarningLabel" text="Seleccione una receta para cargar ingredientes" style="-fx-text-fill: #FF9800; -fx-font-style: italic;" managed="false"/>
+   <TableView fx:id="ingredientesTable" prefHeight="120" maxWidth="Infinity">
+    <columns>
+     <TableColumn fx:id="ingNombreCol" text="Ingrediente" prefWidth="250"/>
+     <TableColumn fx:id="ingCantidadCol" text="Cantidad" prefWidth="120"/>
+     <TableColumn fx:id="ingUnidadCol" text="Unidad" prefWidth="100"/>
+    </columns>
+    <placeholder><Label text="Cargue una receta para ver los ingredientes."/></placeholder>
+   </TableView>
+  </VBox>
+
+  <!-- Informacion de Pago -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
+   <Label text="Informacion de Pago" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <GridPane hgap="10" vgap="6">
+    <columnConstraints><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/></columnConstraints>
+    <Label text="Forma de Pago:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <ComboBox fx:id="tipoPagoCombo" maxWidth="Infinity" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="Estado del Pago:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+    <ComboBox fx:id="estadoPagoCombo" maxWidth="Infinity" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+   </GridPane>
+  </VBox>
+
+  <!-- Costos -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
+   <Label text="Costos y Totales" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <GridPane hgap="10" vgap="6">
+    <columnConstraints><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/><ColumnConstraints percentWidth="16"/><ColumnConstraints percentWidth="34"/></columnConstraints>
+    <Label text="Costo Est.:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <TextField fx:id="costoEstField" promptText="0.00" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="Costo Real:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+    <TextField fx:id="costoRealField" promptText="0.00" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+    <Label text="Precio Venta:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <TextField fx:id="precioField" promptText="0.00" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <Label text="Anticipo:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+    <TextField fx:id="anticipoField" promptText="0.00" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+    <Label text="Saldo:" style="-fx-font-weight: bold; -fx-text-fill: #f55580;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <TextField fx:id="saldoField" editable="false" style="-fx-background-color: #FFF0E6; -fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+   </GridPane>
+  </VBox>
+
+  <!-- Observaciones -->
+  <VBox styleClass="border-light" style="-fx-border-radius: 8; -fx-padding: 12; -fx-spacing: 8;">
+   <Label text="Observaciones" styleClass="text-heading-sm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+   <TextArea fx:id="observacionesArea" promptText="Observaciones adicionales..." prefRowCount="2" wrapText="true" maxWidth="Infinity"/>
+  </VBox>
+
+ </VBox>
+ </ScrollPane>
+
+ <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding: 8 0 0 0;">
+  <Button fx:id="cancelarButton" text="Cancelar" styleClass="btn-secondary" onAction="#cancelar"/>
+  <Button fx:id="guardarButton" text="Guardar Orden" styleClass="btn-success" onAction="#guardar"/>
+ </HBox>
+</VBox>

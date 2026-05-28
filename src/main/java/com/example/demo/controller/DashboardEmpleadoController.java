@@ -1,4 +1,5 @@
 package com.example.demo.controller;
+import com.example.demo.service.Permiso;
 import com.example.demo.service.SessionManager;
 import com.example.demo.util.DatabaseConnection;
 
@@ -38,387 +39,516 @@ import javafx.scene.text.FontWeight;
 
 public class DashboardEmpleadoController {
 
-    private static final Logger LOGGER = Logger.getLogger(DashboardEmpleadoController.class.getName());
+ private static final Logger LOGGER = Logger.getLogger(DashboardEmpleadoController.class.getName());
 
-    // Constantes SQL
-    private static final String SQL_PENDIENTES_HOY =
-            "SELECT COUNT(*) as pendientes FROM pedidos WHERE estado = 'Confirmado' AND CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE)";
-    private static final String SQL_URGENTES_HOY =
-            "SELECT COUNT(*) as urgententes FROM pedidos WHERE estado = 'Confirmado' AND prioridad = 'ALTA' AND CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE)";
-    private static final String SQL_PARA_HOY =
-            "SELECT COUNT(*) as para_hoy FROM pedidos WHERE CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE)";
-    private static final String SQL_PRODUCCION_ACTIVA =
-            "SELECT TOP 5 id_produccion, producto, cantidad, progreso, estado FROM produccion WHERE estado IN ('En Progreso', 'Pendiente') ORDER BY id_produccion DESC";
-    private static final String SQL_STOCK_CRITICO =
-            "SELECT ingrediente, stock_actual, stock_minimo, (stock_minimo - stock_actual) as diferencia, CASE WHEN stock_actual < stock_minimo THEN 'CRÍTICO' WHEN stock_actual < stock_minimo * 1.2 THEN 'BAJO' ELSE 'OK' END as urgencia FROM inventario WHERE stock_actual < stock_minimo * 1.5 ORDER BY (stock_minimo - stock_actual) DESC";
-    private static final String SQL_ENTREGAS_HOY =
-            "SELECT TOP 10 FORMAT(hora_entrega, 'HH:mm') as hora, cliente, direccion, producto, estado FROM entregas WHERE CAST(fecha_entrega AS DATE) = CAST(CURRENT_TIMESTAMP AS DATE) ORDER BY hora_entrega ASC";
+  // Constantes SQL - usando ordenes_produccion como fuente principal
+  private static final String SQL_PENDIENTES_HOY =
+  "SELECT COUNT(*) as pendientes FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION') AND CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
+  private static final String SQL_URGENTES_HOY =
+  "SELECT COUNT(*) as urgententes FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION') AND fecha_entrega <= CAST(GETDATE() AS DATE) AND CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
+   private static final String SQL_PARA_HOY =
+   "SELECT COUNT(*) as para_hoy FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE)";
+   private static final String SQL_PROD_ACTIVA_EMP =
+   "SELECT COUNT(*) as total FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION')";
+   private static final String SQL_ULTIMAS_FACTURAS =
+   "SELECT TOP 10 id_factura, cliente, fecha, total, estado FROM facturas ORDER BY id_factura DESC";
+   private static final String SQL_STOCK_CRITICO_EMP =
+   "SELECT COUNT(*) as total FROM ingredientes WHERE stock_actual < stock_minimo AND estado='Activo'";
+   private static final String SQL_INGRESOS_MES =
+   "SELECT COALESCE(SUM(total), 0) as total FROM facturas WHERE MONTH(fecha) = MONTH(GETDATE()) AND YEAR(fecha) = YEAR(GETDATE()) AND estado = 'PAGADA'";
+   private static final String SQL_COMPRAS_MES =
+   "SELECT COUNT(*) as total FROM compras WHERE MONTH(fecha_compra) = MONTH(GETDATE()) AND YEAR(fecha_compra) = YEAR(GETDATE())";
+   private static final String SQL_PROX_MANTENIMIENTO =
+   "SELECT COUNT(*) as total FROM maquinas WHERE proximo_mantenimiento <= DATEADD(day, 7, GETDATE()) AND estado != 'Fuera de servicio'";
+   private static final String SQL_PRODUCCION_ACTIVA =
+   "SELECT TOP 5 id_orden as id_produccion, COALESCE(categoria, 'General') as producto, libras as cantidad, progreso, estado FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION') ORDER BY id_orden DESC";
+  private static final String SQL_STOCK_CRITICO =
+  "SELECT nombre as ingrediente, stock_actual, stock_minimo, (stock_minimo - stock_actual) as diferencia, CASE WHEN stock_actual < stock_minimo THEN N'CRÍTICO' WHEN stock_actual < stock_minimo * 1.2 THEN N'BAJO' ELSE N'OK' END as urgencia FROM ingredientes WHERE estado='Activo' AND stock_actual < stock_minimo * 1.5 ORDER BY (stock_minimo - stock_actual) DESC";
+  private static final String SQL_ENTREGAS_HOY =
+  "SELECT TOP 10 COALESCE(hora_entrega, '00:00') as hora, COALESCE(cliente, '-') as cliente, COALESCE(direccion, '-') as direccion, COALESCE(categoria, 'Pastel') as producto, estado FROM ordenes_produccion WHERE CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE) ORDER BY hora_entrega ASC";
 
-    // Constantes
-    private static final int REFRESH_INTERVAL_MS = 30000;
-    private static final String COLOR_PRIMARIO = "#8B5E3C";
-    private static final String COLOR_FONDO_NORMAL = "#F5F5F5";
-    private static final String COLOR_FONDO_FIN_SEMANA = "#FAFAFA";
-    private static final String COLOR_TEXTO_NORMAL = "#666666";
-    private static final String COLOR_TEXTO_CLARO = "#999999";
+ // Constantes
+ private static final int REFRESH_INTERVAL_MS = 30000;
+ private static final String COLOR_PRIMARIO = "#8B5E3C";
+ private static final String COLOR_FONDO_NORMAL = "#F5F5F5";
+ private static final String COLOR_FONDO_FIN_SEMANA = "#FAFAFA";
+ private static final String COLOR_TEXTO_NORMAL = "#666666";
+ private static final String COLOR_TEXTO_CLARO = "#999999";
 
-    // UI Components
-    @FXML private Label userLabel;
-    @FXML private Label lastUpdateLabel;
-    @FXML private Label pendientesHoyLabel;
-    @FXML private Label urgentesHoyLabel;
-    @FXML private Label paraHoyLabel;
-    @FXML private ListView<String> pedidosRapidosList;
-    @FXML private TableView<Produccion> produccionTable;
-    @FXML private TableColumn<Produccion, Integer> prodIdColumn;
-    @FXML private TableColumn<Produccion, String> prodProductoColumn;
-    @FXML private TableColumn<Produccion, Integer> prodCantidadColumn;
-    @FXML private TableColumn<Produccion, Double> prodProgresoColumn;
-    @FXML private TableColumn<Produccion, String> prodEstadoColumn;
-    @FXML private TableView<StockCritico> stockCriticoTable;
-    @FXML private TableColumn<StockCritico, String> alertIngredienteColumn;
-    @FXML private TableColumn<StockCritico, Double> alertActualColumn;
-    @FXML private TableColumn<StockCritico, Double> alertMinimoColumn;
-    @FXML private TableColumn<StockCritico, Double> alertDiferenciaColumn;
-    @FXML private TableColumn<StockCritico, String> alertUrgenciaColumn;
-    @FXML private TableView<Entrega> entregasTable;
-    @FXML private TableColumn<Entrega, String> entHoraColumn;
-    @FXML private TableColumn<Entrega, String> entClienteColumn;
-    @FXML private TableColumn<Entrega, String> entDireccionColumn;
-    @FXML private TableColumn<Entrega, String> entProductoColumn;
-    @FXML private TableColumn<Entrega, String> entEstadoColumn;
-    @FXML private GridPane calendarGrid;
+  // UI Components
+  @FXML private Label userLabel;
+  @FXML private Label lastUpdateLabel;
+  @FXML private Label pendientesHoyLabel;
+  @FXML private Label urgentesHoyLabel;
+  @FXML private Label paraHoyLabel;
+  @FXML private Label prodActivaEmpLabel;
+  @FXML private Label stockCriticoEmpLabel;
+  @FXML private Label ingresosMesLabel;
+  @FXML private Label comprasMesLabel;
+  @FXML private Label proxMantenimientoLabel;
+ @FXML private ListView<String> pedidosRapidosList;
+ @FXML private TableView<Produccion> produccionTable;
+ @FXML private TableColumn<Produccion, Integer> prodIdColumn;
+ @FXML private TableColumn<Produccion, String> prodProductoColumn;
+ @FXML private TableColumn<Produccion, Integer> prodCantidadColumn;
+ @FXML private TableColumn<Produccion, Double> prodProgresoColumn;
+ @FXML private TableColumn<Produccion, String> prodEstadoColumn;
+ @FXML private TableView<StockCritico> stockCriticoTable;
+ @FXML private TableColumn<StockCritico, String> alertIngredienteColumn;
+ @FXML private TableColumn<StockCritico, Double> alertActualColumn;
+ @FXML private TableColumn<StockCritico, Double> alertMinimoColumn;
+ @FXML private TableColumn<StockCritico, Double> alertDiferenciaColumn;
+ @FXML private TableColumn<StockCritico, String> alertUrgenciaColumn;
+ @FXML private TableView<Entrega> entregasTable;
+ @FXML private TableColumn<Entrega, String> entHoraColumn;
+ @FXML private TableColumn<Entrega, String> entClienteColumn;
+ @FXML private TableColumn<Entrega, String> entDireccionColumn;
+ @FXML private TableColumn<Entrega, String> entProductoColumn;
+ @FXML private TableColumn<Entrega, String> entEstadoColumn;
+ @FXML private GridPane calendarGrid;
 
-    // Navigation Buttons
-    @FXML private Button btnProduccion;
-    @FXML private Button btnEntregas;
-    @FXML private Button btnInventario;
-    @FXML private Button btnHigiene;
+ // Navigation Buttons
+  @FXML private Button btnDashboard;
+  @FXML private Button btnProduccion;
+  @FXML private Button btnEntregas;
+  @FXML private Button btnInventario;
+   @FXML private Button btnHigiene;
+    @FXML private Button btnOrdenesProduccion;
+  @FXML private Button btnChefsBox;
+  @FXML private Button btnPerfil;
+  @FXML private Button btnFacturacion;
 
-    // Content Sections
-    @FXML private VBox sectionKPIs;
-    @FXML private VBox sectionProduccion;
-    @FXML private VBox sectionStock;
-    @FXML private VBox sectionEntregas;
-    @FXML private VBox sectionCalendario;
+  // Content Sections
+ @FXML private VBox sectionKPIs;
+ @FXML private VBox sectionProduccion;
+ @FXML private VBox sectionStock;
+ @FXML private VBox sectionEntregas;
+  @FXML private VBox sectionCalendario;
+  @FXML private VBox sectionFacturas;
+  @FXML private TableView<FacturaResumen> facturasEmpTable;
+  @FXML private TableColumn<FacturaResumen, Integer> factEmpIdColumn;
+  @FXML private TableColumn<FacturaResumen, String> factEmpClienteColumn;
+  @FXML private TableColumn<FacturaResumen, String> factEmpFechaColumn;
+  @FXML private TableColumn<FacturaResumen, Double> factEmpTotalColumn;
+  @FXML private TableColumn<FacturaResumen, String> factEmpEstadoColumn;
 
-    private SessionManager sessionManager;
-    private DatabaseConnection dbConnection;
-    private Timer refreshTimer;
-    private DateTimeFormatter timeFormatter;
+  @FXML private VBox topBar;
+  private SessionManager sessionManager;
+  private DatabaseConnection dbConnection;
+  private Timer refreshTimer;
+  private boolean modoEmbedded;
+ private DateTimeFormatter timeFormatter;
 
-    @FXML
-    public void initialize() {
-        sessionManager = SessionManager.getInstance();
-        dbConnection = DatabaseConnection.getInstance();
-        timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        
-        configurarTablas();
-        filtrarVistasPorArea();
-        cargarDatosEmpleado();
-        iniciarAutoRefresh();
-        actualizarInfoUsuario();
-        actualizarTimestamp();
-        inicializarCalendario();
-    }
+  public void setModoEmbedded(boolean b) {
+  this.modoEmbedded = b;
+  if (topBar != null) { topBar.setVisible(!b); topBar.setManaged(!b); }
+  }
 
-    private void filtrarVistasPorArea() {
-        String area = sessionManager.getAreaActual();
-        
-        // Reset visibility
-        btnProduccion.setVisible(false); btnProduccion.setManaged(false);
-        btnEntregas.setVisible(false); btnEntregas.setManaged(false);
-        btnInventario.setVisible(false); btnInventario.setManaged(false);
-        btnHigiene.setVisible(false); btnHigiene.setManaged(false);
-        
-        sectionProduccion.setVisible(false); sectionProduccion.setManaged(false);
-        sectionStock.setVisible(false); sectionStock.setManaged(false);
-        sectionEntregas.setVisible(false); sectionEntregas.setManaged(false);
-        sectionCalendario.setVisible(false); sectionCalendario.setManaged(false);
-        
-        if (SessionManager.AREA_PRODUCCION.equals(area) || SessionManager.AREA_DECORACION.equals(area)) {
-            btnProduccion.setVisible(true); btnProduccion.setManaged(true);
-            btnInventario.setVisible(true); btnInventario.setManaged(true);
-            sectionProduccion.setVisible(true); sectionProduccion.setManaged(true);
-            sectionStock.setVisible(true); sectionStock.setManaged(true);
-            sectionCalendario.setVisible(true); sectionCalendario.setManaged(true);
-        } else if (SessionManager.AREA_DELIVERY.equals(area)) {
-            btnEntregas.setVisible(true); btnEntregas.setManaged(true);
-            sectionEntregas.setVisible(true); sectionEntregas.setManaged(true);
-            sectionKPIs.setVisible(false); sectionKPIs.setManaged(false); // No necesita KPIs de producción
-        } else if (SessionManager.AREA_VENTAS.equals(area)) {
-            btnInventario.setVisible(true); btnInventario.setManaged(true);
-            btnEntregas.setVisible(true); btnEntregas.setManaged(true);
-            sectionStock.setVisible(true); sectionStock.setManaged(true);
-            sectionEntregas.setVisible(true); sectionEntregas.setManaged(true);
-            sectionCalendario.setVisible(true); sectionCalendario.setManaged(true);
-        } else if (SessionManager.AREA_ATENCION_CLIENTE.equals(area)) {
-            btnEntregas.setVisible(true); btnEntregas.setManaged(true);
-            sectionEntregas.setVisible(true); sectionEntregas.setManaged(true);
-            sectionCalendario.setVisible(true); sectionCalendario.setManaged(true);
-        } else if (SessionManager.AREA_ADMINISTRACION.equals(area)) {
-            btnProduccion.setVisible(true); btnProduccion.setManaged(true);
-            btnEntregas.setVisible(true); btnEntregas.setManaged(true);
-            btnInventario.setVisible(true); btnInventario.setManaged(true);
-            btnHigiene.setVisible(true); btnHigiene.setManaged(true);
-            sectionProduccion.setVisible(true); sectionProduccion.setManaged(true);
-            sectionStock.setVisible(true); sectionStock.setManaged(true);
-            sectionEntregas.setVisible(true); sectionEntregas.setManaged(true);
-            sectionCalendario.setVisible(true); sectionCalendario.setManaged(true);
-        } else if (SessionManager.AREA_LIMPIEZA.equals(area)) {
-            btnHigiene.setVisible(true); btnHigiene.setManaged(true);
-            sectionKPIs.setVisible(false); sectionKPIs.setManaged(false);
-        }
-    }
+  @FXML
+  public void initialize() {
+  sessionManager = SessionManager.getInstance();
+  dbConnection = DatabaseConnection.getInstance();
+ timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+ 
+ configurarTablas();
+ filtrarVistasPorArea();
+ cargarDatosEmpleado();
+ iniciarAutoRefresh();
+ actualizarInfoUsuario();
+ actualizarTimestamp();
+ inicializarCalendario();
+ }
+
+  private void filtrarVistasPorArea() {
+  btnProduccion.setVisible(false); btnProduccion.setManaged(false);
+  btnEntregas.setVisible(false); btnEntregas.setManaged(false);
+  btnInventario.setVisible(false); btnInventario.setManaged(false);
+  btnHigiene.setVisible(false); btnHigiene.setManaged(false);
+  btnOrdenesProduccion.setVisible(false); btnOrdenesProduccion.setManaged(false);
+
+  sectionProduccion.setVisible(false); sectionProduccion.setManaged(false);
+  sectionStock.setVisible(false); sectionStock.setManaged(false);
+  sectionEntregas.setVisible(false); sectionEntregas.setManaged(false);
+  sectionCalendario.setVisible(false); sectionCalendario.setManaged(false);
+  sectionFacturas.setVisible(false); sectionFacturas.setManaged(false);
+
+   boolean puedeProduccion = sessionManager.tienePermiso(Permiso.PRODUCCION_LEER);
+   boolean puedeInventario = sessionManager.tienePermiso(Permiso.INVENTARIO_LEER);
+   boolean puedeEntregas = sessionManager.tienePermiso(Permiso.ENTREGAS_LEER);
+   boolean puedeLimpieza = sessionManager.tienePermiso(Permiso.LIMPIEZA_LEER);
+   boolean puedePedidos = sessionManager.tienePermiso(Permiso.PEDIDOS_LEER);
+   boolean puedeFacturacion = sessionManager.tienePermiso(Permiso.FACTURACION_LEER);
+
+  if (puedeProduccion) {
+  btnProduccion.setVisible(true); btnProduccion.setManaged(true);
+  sectionProduccion.setVisible(true); sectionProduccion.setManaged(true);
+  sectionCalendario.setVisible(true); sectionCalendario.setManaged(true);
+  }
+  if (puedeInventario) {
+  btnInventario.setVisible(true); btnInventario.setManaged(true);
+  sectionStock.setVisible(true); sectionStock.setManaged(true);
+  }
+  if (puedeEntregas) {
+  btnEntregas.setVisible(true); btnEntregas.setManaged(true);
+  sectionEntregas.setVisible(true); sectionEntregas.setManaged(true);
+  }
+   if (puedeLimpieza) {
+   btnHigiene.setVisible(true); btnHigiene.setManaged(true);
+   }
+   if (puedePedidos) {
+   btnOrdenesProduccion.setVisible(true); btnOrdenesProduccion.setManaged(true);
+   }
+   if (puedeFacturacion) {
+   btnFacturacion.setVisible(true); btnFacturacion.setManaged(true);
+   sectionFacturas.setVisible(true); sectionFacturas.setManaged(true);
+   }
+  // KPIs siempre visibles para cualquier perfil con dashboard de empleado
+  sectionKPIs.setVisible(true); sectionKPIs.setManaged(true);
+  }
 
 
-    private void configurarTablas() {
-        prodIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        prodProductoColumn.setCellValueFactory(new PropertyValueFactory<>("producto"));
-        prodCantidadColumn.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
-        prodProgresoColumn.setCellValueFactory(new PropertyValueFactory<>("progreso"));
-        prodEstadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
-        alertIngredienteColumn.setCellValueFactory(new PropertyValueFactory<>("ingrediente"));
-        alertActualColumn.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
-        alertMinimoColumn.setCellValueFactory(new PropertyValueFactory<>("stockMinimo"));
-        alertDiferenciaColumn.setCellValueFactory(new PropertyValueFactory<>("diferencia"));
-        alertUrgenciaColumn.setCellValueFactory(new PropertyValueFactory<>("urgencia"));
-        entHoraColumn.setCellValueFactory(new PropertyValueFactory<>("hora"));
-        entClienteColumn.setCellValueFactory(new PropertyValueFactory<>("cliente"));
-        entDireccionColumn.setCellValueFactory(new PropertyValueFactory<>("direccion"));
-        entProductoColumn.setCellValueFactory(new PropertyValueFactory<>("producto"));
-        entEstadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
-    }
+ private void configurarTablas() {
+ prodIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+ prodProductoColumn.setCellValueFactory(new PropertyValueFactory<>("producto"));
+ prodCantidadColumn.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
+ prodProgresoColumn.setCellValueFactory(new PropertyValueFactory<>("progreso"));
+ prodEstadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
+ alertIngredienteColumn.setCellValueFactory(new PropertyValueFactory<>("ingrediente"));
+ alertActualColumn.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
+ alertMinimoColumn.setCellValueFactory(new PropertyValueFactory<>("stockMinimo"));
+ alertDiferenciaColumn.setCellValueFactory(new PropertyValueFactory<>("diferencia"));
+ alertUrgenciaColumn.setCellValueFactory(new PropertyValueFactory<>("urgencia"));
+ entHoraColumn.setCellValueFactory(new PropertyValueFactory<>("hora"));
+ entClienteColumn.setCellValueFactory(new PropertyValueFactory<>("cliente"));
+ entDireccionColumn.setCellValueFactory(new PropertyValueFactory<>("direccion"));
+ entProductoColumn.setCellValueFactory(new PropertyValueFactory<>("producto"));
+  entEstadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
 
-    private void cargarDatosEmpleado() {
-        if (!sessionManager.isLoggedIn()) return;
-        try (Connection conn = dbConnection.getConnection()) {
-            cargarKPIs(conn);
-            cargarProduccion(conn);
-            cargarStockCritico(conn);
-            cargarEntregasHoy(conn);
-        } catch (SQLException e) {
-            LOGGER.log(Level.INFO, "Modo offline: usando datos de demostración");
-            pendientesHoyLabel.setText("--");
-            urgentesHoyLabel.setText("--");
-            paraHoyLabel.setText("--");
-            produccionTable.setItems(FXCollections.observableArrayList());
-            stockCriticoTable.setItems(FXCollections.observableArrayList());
-            entregasTable.setItems(FXCollections.observableArrayList());
-        }
-    }
+  factEmpIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+  factEmpClienteColumn.setCellValueFactory(new PropertyValueFactory<>("cliente"));
+  factEmpFechaColumn.setCellValueFactory(new PropertyValueFactory<>("fecha"));
+  factEmpTotalColumn.setCellValueFactory(new PropertyValueFactory<>("total"));
+  factEmpEstadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
+  factEmpEstadoColumn.setCellFactory(col -> new TableCell<>() {
+  private final Label badge = new Label();
+  private final HBox hbox = new HBox(5);
+  { badge.setStyle("-fx-background-radius: 12; -fx-padding: 4 8; -fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white;"); hbox.getChildren().add(badge); }
+  @Override protected void updateItem(String item, boolean empty) {
+  super.updateItem(item, empty);
+  if (empty || item == null) { setGraphic(null); return; }
+  String color = "EMITIDA".equals(item) ? "#28A745" : "PAGADA".equals(item) ? "#007BFF" : "#FF9800";
+  badge.setStyle("-fx-background-radius: 12; -fx-padding: 4 8; -fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: " + color + ";");
+  badge.setText(item);
+  setGraphic(hbox);
+  }
+  });
+  }
 
-    private void cargarKPIs(Connection conn) {
-        ejecutarConsulta(conn, SQL_PENDIENTES_HOY, "pendientes", pendientesHoyLabel);
-        ejecutarConsulta(conn, SQL_URGENTES_HOY, "urgententes", urgentesHoyLabel);
-        ejecutarConsulta(conn, SQL_PARA_HOY, "para_hoy", paraHoyLabel);
-    }
+ private void cargarDatosEmpleado() {
+ if (!sessionManager.isLoggedIn()) return;
+  try (Connection conn = dbConnection.getConnection()) {
+  cargarKPIs(conn);
+  } catch (SQLException e) {
+   LOGGER.log(Level.INFO, "KPI no disponibles: {0}", e.getMessage());
+   pendientesHoyLabel.setText("--");
+   urgentesHoyLabel.setText("--");
+   paraHoyLabel.setText("--");
+   prodActivaEmpLabel.setText("--");
+   stockCriticoEmpLabel.setText("--");
+   }
+   try (Connection conn = dbConnection.getConnection()) {
+   cargarPedidosRapidos(conn);
+   } catch (Exception e) {
+    LOGGER.log(Level.INFO, "Pedidos rapidos no disponibles: {0}", e.getMessage());
+   }
+   try (Connection conn = dbConnection.getConnection()) {
+ cargarProduccion(conn);
+ } catch (SQLException e) {
+ LOGGER.log(Level.INFO, "Producción no disponible: {0}", e.getMessage());
+ produccionTable.setItems(FXCollections.observableArrayList());
+ }
+ try (Connection conn = dbConnection.getConnection()) {
+ cargarStockCritico(conn);
+ } catch (SQLException e) {
+ LOGGER.log(Level.INFO, "Stock crítico no disponible: {0}", e.getMessage());
+ stockCriticoTable.setItems(FXCollections.observableArrayList());
+ }
+  try (Connection conn = dbConnection.getConnection()) {
+  cargarEntregasHoy(conn);
+  } catch (SQLException e) {
+  LOGGER.log(Level.INFO, "Entregas no disponibles: {0}", e.getMessage());
+  entregasTable.setItems(FXCollections.observableArrayList());
+  }
+  try (Connection conn = dbConnection.getConnection()) {
+  cargarFacturasEmp(conn);
+  } catch (SQLException e) {
+  LOGGER.log(Level.INFO, "Facturas no disponibles: {0}", e.getMessage());
+  facturasEmpTable.setItems(FXCollections.observableArrayList());
+  }
+  }
 
-    private void ejecutarConsulta(Connection conn, String sql, String columna, Label label) {
-        try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) label.setText(String.valueOf(rs.getInt(columna)));
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
-        }
-    }
+  private void cargarKPIs(Connection conn) {
+  ejecutarConsulta(conn, SQL_PENDIENTES_HOY, "pendientes", pendientesHoyLabel);
+  ejecutarConsulta(conn, SQL_URGENTES_HOY, "urgententes", urgentesHoyLabel);
+  ejecutarConsulta(conn, SQL_PARA_HOY, "para_hoy", paraHoyLabel);
+  ejecutarConsulta(conn, SQL_PROD_ACTIVA_EMP, "total", prodActivaEmpLabel);
+  ejecutarConsulta(conn, SQL_STOCK_CRITICO_EMP, "total", stockCriticoEmpLabel);
+  ejecutarConsultaDecimal(conn, SQL_INGRESOS_MES, "total", ingresosMesLabel);
+  ejecutarConsulta(conn, SQL_COMPRAS_MES, "total", comprasMesLabel);
+  ejecutarConsulta(conn, SQL_PROX_MANTENIMIENTO, "total", proxMantenimientoLabel);
+  }
 
-    private void cargarProduccion(Connection conn) throws SQLException {
-        ObservableList<Produccion> list = FXCollections.observableArrayList();
-        try (PreparedStatement stmt = conn.prepareStatement(SQL_PRODUCCION_ACTIVA); ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                list.add(new Produccion(rs.getInt("id_produccion"), rs.getString("producto"), rs.getInt("cantidad"), rs.getDouble("progreso"), rs.getString("estado")));
-            }
-        }
-        produccionTable.setItems(list);
-    }
+  private void ejecutarConsulta(Connection conn, String sql, String columna, Label label) {
+  try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+  if (rs.next()) label.setText(String.valueOf(rs.getInt(columna)));
+  } catch (SQLException e) {
+  LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+  }
+  }
 
-    private void cargarStockCritico(Connection conn) throws SQLException {
-        ObservableList<StockCritico> list = FXCollections.observableArrayList();
-        try (PreparedStatement stmt = conn.prepareStatement(SQL_STOCK_CRITICO); ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                list.add(new StockCritico(rs.getString("ingrediente"), rs.getDouble("stock_actual"), rs.getDouble("stock_minimo"), rs.getDouble("diferencia"), rs.getString("urgencia")));
-            }
-        }
-        stockCriticoTable.setItems(list);
-    }
+  private void ejecutarConsultaDecimal(Connection conn, String sql, String columna, Label label) {
+  try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+  if (rs.next()) label.setText("RD$" + String.format("%.2f", rs.getDouble(columna)));
+  } catch (SQLException e) {
+  LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+  }
+  }
 
-    private void cargarEntregasHoy(Connection conn) throws SQLException {
-        ObservableList<Entrega> list = FXCollections.observableArrayList();
-        try (PreparedStatement stmt = conn.prepareStatement(SQL_ENTREGAS_HOY); ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                list.add(new Entrega(rs.getString("hora"), rs.getString("cliente"), rs.getString("direccion"), rs.getString("producto"), rs.getString("estado")));
-            }
-        }
-        entregasTable.setItems(list);
-    }
+ private void cargarProduccion(Connection conn) throws SQLException {
+ ObservableList<Produccion> list = FXCollections.observableArrayList();
+ try (PreparedStatement stmt = conn.prepareStatement(SQL_PRODUCCION_ACTIVA); ResultSet rs = stmt.executeQuery()) {
+ while (rs.next()) {
+ list.add(new Produccion(rs.getInt("id_produccion"), rs.getString("producto"), rs.getInt("cantidad"), rs.getDouble("progreso"), rs.getString("estado")));
+ }
+ }
+ produccionTable.setItems(list);
+ }
 
-    private void inicializarCalendario() {
-        calendarGrid.getChildren().clear();
-        LocalDate today = LocalDate.now();
-        YearMonth currentMonth = YearMonth.from(today);
-        String[] dias = {"Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"};
-        for (int i = 0; i < dias.length; i++) {
-            Label header = new Label(dias[i]);
-            header.setStyle("-fx-font-weight: bold; -fx-text-fill: " + COLOR_PRIMARIO + "; -fx-font-size: 12px;");
-            calendarGrid.add(header, i, 0);
-        }
-        LocalDate firstDay = currentMonth.atDay(1);
-        int startDayOfWeek = firstDay.getDayOfWeek().getValue() % 7;
-        for (int day = 1; day <= currentMonth.lengthOfMonth(); day++) {
-            int row = (startDayOfWeek + day - 1) / 7 + 1;
-            int col = (startDayOfWeek + day - 1) % 7;
-            VBox dayBox = crearDayBox(day, currentMonth, today);
-            calendarGrid.add(dayBox, col, row);
-        }
-    }
+ private void cargarStockCritico(Connection conn) throws SQLException {
+ ObservableList<StockCritico> list = FXCollections.observableArrayList();
+ try (PreparedStatement stmt = conn.prepareStatement(SQL_STOCK_CRITICO); ResultSet rs = stmt.executeQuery()) {
+ while (rs.next()) {
+ list.add(new StockCritico(rs.getString("ingrediente"), rs.getDouble("stock_actual"), rs.getDouble("stock_minimo"), rs.getDouble("diferencia"), rs.getString("urgencia")));
+ }
+ }
+ stockCriticoTable.setItems(list);
+ }
 
-    private VBox crearDayBox(int day, YearMonth currentMonth, LocalDate today) {
-        VBox box = new VBox(5);
-        box.setAlignment(Pos.CENTER);
-        box.setPadding(new Insets(5));
-        Label label = new Label(String.valueOf(day));
-        label.setStyle("-fx-font-size: 12px;");
-        LocalDate currentDay = currentMonth.atDay(day);
-        if (currentDay.equals(today)) {
-            box.setStyle("-fx-background-color: " + COLOR_PRIMARIO + "; -fx-background-radius: 8;");
-            label.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
-        } else if (currentDay.getDayOfWeek() == DayOfWeek.SATURDAY || currentDay.getDayOfWeek() == DayOfWeek.SUNDAY) {
-            box.setStyle("-fx-background-color: " + COLOR_FONDO_FIN_SEMANA + ";");
-            label.setStyle("-fx-text-fill: " + COLOR_TEXTO_CLARO + ";");
-        } else {
-            box.setStyle("-fx-background-color: " + COLOR_FONDO_NORMAL + ";");
-            label.setStyle("-fx-text-fill: " + COLOR_TEXTO_NORMAL + ";");
-        }
-        box.getChildren().add(label);
-        return box;
-    }
+ private void cargarEntregasHoy(Connection conn) throws SQLException {
+ ObservableList<Entrega> list = FXCollections.observableArrayList();
+ try (PreparedStatement stmt = conn.prepareStatement(SQL_ENTREGAS_HOY); ResultSet rs = stmt.executeQuery()) {
+ while (rs.next()) {
+ list.add(new Entrega(rs.getString("hora"), rs.getString("cliente"), rs.getString("direccion"), rs.getString("producto"), rs.getString("estado")));
+ }
+ }
+ entregasTable.setItems(list);
+ }
 
-    private void iniciarAutoRefresh() {
-        refreshTimer = new Timer(true);
-        refreshTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                javafx.application.Platform.runLater(() -> {
-                    cargarDatosEmpleado();
-                    actualizarTimestamp();
-                });
-            }
-        }, REFRESH_INTERVAL_MS, REFRESH_INTERVAL_MS);
-    }
+   private void cargarPedidosRapidos(Connection conn) {
+   ObservableList<String> items = FXCollections.observableArrayList();
+   String sql = "SELECT TOP 5 'Orden #' + CAST(id_orden AS VARCHAR) + ' - ' + cliente + ' (' + FORMAT(fecha_entrega, 'dd/MM') + ')' as item FROM ordenes_produccion WHERE estado IN ('ACTIVA','EN PRODUCCION') AND CAST(fecha_entrega AS DATE) = CAST(GETDATE() AS DATE) ORDER BY fecha_entrega ASC";
+   try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+   while (rs.next()) items.add(rs.getString("item"));
+   } catch (SQLException e) { LOGGER.log(Level.WARNING, "Error pedidos rapidos: {0}", e.getMessage()); }
+   if (items.isEmpty()) items.add("No hay pedidos urgentes hoy");
+   pedidosRapidosList.setItems(items);
+   }
 
-    private void actualizarInfoUsuario() {
-        if (sessionManager.isLoggedIn()) userLabel.setText("👤 " + sessionManager.getUsuarioActual() + " (EMPLEADO)");
-    }
+   private void cargarFacturasEmp(Connection conn) throws SQLException {
+  ObservableList<FacturaResumen> list = FXCollections.observableArrayList();
+  try (PreparedStatement stmt = conn.prepareStatement(SQL_ULTIMAS_FACTURAS); ResultSet rs = stmt.executeQuery()) {
+  while (rs.next()) {
+  list.add(new FacturaResumen(
+  rs.getInt("id_factura"),
+  rs.getString("cliente"),
+  rs.getString("fecha") != null ? rs.getString("fecha") : "",
+  rs.getDouble("total"),
+  rs.getString("estado")));
+  }
+  }
+  facturasEmpTable.setItems(list);
+  }
 
-    private void actualizarTimestamp() {
-        lastUpdateLabel.setText("Última actualización: " + LocalDateTime.now().format(timeFormatter));
-    }
+  private void inicializarCalendario() {
+ calendarGrid.getChildren().clear();
+ LocalDate today = LocalDate.now();
+ YearMonth currentMonth = YearMonth.from(today);
+ String[] dias = {"Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"};
+ for (int i = 0; i < dias.length; i++) {
+ Label header = new Label(dias[i]);
+ header.setStyle("-fx-font-weight: bold; -fx-text-fill: " + COLOR_PRIMARIO + "; -fx-font-size: 12px;");
+ calendarGrid.add(header, i, 0);
+ }
+ LocalDate firstDay = currentMonth.atDay(1);
+ int startDayOfWeek = firstDay.getDayOfWeek().getValue() % 7;
+ for (int day = 1; day <= currentMonth.lengthOfMonth(); day++) {
+ int row = (startDayOfWeek + day - 1) / 7 + 1;
+ int col = (startDayOfWeek + day - 1) % 7;
+ VBox dayBox = crearDayBox(day, currentMonth, today);
+ calendarGrid.add(dayBox, col, row);
+ }
+ }
 
-    @FXML private void cerrarSesion(ActionEvent e) {
-        if (refreshTimer != null) refreshTimer.cancel();
-        sessionManager.cerrarSesion();
-        try {
-            Stage stage = (Stage) userLabel.getScene().getWindow();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml")), 1280, 720));
-            stage.setTitle("🍰 Pastelería Rosato - Sistema de Gestión");
-        } catch (Exception ex) { LOGGER.log(Level.SEVERE, "Error: {0}", ex.getMessage()); }
-    }
+ private VBox crearDayBox(int day, YearMonth currentMonth, LocalDate today) {
+ VBox box = new VBox(5);
+ box.setAlignment(Pos.CENTER);
+ box.setPadding(new Insets(5));
+ Label label = new Label(String.valueOf(day));
+ label.setStyle("-fx-font-size: 12px;");
+ LocalDate currentDay = currentMonth.atDay(day);
+ if (currentDay.equals(today)) {
+ box.setStyle("-fx-background-color: " + COLOR_PRIMARIO + "; -fx-background-radius: 8;");
+ label.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+ } else if (currentDay.getDayOfWeek() == DayOfWeek.SATURDAY || currentDay.getDayOfWeek() == DayOfWeek.SUNDAY) {
+ box.setStyle("-fx-background-color: " + COLOR_FONDO_FIN_SEMANA + ";");
+ label.setStyle("-fx-text-fill: " + COLOR_TEXTO_CLARO + ";");
+ } else {
+ box.setStyle("-fx-background-color: " + COLOR_FONDO_NORMAL + ";");
+ label.setStyle("-fx-text-fill: " + COLOR_TEXTO_NORMAL + ";");
+ }
+ box.getChildren().add(label);
+ return box;
+ }
 
-    @FXML private void mostrarDashboard(ActionEvent e) { cargarDatosEmpleado(); actualizarTimestamp(); }
-    @FXML private void mostrarProduccion(ActionEvent e) { navegarAVista("Planificacion.fxml", "Gestión de Producción"); }
-    @FXML private void mostrarEntregas(ActionEvent e) { navegarAVista("Entregas.fxml", "Gestión de Entregas"); }
-    @FXML private void mostrarInventario(ActionEvent e) { navegarAVista("Inventario.fxml", "Gestión de Inventario"); }
-    @FXML private void mostrarHigiene(ActionEvent e) { navegarAVista("Limpieza.fxml", "Gestión de Higiene"); }
+ private void iniciarAutoRefresh() {
+ refreshTimer = new Timer(true);
+ refreshTimer.scheduleAtFixedRate(new TimerTask() {
+ @Override
+ public void run() {
+ javafx.application.Platform.runLater(() -> {
+ cargarDatosEmpleado();
+ actualizarTimestamp();
+ });
+ }
+ }, REFRESH_INTERVAL_MS, REFRESH_INTERVAL_MS);
+ }
 
-    @FXML
-    private void verMiPerfil(ActionEvent e) {
-        try {
-            Stage stage = new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/MiPerfil.fxml")), 800, 600));
-            stage.setTitle("🍰 Pastelería Rosato - Mi Perfil");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.show();
-        } catch (Exception ex) { mostrarError("Error", "No se pudo abrir perfil"); }
-    }
+ private void actualizarInfoUsuario() {
+ if (sessionManager.isLoggedIn()) userLabel.setText(" " + sessionManager.getUsuarioActual() + " (EMPLEADO)");
+ }
 
-    private void navegarAVista(String fxmlName, String titulo) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/" + fxmlName));
-            Parent viewRoot = loader.load();
+ private void actualizarTimestamp() {
+ lastUpdateLabel.setText("Última actualización: " + LocalDateTime.now().format(timeFormatter));
+ }
 
-            BorderPane wrapper = new BorderPane();
-            HBox navBar = new HBox(15);
-            navBar.setPadding(new Insets(15, 30, 15, 30));
-            navBar.setStyle("-fx-background-color: #8B5E3C; -fx-border-color: #7A4D2B; -fx-border-width: 0 0 2 0;");
-            navBar.setAlignment(Pos.CENTER_LEFT);
+ @FXML private void cerrarSesion(ActionEvent e) {
+ if (refreshTimer != null) refreshTimer.cancel();
+ sessionManager.cerrarSesion();
+ try {
+ Stage stage = (Stage) userLabel.getScene().getWindow();
+ stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/Login.fxml")), 1280, 720));
+ stage.setTitle(" Repostería Rosato - Sistema de Gestión");
+ } catch (Exception ex) { LOGGER.log(Level.SEVERE, "Error: {0}", ex.getMessage()); }
+ }
 
-            Button btnVolver = new Button("← Volver al Dashboard");
-            btnVolver.setStyle("-fx-background-color: white; -fx-text-fill: #8B5E3C; -fx-font-weight: bold; -fx-background-radius: 10;");
-            btnVolver.setOnAction(e -> {
-                try {
-                    Parent dashboardRoot = FXMLLoader.load(getClass().getResource("/com/example/demo/DashboardEmpleado.fxml"));
-                    Stage stage = (Stage) btnVolver.getScene().getWindow();
-                    stage.getScene().setRoot(dashboardRoot);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.SEVERE, "Error: {0}", ex.getMessage());
-                }
-            });
+ @FXML private void mostrarDashboard(ActionEvent e) { cargarDatosEmpleado(); actualizarTimestamp(); }
+ @FXML private void mostrarProduccion(ActionEvent e) { navegarAVista("Planificacion.fxml", "Gestión de Producción"); }
+ @FXML private void mostrarEntregas(ActionEvent e) { navegarAVista("Entregas.fxml", "Gestión de Entregas"); }
+ @FXML private void mostrarInventario(ActionEvent e) { navegarAVista("Inventario.fxml", "Gestión de Inventario"); }
+ @FXML private void mostrarHigiene(ActionEvent e) { navegarAVista("Limpieza.fxml", "Gestión de Higiene"); }
+   @FXML private void mostrarChefsBox(ActionEvent e) { navegarAVista("ChefsBox.fxml", "Chef's Box"); }
+    @FXML private void mostrarOrdenesProduccion(ActionEvent e) { navegarAVista("OrdenesProduccion.fxml", "Ordenes de Produccion"); }
+  @FXML private void mostrarFacturacion(ActionEvent e) { navegarAVista("Factura.fxml", "Facturación"); }
 
-            Label title = new Label(titulo);
-            title.setFont(Font.font("System", FontWeight.BOLD, 18));
-            title.setStyle("-fx-text-fill: white;");
+ @FXML
+ private void verMiPerfil(ActionEvent e) {
+ try {
+ Stage stage = new Stage();
+ stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/com/example/demo/MiPerfil.fxml")), 800, 600));
+ stage.setTitle(" Repostería Rosato - Mi Perfil");
+ stage.initModality(Modality.APPLICATION_MODAL);
+ stage.show();
+ } catch (Exception ex) { mostrarError("Error", "No se pudo abrir perfil"); }
+ }
 
-            navBar.getChildren().addAll(btnVolver, title);
-            wrapper.setTop(navBar);
-            wrapper.setCenter(viewRoot);
+ private void navegarAVista(String fxmlName, String titulo) {
+ try {
+ FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/" + fxmlName));
+ Parent viewRoot = loader.load();
 
-            Stage stage = (Stage) userLabel.getScene().getWindow();
-            stage.getScene().setRoot(wrapper);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al navegar a {0}: {1}", new Object[]{fxmlName, e.getMessage()});
-            mostrarError("Error", "No se pudo abrir " + titulo);
-        }
-    }
+ BorderPane wrapper = new BorderPane();
+ HBox navBar = new HBox(15);
+ navBar.setPadding(new Insets(15, 30, 15, 30));
+ navBar.setStyle("-fx-background-color: #8B5E3C; -fx-border-color: #7A4D2B; -fx-border-width: 0 0 2 0;");
+ navBar.setAlignment(Pos.CENTER_LEFT);
 
-    private void mostrarError(String t, String m) { mostrarAlerta(Alert.AlertType.ERROR, t, m); }
-    private void mostrarMensaje(String t, String m) { mostrarAlerta(Alert.AlertType.INFORMATION, t, m); }
-    private void mostrarAlerta(Alert.AlertType tipo, String t, String m) {
-        Alert a = new Alert(tipo); a.setTitle(t); a.setHeaderText(null); a.setContentText(m); a.showAndWait();
-    }
+ Button btnVolver = new Button("← Cerrar");
+ btnVolver.setStyle("-fx-background-color: white; -fx-text-fill: #8B5E3C; -fx-font-weight: bold; -fx-background-radius: 10;");
+ btnVolver.setOnAction(e -> {
+ Stage stage = (Stage) btnVolver.getScene().getWindow();
+ stage.close();
+ });
 
-    public static class Produccion {
-        private int id; private String producto; private int cantidad; private double progreso; private String estado;
-        public Produccion(int id, String producto, int cantidad, double progreso, String estado) {
-            this.id = id; this.producto = producto; this.cantidad = cantidad; this.progreso = progreso; this.estado = estado;
-        }
-        public int getId() { return id; }
-        public String getProducto() { return producto; }
-        public int getCantidad() { return cantidad; }
-        public double getProgreso() { return progreso; }
-        public String getEstado() { return estado; }
-    }
+ Label title = new Label(titulo);
+ title.setFont(Font.font("System", FontWeight.BOLD, 18));
+ title.setStyle("-fx-text-fill: white;");
 
-    public static class StockCritico {
-        private String ingrediente; private double stockActual; private double stockMinimo; private double diferencia; private String urgencia;
-        public StockCritico(String i, double sa, double sm, double d, String u) {
-            this.ingrediente = i; this.stockActual = sa; this.stockMinimo = sm; this.diferencia = d; this.urgencia = u;
-        }
-        public String getIngrediente() { return ingrediente; }
-        public double getStockActual() { return stockActual; }
-        public double getStockMinimo() { return stockMinimo; }
-        public double getDiferencia() { return diferencia; }
-        public String getUrgencia() { return urgencia; }
-    }
+ navBar.getChildren().addAll(btnVolver, title);
+ wrapper.setTop(navBar);
+ wrapper.setCenter(viewRoot);
 
-    public static class Entrega {
-        private String hora; private String cliente; private String direccion; private String producto; private String estado;
-        public Entrega(String h, String c, String d, String p, String e) {
-            this.hora = h; this.cliente = c; this.direccion = d; this.producto = p; this.estado = e;
-        }
-        public String getHora() { return hora; }
-        public String getCliente() { return cliente; }
-        public String getDireccion() { return direccion; }
-        public String getProducto() { return producto; }
-        public String getEstado() { return estado; }
-    }
+ Stage newStage = new Stage();
+ Scene scene = new Scene(wrapper, 1280, 720);
+ newStage.setScene(scene);
+ newStage.setTitle(" Repostería Rosato - " + titulo);
+ newStage.show();
+ } catch (Exception e) {
+ LOGGER.log(Level.SEVERE, "Error al navegar a {0}: {1}", new Object[]{fxmlName, e.getMessage()});
+ mostrarError("Error", "No se pudo abrir " + titulo);
+ }
+ }
+
+ private void mostrarError(String t, String m) { mostrarAlerta(Alert.AlertType.ERROR, t, m); }
+ private void mostrarMensaje(String t, String m) { mostrarAlerta(Alert.AlertType.INFORMATION, t, m); }
+ private void mostrarAlerta(Alert.AlertType tipo, String t, String m) {
+ Alert a = new Alert(tipo); a.setTitle(t); a.setHeaderText(null); a.setContentText(m); a.showAndWait();
+ }
+
+ public static class Produccion {
+ private int id; private String producto; private int cantidad; private double progreso; private String estado;
+ public Produccion(int id, String producto, int cantidad, double progreso, String estado) {
+ this.id = id; this.producto = producto; this.cantidad = cantidad; this.progreso = progreso; this.estado = estado;
+ }
+ public int getId() { return id; }
+ public String getProducto() { return producto; }
+ public int getCantidad() { return cantidad; }
+ public double getProgreso() { return progreso; }
+ public String getEstado() { return estado; }
+ }
+
+ public static class StockCritico {
+ private String ingrediente; private double stockActual; private double stockMinimo; private double diferencia; private String urgencia;
+ public StockCritico(String i, double sa, double sm, double d, String u) {
+ this.ingrediente = i; this.stockActual = sa; this.stockMinimo = sm; this.diferencia = d; this.urgencia = u;
+ }
+ public String getIngrediente() { return ingrediente; }
+ public double getStockActual() { return stockActual; }
+ public double getStockMinimo() { return stockMinimo; }
+ public double getDiferencia() { return diferencia; }
+ public String getUrgencia() { return urgencia; }
+ }
+
+ public static class Entrega {
+ private String hora; private String cliente; private String direccion; private String producto; private String estado;
+ public Entrega(String h, String c, String d, String p, String e) {
+ this.hora = h; this.cliente = c; this.direccion = d; this.producto = p; this.estado = e;
+ }
+ public String getHora() { return hora; }
+ public String getCliente() { return cliente; }
+ public String getDireccion() { return direccion; }
+ public String getProducto() { return producto; }
+  public String getEstado() { return estado; }
+  }
+
+  public static class FacturaResumen {
+  private int id; private String cliente; private String fecha; private double total; private String estado;
+  public FacturaResumen(int id, String c, String f, double t, String e) {
+  this.id = id; this.cliente = c; this.fecha = f; this.total = t; this.estado = e;
+  }
+  public int getId() { return id; }
+  public String getCliente() { return cliente; }
+  public String getFecha() { return fecha; }
+  public double getTotal() { return total; }
+  public String getEstado() { return estado; }
+  }
 }
