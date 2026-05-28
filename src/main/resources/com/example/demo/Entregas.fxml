@@ -41,7 +41,7 @@
 
  <TableView fx:id="pedidosPendientesTable" styleClass="delivery-table">
  <columns>
- <TableColumn fx:id="pendienteIdColumn" text="ID Pedido" prefWidth="80"/>
+  <TableColumn fx:id="pendienteIdColumn" text="ID Orden" prefWidth="80"/>
  <TableColumn fx:id="pendienteClienteColumn" text="Cliente" prefWidth="150"/>
  <TableColumn fx:id="pendienteDireccionColumn" text="Dirección" prefWidth="200"/>
  <TableColumn fx:id="pendienteTotalColumn" text="Total" prefWidth="100"/>

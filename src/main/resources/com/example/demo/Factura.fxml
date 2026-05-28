@@ -56,6 +56,7 @@
    <VBox spacing="5" HBox.hgrow="ALWAYS" alignment="BOTTOM_LEFT">
     <Label text="Método de Pago:" styleClass="text-muted-sm"/>
     <ComboBox fx:id="metodoPagoCombo" prefWidth="160" styleClass="form-field"/>
+    <Button text="Pagar Monto" fx:id="pagarBtn" styleClass="btn-success" onAction="#handlePagar"/>
    </VBox>
   </HBox>
  </VBox>

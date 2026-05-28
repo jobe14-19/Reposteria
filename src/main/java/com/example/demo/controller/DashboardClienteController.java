@@ -50,9 +50,9 @@ public class DashboardClienteController {
   private static final String SQL_TOTAL_PEDIDO =
   "SELECT id_pedido, total, producto, estado_pago FROM pedidos WHERE id_pedido = ?";
   private static final String SQL_ACTUALIZAR_ESTADO_PAGO =
-  "UPDATE pedidos SET adelanto = total, estado_pago = 'Pagado', tipo_pago = 'PayPal' WHERE id_pedido = ?";
+  "UPDATE pedidos SET adelanto = total, estado_pago = 'PAGADO', tipo_pago = 'PayPal' WHERE id_pedido = ?";
   private static final String SQL_ACTUALIZAR_ORDEN_PAGO =
-  "UPDATE ordenes_produccion SET anticipo = precio_venta, saldo = 0, estado_pago = 'Pagado', tipo_pago = 'PayPal' WHERE id_pedido = ?";
+  "UPDATE ordenes_produccion SET anticipo = precio_venta, saldo = 0, estado_pago = 'PAGADO', tipo_pago = 'PayPal' WHERE id_pedido = ?";
 
  private static final int REFRESH_INTERVAL_MS = 30000;
  private static final int PUNTOS_POR_GASTO = 10;
@@ -122,10 +122,10 @@ public class DashboardClienteController {
      if (empty || est == null) { setText(null); setStyle(""); return; }
      setText(est);
      String bg;
-     switch (est != null ? est : "") {
-      case "Pagado": bg = "#28A745"; break;
-      case "En Proceso": bg = "#FF9800"; break;
-      case "Pendiente": bg = "#DC3545"; break;
+      switch (est != null ? est : "") {
+       case "PAGADO": bg = "#28A745"; break;
+       case "PAGADO_PARCIAL": bg = "#FF9800"; break;
+       case "Pendiente": bg = "#DC3545"; break;
       default: bg = "#6C757D";
      }
      setStyle("-fx-background-color: " + bg + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 4 8; -fx-background-radius: 4;");
@@ -384,7 +384,8 @@ private void verChefsBox(ActionEvent event) {
       double total = rs.getDouble("total");
       String producto = rs.getString("producto");
       if (total <= 0) { mostrarError("Sin Precio", "El administrador aun no ha asignado un precio a este pedido."); return; }
-      if ("Pagado".equals(rs.getString("estado_pago"))) { mostrarMensaje("Ya Pagado", "Este pedido ya fue pagado."); return; }
+      String ep = rs.getString("estado_pago");
+      if ("PAGADO".equals(ep) || "Pagado".equals(ep)) { mostrarMensaje("Ya Pagado", "Este pedido ya fue pagado."); return; }
       PayPalService paypal = new PayPalService();
       PayPalCheckoutResult res = paypal.crearCheckoutSession(total, producto, sessionManager.getUsuarioActual(), pedidoView.getId());
       if (!res.ok) { mostrarError("Error de Pago", res.url); return; }

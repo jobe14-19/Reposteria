@@ -2,7 +2,17 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-              name="Reporte_OrdenProduccion" language="java" pageWidth="612" pageHeight="792" columnWidth="576" leftMargin="18" rightMargin="18" topMargin="18" bottomMargin="18">
+               name="Reporte_OrdenProduccion" language="java" pageWidth="612" pageHeight="792" columnWidth="576" leftMargin="18" rightMargin="18" topMargin="18" bottomMargin="18">
+
+ <style name="title" fontName="Arial" fontSize="18" isBold="true" forecolor="#6c4540"/>
+ <style name="subtitle" fontName="Arial" fontSize="9" forecolor="#6c4540"/>
+ <style name="section-header" fontName="Arial" fontSize="8" isBold="true" forecolor="#ffffff" backcolor="#6c4540"/>
+ <style name="section-border" mode="Opaque" backcolor="#FFF8F5" forecolor="#f5ede8"/>
+ <style name="label" fontName="Arial" fontSize="9" isBold="true" forecolor="#6c4540"/>
+ <style name="value" fontName="Arial" fontSize="9" forecolor="#333333"/>
+ <style name="total-label" fontName="Arial" fontSize="10" isBold="true" forecolor="#6c4540"/>
+ <style name="total-value" fontName="Arial" fontSize="12" isBold="true" forecolor="#6c4540"/>
+ <style name="separator" forecolor="#dccbc6"/>
 
  <parameter name="ORDEN" class="java.lang.String"/>
  <parameter name="ESTADO" class="java.lang.String"/>
@@ -37,17 +47,6 @@
  <parameter name="ENVIO" class="java.math.BigDecimal"/>
  <parameter name="TOTAL" class="java.math.BigDecimal"/>
 
- <style name="title" fontName="Arial" fontSize="18" isBold="true" forecolor="#6c4540"/>
- <style name="subtitle" fontName="Arial" fontSize="9" forecolor="#6c4540"/>
-
- <style name="section-header" fontName="Arial" fontSize="8" isBold="true" forecolor="#ffffff" backcolor="#6c4540"/>
- <style name="section-border" mode="Opaque" backcolor="#FFF8F5" forecolor="#f5ede8"/>
- <style name="label" fontName="Arial" fontSize="9" isBold="true" forecolor="#6c4540"/>
- <style name="value" fontName="Arial" fontSize="9" forecolor="#333333"/>
- <style name="total-label" fontName="Arial" fontSize="10" isBold="true" forecolor="#6c4540"/>
- <style name="total-value" fontName="Arial" fontSize="12" isBold="true" forecolor="#6c4540"/>
- <style name="separator" forecolor="#dccbc6"/>
-
  <title>
   <band height="74" splitType="Stretch">
    <!-- Dark header background -->
@@ -79,37 +78,41 @@
     <text><![CDATA[ORDEN DE PRODUCCION]]></text>
    </staticText>
    <!-- Order number -->
-   <staticText>
+   <textField>
     <reportElement x="290" y="24" width="272" height="12" forecolor="#e0d0c8"/>
     <textElement textAlignment="Right" verticalAlignment="Middle">
      <font fontName="Arial" size="10" isBold="true"/>
     </textElement>
     <textFieldExpression><![CDATA["No. " + ($P{ORDEN} != null ? $P{ORDEN} : "")]]></textFieldExpression>
-   </staticText>
+   </textField>
    <!-- Status badge area -->
    <rectangle>
     <reportElement x="14" y="48" width="140" height="20" mode="Opaque" forecolor="#FFF8F5" backcolor="#FFF8F5">
      <printWhenExpression><![CDATA["PENDIENTE".equals($P{ESTADO})]]></printWhenExpression>
-    </rectangle>
+    </reportElement>
+   </rectangle>
    <rectangle>
     <reportElement x="14" y="48" width="140" height="20" mode="Opaque" forecolor="#FFF3CD" backcolor="#FFF3CD">
      <printWhenExpression><![CDATA["EN PRODUCCION".equals($P{ESTADO}) || "ACTIVA".equals($P{ESTADO})]]></printWhenExpression>
-    </rectangle>
+    </reportElement>
+   </rectangle>
    <rectangle>
     <reportElement x="14" y="48" width="140" height="20" mode="Opaque" forecolor="#D4EDDA" backcolor="#D4EDDA">
      <printWhenExpression><![CDATA["COMPLETADA".equals($P{ESTADO}) || "ENTREGADA".equals($P{ESTADO})]]></printWhenExpression>
-    </rectangle>
+    </reportElement>
+   </rectangle>
    <rectangle>
     <reportElement x="14" y="48" width="140" height="20" mode="Opaque" forecolor="#F8D7DA" backcolor="#F8D7DA">
      <printWhenExpression><![CDATA["CANCELADA".equals($P{ESTADO})]]></printWhenExpression>
-    </rectangle>
+    </reportElement>
+   </rectangle>
    <!-- Status label -->
    <textField>
-    <reportElement x="14" y="48" width="140" height="20"/>
-    <textElement textAlignment="Center" verticalAlignment="Middle">
-     <font fontName="Arial" size="10" isBold="true" forecolor="#6c4540"/>
-    </textElement>
-    <textFieldExpression><![CDATA[$P{ESTADO}]]></textFieldExpression>
+     <reportElement x="14" y="48" width="140" height="20" forecolor="#6c4540"/>
+      <textElement textAlignment="Center" verticalAlignment="Middle">
+       <font fontName="Arial" size="10" isBold="true"/>
+      </textElement>
+     <textFieldExpression><![CDATA[$P{ESTADO}]]></textFieldExpression>
    </textField>
    <!-- Category label -->
    <staticText>
@@ -119,13 +122,13 @@
     </textElement>
     <text><![CDATA[Categoria:]]></text>
    </staticText>
-   <textField>
-    <reportElement x="240" y="48" width="160" height="20"/>
-    <textElement verticalAlignment="Middle">
-     <font fontName="Arial" size="10" isBold="true" forecolor="#8B5E3C"/>
-    </textElement>
-    <textFieldExpression><![CDATA[$P{CATEGORIA}]]></textFieldExpression>
-   </textField>
+    <textField forecolor="#8B5E3C">
+     <reportElement x="240" y="48" width="160" height="20"/>
+     <textElement verticalAlignment="Middle">
+      <font fontName="Arial" size="10" isBold="true"/>
+     </textElement>
+     <textFieldExpression><![CDATA[$P{CATEGORIA}]]></textFieldExpression>
+    </textField>
    <!-- Date -->
    <staticText>
     <reportElement x="430" y="48" width="70" height="20" forecolor="#9a7a75"/>
@@ -134,13 +137,13 @@
     </textElement>
     <text><![CDATA[Emision:]]></text>
    </staticText>
-   <textField>
-    <reportElement x="500" y="48" width="76" height="20"/>
-    <textElement textAlignment="Right" verticalAlignment="Middle">
-     <font fontName="Arial" size="9" forecolor="#6c4540"/>
-    </textElement>
-    <textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yy HH:mm").format(new java.util.Date())]]></textFieldExpression>
-   </textField>
+    <textField forecolor="#6c4540">
+     <reportElement x="500" y="48" width="76" height="20"/>
+     <textElement textAlignment="Right" verticalAlignment="Middle">
+      <font fontName="Arial" size="9"/>
+     </textElement>
+     <textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+    </textField>
    <!-- Bottom separator -->
    <line>
     <reportElement x="0" y="72" width="576" height="1" forecolor="#dccbc6"/>
@@ -573,13 +576,13 @@
     </textElement>
     <text><![CDATA[Mensaje en masilla:]]></text>
    </staticText>
-   <textField>
-    <reportElement x="10" y="136" width="556" height="34"/>
-    <textElement>
-     <font fontName="Arial" size="10" isItalic="true" forecolor="#555555"/>
-    </textElement>
-    <textFieldExpression><![CDATA[$P{MENSAJE}]]></textFieldExpression>
-   </textField>
+    <textField forecolor="#555555">
+     <reportElement x="10" y="136" width="556" height="34"/>
+     <textElement>
+      <font fontName="Arial" size="10" isItalic="true"/>
+     </textElement>
+     <textFieldExpression><![CDATA[$P{MENSAJE}]]></textFieldExpression>
+    </textField>
    <line>
     <reportElement x="0" y="172" width="576" height="1" forecolor="#e8ddd5"/>
    </line>
@@ -590,13 +593,13 @@
     </textElement>
     <text><![CDATA[Observaciones:]]></text>
    </staticText>
-   <textField>
-    <reportElement x="10" y="194" width="556" height="60"/>
-    <textElement>
-     <font fontName="Arial" size="9" forecolor="#555555"/>
-    </textElement>
-    <textFieldExpression><![CDATA[$P{OBSERVACION}]]></textFieldExpression>
-   </textField>
+    <textField forecolor="#555555">
+     <reportElement x="10" y="194" width="556" height="60"/>
+     <textElement>
+      <font fontName="Arial" size="9"/>
+     </textElement>
+     <textFieldExpression><![CDATA[$P{OBSERVACION}]]></textFieldExpression>
+    </textField>
   </band>
  </detail>
 

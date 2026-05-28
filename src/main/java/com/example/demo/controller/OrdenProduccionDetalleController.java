@@ -1,17 +1,23 @@
 package com.example.demo.controller;
 
 import com.example.demo.dao.OrdenProduccionDAO;
+import com.example.demo.dao.PagoDAO;
 import com.example.demo.dao.RecetaDAO;
 import com.example.demo.model.OrdenProduccion;
 import com.example.demo.model.OrdenProduccion.OrdenFase;
 import com.example.demo.model.OrdenProduccion.OrdenHistorial;
 import com.example.demo.model.OrdenProduccion.OrdenIngrediente;
+import com.example.demo.model.Pago;
 import com.example.demo.model.Receta;
 import com.example.demo.service.ReportService;
 import com.example.demo.service.SessionManager;
 
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import com.example.demo.service.PayPalService;
+import javafx.application.Platform;
+import java.awt.Desktop;
+import java.net.URI;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -26,6 +32,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -48,7 +55,15 @@ public class OrdenProduccionDetalleController {
     @FXML private Label decoracionLabel, lustresLabel, camuflajesLabel, floresLabel;
     @FXML private Label mensajeLabel, adornosLabel, rellenosLabel, observacionesLabel;
     @FXML private Label progresoLabel, pausadoLabel;
-    @FXML private Label tipoPagoLabel, estadoPagoLabel, fechaInicioLabel, fechaCompletadoLabel;
+    @FXML private Label fechaInicioLabel, fechaCompletadoLabel;
+
+    @FXML private Label estadoPagoBadge, totalPagoLabel, pagadoLabel, saldoPendienteLabel;
+    @FXML private TextField montoPagoField;
+    @FXML private ComboBox<String> metodoPagoCombo;
+    @FXML private Button registrarPagoBtn;
+    @FXML private TableView<Pago> pagosTable;
+    @FXML private TableColumn<Pago, String> pagoFechaCol, pagoMetodoCol, pagoRefCol;
+    @FXML private TableColumn<Pago, Double> pagoMontoCol;
 
     @FXML private ProgressBar progresoBar;
     @FXML private ComboBox<String> estadoCombo;
@@ -64,6 +79,7 @@ public class OrdenProduccionDetalleController {
     @FXML private TableColumn<OrdenHistorial, String> histAccionCol, histDetalleCol, histUsuarioCol, histFechaCol;
 
     private OrdenProduccionDAO ordenDAO;
+    private PagoDAO pagoDAO;
     private OrdenProduccion orden;
     private int ordenId;
 
@@ -76,6 +92,7 @@ public class OrdenProduccionDetalleController {
     @FXML
     public void initialize() {
         if (ordenDAO == null) ordenDAO = new OrdenProduccionDAO();
+        pagoDAO = new PagoDAO();
         configurarCombos();
         configurarTablas();
         if (ordenId > 0) cargarOrden();
@@ -89,6 +106,10 @@ public class OrdenProduccionDetalleController {
         verRecetaBtn.setOnAction(e -> verReceta());
         editarBtn.setOnAction(e -> editarOrden());
         imprimirBtn.setOnAction(e -> imprimirOrden());
+
+        metodoPagoCombo.getItems().addAll("Efectivo", "Tarjeta de Credito", "Tarjeta de Debito", "Transferencia", "Yappy", "PayPal", "Otro");
+        metodoPagoCombo.setValue("Efectivo");
+        registrarPagoBtn.setOnAction(e -> registrarPagoAction());
     }
 
     private void configurarTablas() {
@@ -110,6 +131,18 @@ public class OrdenProduccionDetalleController {
         histDetalleCol.setCellValueFactory(d -> new javafx.beans.property.SimpleStringProperty(d.getValue().getDetalle()));
         histUsuarioCol.setCellValueFactory(d -> new javafx.beans.property.SimpleStringProperty(d.getValue().getUsuario()));
         histFechaCol.setCellValueFactory(d -> new javafx.beans.property.SimpleStringProperty(d.getValue().getFechaHoraStr()));
+
+        pagoFechaCol.setCellValueFactory(d -> new javafx.beans.property.SimpleStringProperty(d.getValue().getFechaPago()));
+        pagoMontoCol.setCellValueFactory(d -> new javafx.beans.property.SimpleObjectProperty<>(d.getValue().getMonto()));
+        pagoMontoCol.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Double m, boolean empty) {
+                super.updateItem(m, empty);
+                if (empty || m == null) { setText(null); return; }
+                setText("RD$" + String.format("%.2f", m));
+            }
+        });
+        pagoMetodoCol.setCellValueFactory(d -> new javafx.beans.property.SimpleStringProperty(d.getValue().getMetodoPago()));
+        pagoRefCol.setCellValueFactory(d -> new javafx.beans.property.SimpleStringProperty(d.getValue().getReferencia()));
     }
 
     private void cargarOrden() {
@@ -143,17 +176,7 @@ public class OrdenProduccionDetalleController {
         anticipoLabel.setText("RD$" + String.format("%.2f", orden.getAnticipo()));
         saldoLabel.setText("RD$" + String.format("%.2f", orden.getSaldo()));
 
-        tipoPagoLabel.setText(orden.getTipoPago() != null ? orden.getTipoPago() : "Efectivo");
-        String ep = orden.getEstadoPago() != null ? orden.getEstadoPago() : "Pendiente";
-        estadoPagoLabel.setText(ep);
-        String epBg;
-        switch (ep) {
-            case "Pagado": epBg = "#28A745"; break;
-            case "En Proceso": epBg = "#FF9800"; break;
-            case "Pendiente": epBg = "#DC3545"; break;
-            default: epBg = "#6C757D";
-        }
-        estadoPagoLabel.setStyle("-fx-background-color: " + epBg + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2 8; -fx-background-radius: 4;");
+        actualizarSeccionPago();
 
         fechaInicioLabel.setText(orden.getFechaInicioStr());
         fechaCompletadoLabel.setText(orden.getFechaCompletadoStr());
@@ -186,6 +209,39 @@ public class OrdenProduccionDetalleController {
         cargarFases();
         ingredientesTable.setItems(FXCollections.observableArrayList(orden.getIngredientes()));
         historialTable.setItems(FXCollections.observableArrayList(orden.getHistorial()));
+    }
+
+    private void actualizarSeccionPago() {
+        double total = orden.getPrecioVenta();
+        double anticipo = orden.getAnticipo();
+        double saldo = orden.getSaldo();
+
+        totalPagoLabel.setText("RD$" + String.format("%.2f", total));
+        pagadoLabel.setText("RD$" + String.format("%.2f", anticipo));
+        saldoPendienteLabel.setText("RD$" + String.format("%.2f", saldo));
+
+        String estadoDisplay;
+        String estadoBg;
+        if ("PAGADO".equals(orden.getEstadoPago()) || "Pagado".equals(orden.getEstadoPago()) || saldo <= 0) {
+            estadoDisplay = "Pagado Total";
+            estadoBg = "#28A745";
+        } else if (anticipo > 0) {
+            estadoDisplay = "Pagado Parcial";
+            estadoBg = "#FF9800";
+        } else {
+            estadoDisplay = "Pendiente";
+            estadoBg = "#DC3545";
+        }
+        estadoPagoBadge.setText(estadoDisplay);
+        estadoPagoBadge.setStyle("-fx-background-color: " + estadoBg + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 4 12; -fx-background-radius: 4;");
+
+        int idPedido = orden.getIdPedido();
+        if (idPedido > 0) {
+            List<Pago> pagos = pagoDAO.listarPorPedido(idPedido);
+            pagosTable.setItems(FXCollections.observableArrayList(pagos));
+        } else {
+            pagosTable.setItems(FXCollections.observableArrayList());
+        }
     }
 
     private String getEstadoColor(String est) {
@@ -557,6 +613,136 @@ public class OrdenProduccionDetalleController {
             LOGGER.log(Level.SEVERE, "Error al imprimir orden: {0}", e.getMessage());
             mostrarError("Error", "No se pudo generar el reporte: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void registrarPagoAction() {
+        if (orden == null) return;
+
+        double saldo = orden.getSaldo();
+        if (saldo <= 0) {
+            mostrarMensaje("Orden Pagada", "Esta orden ya se encuentra totalmente pagada.");
+            return;
+        }
+
+        String montoStr = montoPagoField.getText().trim();
+        if (montoStr.isEmpty()) {
+            mostrarError("Monto requerido", "Debe ingresar un monto para registrar el pago.");
+            return;
+        }
+
+        double monto;
+        try {
+            monto = Double.parseDouble(montoStr);
+        } catch (NumberFormatException e) {
+            mostrarError("Monto inv\u00e1lido", "El monto ingresado no es un n\u00famero v\u00e1lido.");
+            return;
+        }
+
+        if (monto <= 0) {
+            mostrarError("Monto inv\u00e1lido", "El monto debe ser mayor que cero.");
+            return;
+        }
+
+        if (monto > saldo) {
+            mostrarError("Monto excedido", "El monto a pagar (RD$" + String.format("%.2f", monto) +
+                ") no puede exceder el saldo pendiente de RD$" + String.format("%.2f", saldo) + ".");
+            return;
+        }
+
+        String metodo = metodoPagoCombo.getValue();
+        String usuario = SessionManager.getInstance().getUsuarioActual();
+
+        if ("PayPal".equals(metodo)) {
+            ejecutarPagoPayPal(monto, usuario);
+        } else {
+            if (ordenDAO.registrarPagoCompleto(orden.getId(), metodo, "", monto, usuario)) {
+                mostrarMensaje("Pago Registrado", "El pago de RD$" + String.format("%.2f", monto) +
+                    " ha sido registrado exitosamente.");
+                cargarOrden();
+                montoPagoField.clear();
+            } else {
+                mostrarError("Error", "No se pudo registrar el pago. Verifique los datos o consulte al administrador.");
+            }
+        }
+    }
+
+    private void ejecutarPagoPayPal(double monto, String usuario) {
+        int idPedido = ordenDAO.asegurarPedidoVinculadoConConex(null, orden.getId());
+        if (idPedido <= 0) {
+            // Re-attempt using a normal connection fallback inside the method
+            try (java.sql.Connection c = com.example.demo.util.DatabaseConnection.getInstance().getConnection()) {
+                idPedido = ordenDAO.asegurarPedidoVinculadoConConex(c, orden.getId());
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Error securing connection for PayPal", ex);
+            }
+        }
+        
+        if (idPedido <= 0) {
+            mostrarError("Error", "No se pudo vincular la orden con un pedido para el pago con PayPal.");
+            return;
+        }
+
+        final int finalIdPedido = idPedido;
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Pago con PayPal");
+        confirm.setHeaderText("Orden " + orden.getNumeroOrden());
+        confirm.setContentText("Se iniciará el pago de RD$" + String.format("%.2f", monto) + " con PayPal.\nSe abrirá el navegador para completar el pago. ¿Continuar?");
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
+
+        new Thread(() -> {
+            try {
+                PayPalService paypal = new PayPalService();
+                PayPalService.PayPalCheckoutResult result = paypal.crearCheckoutSession(monto,
+                    "Orden " + orden.getNumeroOrden() + " - Pago de cliente", null, finalIdPedido);
+
+                if (!result.ok) {
+                    Platform.runLater(() -> mostrarError("Error", "No se pudo iniciar el pago con PayPal:\n" + result.url));
+                    return;
+                }
+
+                String finalUrl = result.url;
+                Platform.runLater(() -> {
+                    Alert info = new Alert(Alert.AlertType.INFORMATION);
+                    info.setTitle("Redirigiendo a PayPal");
+                    info.setHeaderText(null);
+                    info.setContentText("Se abrirá el navegador para completar el pago.\nEspera mientras confirmamos el pago...");
+                    info.show();
+                    try {
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().browse(new URI(finalUrl));
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.WARNING, "Error al abrir navegador: {0}", ex.getMessage());
+                    }
+                });
+
+                boolean confirmado = false;
+                for (int i = 0; i < 100; i++) {
+                    Thread.sleep(3000);
+                    if (paypal.verificarPago(result.sessionId)) {
+                        ordenDAO.registrarPagoCompleto(orden.getId(), "PayPal", "PayPal Checkout Session ID: " + result.sessionId, monto, usuario);
+                        confirmado = true;
+                        break;
+                    }
+                }
+
+                boolean finalConfirmado = confirmado;
+                Platform.runLater(() -> {
+                    if (finalConfirmado) {
+                        cargarOrden();
+                        mostrarMensaje("Pago Exitoso", "El pago de RD$" + String.format("%.2f", monto) + " con PayPal ha sido confirmado y la factura ha sido generada/actualizada.");
+                    } else {
+                        mostrarMensaje("Pago Pendiente", "El pago no se pudo confirmar en el tiempo esperado. Puede verificar la transacción en PayPal.");
+                    }
+                });
+
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error en pago PayPal: {0}", e.getMessage());
+                Platform.runLater(() -> mostrarError("Error de Pago", "Ocurrió un error al procesar el pago:\n" + e.getMessage()));
+            }
+        }).start();
     }
 
     private void mostrarMensaje(String t, String m) {

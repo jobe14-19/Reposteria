@@ -1,4 +1,5 @@
 package com.example.demo.controller;
+import com.example.demo.dao.OrdenProduccionDAO;
 import com.example.demo.service.SessionManager;
 import com.example.demo.util.DatabaseConnection;
 
@@ -20,17 +21,14 @@ public class EntregaModalController {
 
  private static final Logger LOGGER = Logger.getLogger(EntregaModalController.class.getName());
 
- // Constantes SQL usando Text Blocks (Java 15+)
  private static final String SQL_PEDIDOS_PENDIENTES = """
- SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente,
- c.direccion, p.total, p.adelanto,
- p.total - p.adelanto as saldo,
- CASE WHEN p.tipo_entrega = 'L' THEN 'Local' ELSE 'Delivery' END as tipo
- FROM pedidos p
- INNER JOIN clientes c ON p.id_cliente = c.id_cliente
- WHERE p.estado IN ('Confirmado', 'Pendiente', 'Listo para entregar')
- AND (p.total - p.adelanto) > 0
- ORDER BY p.fecha_entrega
+ SELECT o.id_orden, o.numero_orden, o.cliente as nombre_cliente,
+ ISNULL(o.direccion, '') as direccion, o.precio_venta as total, o.anticipo as adelanto,
+ o.saldo,
+ CASE WHEN ISNULL(o.tipo_entrega, 'L') = 'L' THEN 'Local' ELSE 'Delivery' END as tipo
+  FROM ordenes_produccion o
+  WHERE o.estado IN ('LISTO_PARA_ENTREGAR', 'COMPLETADA')
+  ORDER BY o.fecha_entrega
  """;
 
  private static final String SQL_INSERTAR_PAGO = """
@@ -40,8 +38,20 @@ public class EntregaModalController {
 
  private static final String SQL_ACTUALIZAR_PEDIDO = """
  UPDATE pedidos SET estado = 'Entregado', fecha_entrega_real = CURRENT_TIMESTAMP,
- tipo_entrega = ?, direccion_entrega = ?, costo_delivery = ?
+ tipo_entrega = ?, direccion_entrega = ?, costo_delivery = ?,
+ adelanto = adelanto + ?, total = ?
  WHERE id_pedido = ?
+ """;
+
+ private static final String SQL_ACTUALIZAR_ORDEN = """
+ UPDATE ordenes_produccion SET estado = 'ENTREGADA', fecha_completado = GETDATE(), fecha_entregado = GETDATE(),
+ anticipo = anticipo + ?, saldo = saldo - ?, estado_pago = ?, tipo_pago = ?
+ WHERE id_orden = ?
+ """;
+
+ private static final String SQL_ACTUALIZAR_FACTURA = """
+ UPDATE facturas SET estado = 'PAGADA', pagado = 'SI', metodo_pago = ?
+ WHERE id_orden = ?
  """;
 
  private static final String SQL_REGISTRAR_ACTIVIDAD = """
@@ -49,10 +59,7 @@ public class EntregaModalController {
   VALUES (CURRENT_TIMESTAMP, ?, ?, ?)
   """;
 
- private static final String SQL_INSERTAR_FACTURA_PEDIDO = """
-  INSERT INTO facturas (id_orden, cliente, telefono, direccion, fecha, subtotal, costo_delivery, itbis, descuento, total, estado, detalles, usuario_genera, fecha_generacion)
-  VALUES (NULL, ?, ?, ?, CAST(GETDATE() AS DATE), ?, ?, ?, 0, ?, 'EMITIDA', ?, ?, GETDATE())
-  """;
+
 
  // Constantes
  private static final double BASE_DELIVERY_COST = 5.0;
@@ -88,14 +95,17 @@ public class EntregaModalController {
  // Services and Managers
  private DatabaseConnection dbConnection;
  private SessionManager sessionManager;
+ private OrdenProduccionDAO ordenDAO;
  private EntregasController.PedidoPendiente pedidoActual;
  private double costoDelivery = 0.0;
  private Map<String, EntregasController.PedidoPendiente> pedidoMap = new HashMap<>();
+ private int idPedidoVinculado = 0;
 
- @FXML
- public void initialize() {
- dbConnection = DatabaseConnection.getInstance();
- sessionManager = SessionManager.getInstance();
+  @FXML
+  public void initialize() {
+  dbConnection = DatabaseConnection.getInstance();
+  sessionManager = SessionManager.getInstance();
+  ordenDAO = new OrdenProduccionDAO();
 
  initializeRadioButtons();
  initializePaymentCombo();
@@ -125,20 +135,20 @@ public class EntregaModalController {
  pedidoComboBox.getItems().clear();
  pedidoMap.clear();
 
- while (rs.next()) {
- int id = rs.getInt("id_pedido");
- String nombre = rs.getString("nombre_cliente");
- String direccion = rs.getString("direccion");
- double total = rs.getDouble("total");
- double adelanto = rs.getDouble("adelanto");
- double saldo = rs.getDouble("saldo");
- String tipo = rs.getString("tipo");
+  while (rs.next()) {
+  int id = rs.getInt("id_orden");
+  String nombre = rs.getString("nombre_cliente");
+  String direccion = rs.getString("direccion");
+  double total = rs.getDouble("total");
+  double adelanto = rs.getDouble("adelanto");
+  double saldo = rs.getDouble("saldo");
+  String tipo = rs.getString("tipo");
 
- EntregasController.PedidoPendiente pedido = new EntregasController.PedidoPendiente(id, nombre, direccion, total, adelanto, saldo, tipo);
- String display = "#" + id + " - " + nombre + " ($" + String.format("%.2f", saldo) + ")";
- pedidoComboBox.getItems().add(display);
- pedidoMap.put(display, pedido);
- }
+  EntregasController.PedidoPendiente pedido = new EntregasController.PedidoPendiente(id, nombre, direccion, total, adelanto, saldo, tipo);
+  String display = "#" + id + " - " + nombre + " ($" + String.format("%.2f", saldo) + ")";
+  pedidoComboBox.getItems().add(display);
+  pedidoMap.put(display, pedido);
+  }
 
  } catch (SQLException e) {
  LOGGER.log(Level.SEVERE, "Error al cargar pedidos pendientes: {0}", e.getMessage());
@@ -266,19 +276,28 @@ public class EntregaModalController {
  conn = dbConnection.getConnection();
  conn.setAutoCommit(false);
 
- registrarPago(conn);
- actualizarPedido(conn);
- registrarActividad("REGISTRAR ENTREGA",
- "Entrega registrada para pedido #" + pedidoActual.getId() + " - Monto: $" + montoCobrarField.getText());
+  // Asegurar que exista un pedido vinculado a la orden de producción
+  int idOrden = pedidoActual.getId();
+  String usuario = sessionManager.getUsuarioActual();
+  idPedidoVinculado = ordenDAO.asegurarPedidoVinculadoConConex(conn, idOrden);
+  if (idPedidoVinculado <= 0) {
+  throw new SQLException("No se pudo crear/vincular un pedido para la orden #" + idOrden);
+  }
 
-  generarFacturaPedido(conn);
+  registrarPago(conn);
+  actualizarPedido(conn);
+  actualizarOrdenProduccion(conn, idOrden);
+  actualizarFactura(conn, idOrden);
+  registrarActividad("REGISTRAR ENTREGA",
+  "Entrega registrada para orden #" + idOrden + " - Monto: $" + montoCobrarField.getText());
+
   conn.commit();
 
   enviarWhatsAppSimulado();
 
   mostrarMensaje("Entrega Registrada",
   "La entrega ha sido registrada correctamente.\n\n" + 
-  "Factura generada automáticamente.\n" + 
+  "La factura fue generada al completar la producción.\n" + 
   "Comprobante enviado por WhatsApp.");
 
  cerrarModal();
@@ -295,7 +314,7 @@ public class EntregaModalController {
  String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
  String referencia = PAGO_EFECTIVO.equals(metodo) ? null : obtenerTexto(referenciaField);
 
- stmt.setInt(1, pedidoActual.getId());
+  stmt.setInt(1, idPedidoVinculado);
  stmt.setDouble(2, obtenerMontoCobrar());
  stmt.setString(3, metodo);
  stmt.setString(4, referencia);
@@ -308,11 +327,41 @@ public class EntregaModalController {
  String tipoEntrega = localRadioButton.isSelected() ? TIPO_ENTREGA_LOCAL : TIPO_ENTREGA_DELIVERY;
  String direccion = deliveryRadioButton.isSelected() ? obtenerTexto(direccionField) : null;
  double deliveryCost = deliveryRadioButton.isSelected() ? costoDelivery : 0.0;
+ double monto = obtenerMontoCobrar();
+ double total = pedidoActual.getTotal();
 
  stmt.setString(1, tipoEntrega);
  stmt.setString(2, direccion);
  stmt.setDouble(3, deliveryCost);
- stmt.setInt(4, pedidoActual.getId());
+ stmt.setDouble(4, monto);
+ stmt.setDouble(5, total);
+ stmt.setInt(6, idPedidoVinculado);
+ stmt.executeUpdate();
+ }
+ }
+
+ private void actualizarOrdenProduccion(Connection conn, int idOrden) throws SQLException {
+ double monto = obtenerMontoCobrar();
+ double nuevoAnticipo = pedidoActual.getAdelanto() + monto;
+ double nuevoSaldo = pedidoActual.getTotal() - nuevoAnticipo;
+ String estadoPago = nuevoSaldo <= 0 ? "PAGADO" : "PAGADO_PARCIAL";
+ String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
+
+ try (PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_ORDEN)) {
+ stmt.setDouble(1, monto);
+ stmt.setDouble(2, monto);
+ stmt.setString(3, estadoPago);
+ stmt.setString(4, metodo);
+ stmt.setInt(5, idOrden);
+ stmt.executeUpdate();
+ }
+ }
+
+ private void actualizarFactura(Connection conn, int idOrden) throws SQLException {
+ String metodo = metodoPagoComboBox.getSelectionModel().getSelectedItem();
+ try (PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_FACTURA)) {
+ stmt.setString(1, metodo);
+ stmt.setInt(2, idOrden);
  stmt.executeUpdate();
  }
  }
@@ -373,48 +422,12 @@ public class EntregaModalController {
  return (texto != null && !texto.isBlank()) ? Double.parseDouble(texto) : 0.0;
  } catch (NumberFormatException e) {
  return 0.0;
- }
+  }
  }
 
  private String obtenerTexto(TextField field) {
  return field.getText() == null ? "" : field.getText().trim();
  }
-
-  private void generarFacturaPedido(Connection conn) throws SQLException {
-  if (pedidoActual == null) return;
-  String cliSql = "SELECT c.nombre + ' ' + ISNULL(c.apellido, '') as nombre_completo, ISNULL(c.telefono, '') as telefono, ISNULL(c.direccion, '') as direccion FROM clientes c INNER JOIN pedidos p ON c.id_cliente = p.id_cliente WHERE p.id_pedido = ?";
-  String cliNombre = pedidoActual.getNombreCliente();
-  String cliTelefono = "";
-  String cliDireccion = pedidoActual.getDireccion();
-  try (PreparedStatement stmt = conn.prepareStatement(cliSql)) {
-    stmt.setInt(1, pedidoActual.getId());
-    try (ResultSet rs = stmt.executeQuery()) {
-      if (rs.next()) {
-        cliNombre = rs.getString("nombre_completo");
-        cliTelefono = rs.getString("telefono");
-        cliDireccion = rs.getString("direccion");
-      }
-    }
-  }
-  double subtotal = pedidoActual.getTotal();
-  double delivery = costoDelivery;
-  if (delivery < 0) delivery = 0;
-  double itbis = (subtotal + delivery) * 0.18;
-  double total = subtotal + delivery + itbis;
-  String detalles = "Pedido #" + pedidoActual.getId() + " - " + (localRadioButton.isSelected() ? "Retiro en Local" : "Delivery");
-  try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR_FACTURA_PEDIDO)) {
-    stmt.setString(1, cliNombre);
-    stmt.setString(2, cliTelefono);
-    stmt.setString(3, cliDireccion);
-    stmt.setDouble(4, subtotal);
-    stmt.setDouble(5, delivery);
-    stmt.setDouble(6, itbis);
-    stmt.setDouble(7, total);
-    stmt.setString(8, detalles);
-    stmt.setString(9, sessionManager.getUsuarioActual());
-    stmt.executeUpdate();
-  }
-  }
 
  private void enviarWhatsAppSimulado() {
  LOGGER.log(Level.INFO, "Enviando comprobante por WhatsApp para pedido #{0}", pedidoActual.getId());

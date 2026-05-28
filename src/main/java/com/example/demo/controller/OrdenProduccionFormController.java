@@ -59,7 +59,7 @@ public class OrdenProduccionFormController {
 
         tipoPagoCombo.getItems().addAll("Efectivo","Tarjeta de Credito","Tarjeta de Debito","Cheque","Transferencia","PayPal");
         tipoPagoCombo.getSelectionModel().select("Efectivo");
-        estadoPagoCombo.getItems().addAll("Pendiente","Pagado","En Proceso","Reembolsado");
+        estadoPagoCombo.getItems().addAll("Pendiente","PAGADO","PAGADO_PARCIAL","Reembolsado");
         estadoPagoCombo.getSelectionModel().select("Pendiente");
 
         configurarTablaIngredientes();

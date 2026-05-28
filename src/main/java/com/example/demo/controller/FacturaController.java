@@ -77,7 +77,7 @@ public class FacturaController {
     private static final String SQL_UPDATE_PAGADO_CLIENTE =
         "UPDATE facturas SET estado = 'PAGADA', pagado = 'SI' WHERE cliente = ? AND estado != 'PAGADA' AND estado != 'ANULADA' AND estado != 'CANCELADA'";
 
-    @FXML private Button generarBtn, imprimirBtn, buscarBtn, estadoBtn;
+    @FXML private Button generarBtn, imprimirBtn, buscarBtn, estadoBtn, pagarBtn;
     @FXML private TextField buscarField;
     @FXML private Label ordenInfoLabel;
     @FXML private VBox detalleOrdenPanel;
@@ -158,6 +158,7 @@ public class FacturaController {
         generarBtn.setOnAction(e -> generarFactura());
         estadoBtn.setOnAction(e -> cambiarEstado());
         imprimirBtn.setOnAction(e -> imprimir());
+        pagarBtn.setOnAction(e -> handlePagar());
 
         facturasTable.setRowFactory(tv -> {
             TableRow<Factura> row = new TableRow<>();
@@ -390,6 +391,55 @@ public class FacturaController {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al imprimir factura: {0}", e.getMessage());
             mostrarAlerta("Error al imprimir: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handlePagar() {
+        if (ordenSeleccionadaId == null) {
+            mostrarAlerta("Seleccione una orden primero para procesar el pago.");
+            return;
+        }
+
+        String metodoPago = metodoPagoCombo.getValue();
+        if (metodoPago == null || metodoPago.isEmpty()) {
+            metodoPago = "Efectivo";
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar Pago");
+        confirm.setHeaderText("Procesar Pago");
+        confirm.setContentText("¿Desea procesar el pago de la orden seleccionada usando " + metodoPago + "?");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                // Generar factura automáticamente con el pago
+                generarFactura();
+                
+                // Marcar como pagada
+                Factura ultimaFactura = facturasTable.getItems().isEmpty() ? null : facturasTable.getItems().get(0);
+                if (ultimaFactura != null) {
+                    try (Connection conn = dbConnection.getConnection();
+                         PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_ESTADO)) {
+                        stmt.setString(1, "PAGADA");
+                        stmt.setInt(2, ultimaFactura.getId());
+                        stmt.executeUpdate();
+                        
+                        // Actualizar campo pagado
+                        String sqlUpdatePagado = "UPDATE facturas SET pagado = 'SI' WHERE id_factura = ?";
+                        try (PreparedStatement updPagado = conn.prepareStatement(sqlUpdatePagado)) {
+                            updPagado.setInt(1, ultimaFactura.getId());
+                            updPagado.executeUpdate();
+                        }
+                    }
+                    cargarFacturas();
+                    mostrarAlerta("Pago procesado exitosamente. Factura #" + ultimaFactura.getId() + " marcada como PAGADA.");
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error al procesar pago: {0}", e.getMessage());
+                mostrarAlerta("Error al procesar pago: " + e.getMessage());
+            }
         }
     }
 

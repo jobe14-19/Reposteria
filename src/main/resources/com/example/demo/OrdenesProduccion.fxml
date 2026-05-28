@@ -38,7 +38,7 @@
     <TableColumn fx:id="vendedorColumn" text="Vendedor" prefWidth="90"/>
     <TableColumn fx:id="librasColumn" text="Libras" prefWidth="65"/>
     <TableColumn fx:id="totalColumn" text="Total" prefWidth="80"/>
-    <TableColumn fx:id="accionesColumn" text="Accion" prefWidth="65"/>
+    <TableColumn fx:id="accionesColumn" text="Accion" prefWidth="200"/>
    </columns>
    <placeholder><Label text="No hay ordenes de produccion registradas." styleClass="text-muted"/></placeholder>
  </TableView>

@@ -57,6 +57,9 @@ public class OrdenProduccionDAO {
             "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='id_pedido') " +
             "ALTER TABLE ordenes_produccion ADD id_pedido INT",
 
+            "IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='fecha_entregado') " +
+            "ALTER TABLE ordenes_produccion ADD fecha_entregado DATETIME",
+
             "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='orden_fases' AND xtype='U') CREATE TABLE orden_fases (" +
             "id_fase INT IDENTITY(1,1) PRIMARY KEY, id_orden INT NOT NULL, fase_nombre NVARCHAR(50) NOT NULL, fase_orden INT NOT NULL, " +
             "estado NVARCHAR(20) DEFAULT 'PENDIENTE', fecha_inicio DATETIME, fecha_fin DATETIME, " +
@@ -272,6 +275,18 @@ public class OrdenProduccionDAO {
         }
     }
 
+    public boolean actualizarEstadoPago(int idOrden, String estadoPago) {
+        String sql = "UPDATE ordenes_produccion SET estado_pago = ? WHERE id_orden = ?";
+        try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, estadoPago);
+            stmt.setInt(2, idOrden);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar estado_pago: {0}", e.getMessage());
+            return false;
+        }
+    }
+
     public boolean cambiarEstado(int idOrden, String nuevoEstado, String usuario) {
         String sql = "UPDATE ordenes_produccion SET estado=? WHERE id_orden=?";
         String hist = "UPDATE orden_historial SET accion='CAMBIO_ESTADO', detalle='Estado cambiado a: " + nuevoEstado + "', usuario=? WHERE id_orden=?";
@@ -292,14 +307,38 @@ public class OrdenProduccionDAO {
                     return false;
                 }
             }
-            if ("COMPLETADA".equals(nuevoEstado)) {
+            if ("COMPLETADA".equals(nuevoEstado) || "LISTO_PARA_ENTREGAR".equals(nuevoEstado)) {
                 try (PreparedStatement up = conn.prepareStatement("UPDATE ordenes_produccion SET fecha_completado=GETDATE(), progreso=100 WHERE id_orden=?")) {
                     up.setInt(1, idOrden); up.executeUpdate();
                 }
                 generarFacturaAuto(conn, idOrden, usuario);
+                int idPedido = 0;
+                try (PreparedStatement ps = conn.prepareStatement("SELECT id_pedido FROM ordenes_produccion WHERE id_orden=?")) {
+                    ps.setInt(1, idOrden);
+                    try (ResultSet r = ps.executeQuery()) { if (r.next()) idPedido = r.getInt("id_pedido"); }
+                }
+                if (idPedido > 0) {
+                    try (PreparedStatement upPed = conn.prepareStatement(
+                        "UPDATE pedidos SET estado='Listo para entregar' WHERE id_pedido=?")) {
+                        upPed.setInt(1, idPedido); upPed.executeUpdate();
+                    }
+                    registrarHistorial(conn, idOrden, "PEDIDO_LISTO", "Pedido marcado como Listo para entregar", usuario);
+                }
             }
             if ("ENTREGADA".equals(nuevoEstado)) {
                 generarFacturaAuto(conn, idOrden, usuario);
+                int idPedido = 0;
+                try (PreparedStatement ps = conn.prepareStatement("SELECT id_pedido FROM ordenes_produccion WHERE id_orden=?")) {
+                    ps.setInt(1, idOrden);
+                    try (ResultSet r = ps.executeQuery()) { if (r.next()) idPedido = r.getInt("id_pedido"); }
+                }
+                if (idPedido > 0) {
+                    try (PreparedStatement upPed = conn.prepareStatement(
+                        "UPDATE pedidos SET estado='Entregado' WHERE id_pedido=?")) {
+                        upPed.setInt(1, idPedido); upPed.executeUpdate();
+                    }
+                    registrarHistorial(conn, idOrden, "PEDIDO_ENTREGADO", "Pedido marcado como Entregado", usuario);
+                }
             }
             registrarHistorial(conn, idOrden, "CAMBIO_ESTADO", "Estado cambiado a: " + nuevoEstado, usuario);
             conn.commit();
@@ -360,10 +399,22 @@ public class OrdenProduccionDAO {
                     try (ResultSet rs = stmt.executeQuery()) {
                         if (rs.next() && rs.getInt(1) >= 8) {
                             try (PreparedStatement up = conn.prepareStatement(
-                                "UPDATE ordenes_produccion SET estado='COMPLETADA', fecha_completado=GETDATE() WHERE id_orden=?")) {
+                                "UPDATE ordenes_produccion SET estado='LISTO_PARA_ENTREGAR', fecha_completado=GETDATE(), progreso=100 WHERE id_orden=?")) {
                                 up.setInt(1, idOrden); up.executeUpdate();
                             }
-                            registrarHistorial(conn, idOrden, "COMPLETADA", "Orden completada automaticamente", usuario);
+                            registrarHistorial(conn, idOrden, "LISTO_PARA_ENTREGAR", "Orden lista para entregar", usuario);
+                            generarFacturaAuto(conn, idOrden, usuario);
+                            int idPedido = 0;
+                            try (PreparedStatement ps = conn.prepareStatement("SELECT id_pedido FROM ordenes_produccion WHERE id_orden=?")) {
+                                ps.setInt(1, idOrden);
+                                try (ResultSet r = ps.executeQuery()) { if (r.next()) idPedido = r.getInt("id_pedido"); }
+                            }
+                            if (idPedido > 0) {
+                                try (PreparedStatement upPed = conn.prepareStatement(
+                                    "UPDATE pedidos SET estado='Listo para entregar' WHERE id_pedido=?")) {
+                                    upPed.setInt(1, idPedido); upPed.executeUpdate();
+                                }
+                            }
                         }
                     }
                 }
@@ -484,6 +535,7 @@ public class OrdenProduccionDAO {
         String sql = "INSERT INTO orden_ingredientes (id_orden, id_ingrediente, cantidad_requerida) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (OrdenIngrediente ing : ingredientes) {
+                if (ing.getIdIngrediente() <= 0) continue;
                 stmt.setInt(1, idOrden); stmt.setInt(2, ing.getIdIngrediente());
                 stmt.setDouble(3, ing.getCantidadRequerida());
                 stmt.addBatch();
@@ -539,6 +591,23 @@ public class OrdenProduccionDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error obtener orden: {0}", e.getMessage());
+        }
+        return null;
+    }
+
+    private OrdenProduccion obtenerPorIdEnTransaccion(Connection conn, int id) throws SQLException {
+        String sql = "SELECT o.*, r.nombre_receta FROM ordenes_produccion o LEFT JOIN recetas r ON o.id_receta = r.id_receta WHERE o.id_orden=?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    OrdenProduccion orden = mapearOrden(rs);
+                    orden.setFases(obtenerFases(conn, id));
+                    orden.setHistorial(obtenerHistorial(conn, id));
+                    orden.setIngredientes(obtenerIngredientes(conn, id));
+                    return orden;
+                }
+            }
         }
         return null;
     }
@@ -674,7 +743,7 @@ public class OrdenProduccionDAO {
     }
 
     public boolean actualizarPagoPorIdPedido(int idPedido, double monto, String estadoPago) {
-        String sql = "UPDATE ordenes_produccion SET anticipo = ?, saldo = CASE WHEN ? = 'Pagado' THEN 0 ELSE saldo END, estado_pago = ? WHERE id_pedido = ?";
+        String sql = "UPDATE ordenes_produccion SET anticipo = ?, saldo = CASE WHEN ? = 'PAGADO' THEN 0 ELSE saldo END, estado_pago = ? WHERE id_pedido = ?";
         try (Connection conn = dbConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDouble(1, monto);
             stmt.setString(2, estadoPago);
@@ -707,5 +776,238 @@ public class OrdenProduccionDAO {
             if (stockDAO.getStockActual(ing.getIdIngrediente()) < ing.getCantidadRequerida()) return false;
         }
         return true;
+    }
+
+    public int asegurarPedidoVinculadoConConex(Connection conn, int idOrden) {
+        String sqlSelect = "SELECT id_pedido, numero_orden, cliente, fecha_entrega, libras, precio_venta, anticipo, estado, tipo_pago, estado_pago, direccion, costo_delivery, categoria, tipo_entrega FROM ordenes_produccion WHERE id_orden=?";
+        int idPedidoExistente = 0;
+        String numeroOrden = "";
+        String cliente = "";
+        String fechaEntrega = null;
+        double libras = 0;
+        double precioVenta = 0;
+        double anticipo = 0;
+        String estado = "Pendiente";
+        String tipoPago = "Efectivo";
+        String estadoPago = "Pendiente";
+        String direccion = "";
+        double costoDelivery = 0;
+        String categoria = "Pastel";
+        String tipoEntrega = "L";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sqlSelect)) {
+            stmt.setInt(1, idOrden);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    idPedidoExistente = rs.getInt("id_pedido");
+                    numeroOrden = rs.getString("numero_orden");
+                    cliente = rs.getString("cliente");
+                    Date d = rs.getDate("fecha_entrega");
+                    if (d != null) fechaEntrega = d.toString();
+                    libras = rs.getDouble("libras");
+                    precioVenta = rs.getDouble("precio_venta");
+                    anticipo = rs.getDouble("anticipo");
+                    estado = rs.getString("estado");
+                    tipoPago = rs.getString("tipo_pago");
+                    estadoPago = rs.getString("estado_pago");
+                    direccion = rs.getString("direccion");
+                    costoDelivery = rs.getDouble("costo_delivery");
+                    categoria = rs.getString("categoria");
+                    tipoEntrega = rs.getString("tipo_entrega");
+                    if (tipoEntrega == null || tipoEntrega.trim().isEmpty()) tipoEntrega = "L";
+                } else {
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al buscar orden para vincular pedido: " + e.getMessage());
+            return -1;
+        }
+
+        if (idPedidoExistente > 0) return idPedidoExistente;
+
+        Integer idCliente = null;
+        String clientUsername = null;
+        if (cliente != null && !cliente.trim().isEmpty()) {
+            String sqlClient = "SELECT TOP 1 id_cliente, usuario FROM clientes WHERE (nombre + ' ' + ISNULL(apellido, '')) LIKE ? OR nombre LIKE ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlClient)) {
+                String like = "%" + cliente.trim() + "%";
+                stmt.setString(1, like);
+                stmt.setString(2, like);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        idCliente = rs.getInt("id_cliente");
+                        clientUsername = rs.getString("usuario");
+                    }
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.WARNING, "Error al buscar cliente coincidente: " + e.getMessage());
+            }
+        }
+        if (idCliente == null) {
+            idCliente = 3; 
+            clientUsername = "cliente";
+        }
+
+        String sqlIns = "INSERT INTO pedidos (id_cliente, fecha_pedido, fecha_entrega, libras, total, adelanto, estado, tipo_pago, estado_pago, username, producto, observaciones, direccion_entrega, costo_delivery, tipo_entrega) " +
+                        "VALUES (?, GETDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        int idPedido = -1;
+        try (PreparedStatement stmt = conn.prepareStatement(sqlIns, Statement.RETURN_GENERATED_KEYS)) {
+            if (idCliente != null) stmt.setInt(1, idCliente); else stmt.setNull(1, Types.INTEGER);
+            if (fechaEntrega != null) stmt.setDate(2, java.sql.Date.valueOf(fechaEntrega)); else stmt.setNull(2, Types.DATE);
+            stmt.setDouble(3, libras);
+            stmt.setDouble(4, precioVenta);
+            stmt.setDouble(5, anticipo);
+            stmt.setString(6, estado);
+            stmt.setString(7, tipoPago != null ? tipoPago : "Efectivo");
+            stmt.setString(8, estadoPago != null ? estadoPago : "Pendiente");
+            stmt.setString(9, clientUsername);
+            stmt.setString(10, categoria != null ? categoria : "Pastel");
+            stmt.setString(11, "Pedido generado automáticamente desde orden de producción #" + numeroOrden);
+            stmt.setString(12, direccion);
+            stmt.setDouble(13, costoDelivery);
+            stmt.setString(14, tipoEntrega);
+            stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) idPedido = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al insertar pedido dummy para orden: " + e.getMessage());
+            return -1;
+        }
+
+        if (idPedido > 0) {
+            String sqlUpd = "UPDATE ordenes_produccion SET id_pedido = ? WHERE id_orden = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlUpd)) {
+                stmt.setInt(1, idPedido);
+                stmt.setInt(2, idOrden);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error al actualizar orden de producción con id_pedido: " + e.getMessage());
+                return -1;
+            }
+            return idPedido;
+        }
+        return -1;
+    }
+
+    public boolean registrarPagoCompleto(int idOrden, String metodoPago, String referencia, double monto, String usuario) {
+        Connection conn = null;
+        try {
+            conn = dbConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            int idPedido = asegurarPedidoVinculadoConConex(conn, idOrden);
+            if (idPedido <= 0) {
+                conn.rollback();
+                return false;
+            }
+
+            OrdenProduccion orden = obtenerPorIdEnTransaccion(conn, idOrden);
+            if (orden == null) {
+                conn.rollback();
+                return false;
+            }
+
+            double nuevoAnticipo = orden.getAnticipo() + monto;
+            double nuevoSaldo = Math.max(0, orden.getPrecioVenta() - nuevoAnticipo);
+            String nuevoEstadoPago = nuevoSaldo <= 0 ? "PAGADO" : "PAGADO_PARCIAL";
+
+            String sqlOrd = "UPDATE ordenes_produccion SET anticipo = ?, saldo = ?, estado_pago = ?, tipo_pago = ? WHERE id_orden = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlOrd)) {
+                stmt.setDouble(1, nuevoAnticipo);
+                stmt.setDouble(2, nuevoSaldo);
+                stmt.setString(3, nuevoEstadoPago);
+                stmt.setString(4, metodoPago);
+                stmt.setInt(5, idOrden);
+                stmt.executeUpdate();
+            }
+
+            String sqlPed = "UPDATE pedidos SET total = ?, adelanto = ?, estado_pago = ?, tipo_pago = ? WHERE id_pedido = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlPed)) {
+                stmt.setDouble(1, orden.getPrecioVenta());
+                stmt.setDouble(2, nuevoAnticipo);
+                stmt.setString(3, nuevoEstadoPago);
+                stmt.setString(4, metodoPago);
+                stmt.setInt(5, idPedido);
+                stmt.executeUpdate();
+            }
+
+            String sqlPago = "INSERT INTO pagos (id_pedido, monto, fecha_pago, metodo_pago, referencia, estado) VALUES (?, ?, GETDATE(), ?, ?, 'Pagado')";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlPago)) {
+                stmt.setInt(1, idPedido);
+                stmt.setDouble(2, monto);
+                stmt.setString(3, metodoPago);
+                stmt.setString(4, referencia != null ? referencia : "Pago registrado desde Orden de Producción");
+                stmt.executeUpdate();
+            }
+
+            int idFactura = -1;
+            String sqlFactCheck = "SELECT id_factura FROM facturas WHERE id_orden = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlFactCheck)) {
+                stmt.setInt(1, idOrden);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) idFactura = rs.getInt("id_factura");
+                }
+            }
+
+            if (idFactura > 0) {
+                String sqlFactUpd = "UPDATE facturas SET pagado = ?, estado = ?, metodo_pago = ? WHERE id_factura = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(sqlFactUpd)) {
+                    stmt.setString(1, nuevoEstadoPago.equals("PAGADO") ? "SI" : "NO");
+                    stmt.setString(2, nuevoEstadoPago.equals("PAGADO") ? "PAGADA" : "EMITIDA");
+                    stmt.setString(3, metodoPago);
+                    stmt.setInt(4, idFactura);
+                    stmt.executeUpdate();
+                }
+            } else {
+                String cliente = orden.getCliente();
+                String telefono = orden.getTelefono();
+                String direccion = orden.getDireccion();
+                double subtotal = orden.getPrecioVenta();
+                double delivery = orden.getCostoDelivery();
+                if (delivery < 0) delivery = 0;
+                double itbis = (subtotal + delivery) * 0.18;
+                double total = subtotal + delivery + itbis;
+                String detalles = String.format("Categoria: %s | Libras: %.1f | Decoracion: %s | Adornos: %s | Rellenos: %s | Mensaje: %s",
+                    orden.getCategoria(), orden.getLibras(),
+                    orden.getDecoracion(), orden.getAdornos(),
+                    orden.getRellenos(), orden.getMensaje());
+                    
+                String sqlIns = "INSERT INTO facturas (id_orden, cliente, telefono, direccion, fecha, subtotal, costo_delivery, itbis, descuento, total, estado, detalles, usuario_genera, fecha_generacion, metodo_pago, pagado) " +
+                                "VALUES (?, ?, ?, ?, CAST(GETDATE() AS DATE), ?, ?, ?, 0, ?, ?, ?, ?, GETDATE(), ?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(sqlIns)) {
+                    stmt.setInt(1, idOrden);
+                    stmt.setString(2, cliente);
+                    stmt.setString(3, telefono);
+                    stmt.setString(4, direccion);
+                    stmt.setDouble(5, subtotal);
+                    stmt.setDouble(6, delivery);
+                    stmt.setDouble(7, itbis);
+                    stmt.setDouble(8, total);
+                    stmt.setString(9, nuevoEstadoPago.equals("PAGADO") ? "PAGADA" : "EMITIDA");
+                    stmt.setString(10, detalles);
+                    stmt.setString(11, usuario);
+                    stmt.setString(12, metodoPago);
+                    stmt.setString(13, nuevoEstadoPago.equals("PAGADO") ? "SI" : "NO");
+                    stmt.executeUpdate();
+                }
+            }
+
+            registrarHistorial(conn, idOrden, "REGISTRO_PAGO", "Pago registrado de RD$" + String.format("%.2f", monto) + " via " + metodoPago + ". Referencia: " + referencia, usuario);
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar pago en orden: " + e.getMessage(), e);
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) {}
+            }
+            return false;
+        } finally {
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
+            }
+        }
     }
 }

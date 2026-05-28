@@ -28,30 +28,26 @@ public class EntregasController {
 
  private static final Logger LOGGER = Logger.getLogger(EntregasController.class.getName());
 
- // Constantes SQL - CORREGIDO para SQLite
  private static final String SQL_PEDIDOS_PENDIENTES = """
- SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente,
- c.direccion, p.total, p.adelanto,
- p.total - p.adelanto as saldo,
- CASE WHEN p.tipo_entrega = 'L' THEN 'Local' ELSE 'Delivery' END as tipo
- FROM pedidos p
- INNER JOIN clientes c ON p.id_cliente = c.id_cliente
- WHERE p.estado = 'Listo para entregar'
- AND (p.total - p.adelanto) > 0
- ORDER BY p.fecha_entrega
+ SELECT o.id_orden, o.numero_orden, o.cliente as nombre_cliente,
+ ISNULL(o.direccion, '') as direccion, o.precio_venta as total, o.anticipo as adelanto,
+ o.saldo,
+ CASE WHEN ISNULL(o.tipo_entrega, 'L') = 'L' THEN 'Local' ELSE 'Delivery' END as tipo
+  FROM ordenes_produccion o
+  WHERE o.estado IN ('LISTO_PARA_ENTREGAR', 'COMPLETADA')
+  ORDER BY o.fecha_entrega
  """;
 
  private static final String SQL_HISTORIAL_ENTREGAS = """
- SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente,
- CAST(p.fecha_entrega AS DATE) as fecha_entrega,
- CASE WHEN p.tipo_entrega = 'L' THEN 'Local' ELSE 'Delivery' END as tipo,
- p.total,
- COALESCE((SELECT SUM(monto) FROM pagos WHERE id_pedido = p.id_pedido), 0) as pagado,
- (SELECT TOP 1 metodo_pago FROM pagos WHERE id_pedido = p.id_pedido ORDER BY fecha_pago DESC) as metodo_pago
- FROM pedidos p
- INNER JOIN clientes c ON p.id_cliente = c.id_cliente
- WHERE p.estado = 'Entregado'
- ORDER BY p.fecha_entrega DESC
+ SELECT o.id_orden, o.cliente as nombre_cliente,
+ CAST(ISNULL(o.fecha_entregado, o.fecha_completado) AS DATE) as fecha_entrega,
+ CASE WHEN ISNULL(o.tipo_entrega, 'L') = 'L' THEN 'Local' ELSE 'Delivery' END as tipo,
+ o.precio_venta as total,
+ COALESCE((SELECT SUM(p.monto) FROM pagos p WHERE p.id_pedido = o.id_pedido), 0) as pagado,
+ (SELECT TOP 1 p.metodo_pago FROM pagos p WHERE p.id_pedido = o.id_pedido ORDER BY p.fecha_pago DESC) as metodo_pago
+ FROM ordenes_produccion o
+ WHERE o.estado = 'ENTREGADA'
+ ORDER BY ISNULL(o.fecha_entregado, o.fecha_completado) DESC
  """;
 
  // Constantes
@@ -71,6 +67,7 @@ public class EntregasController {
  private static final String BUTTON_COBRAR_STYLE = "-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
  private static final String BUTTON_FACTURA_STYLE = "-fx-background-color: #6F42C1; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
  private static final String BUTTON_WHATSAPP_STYLE = "-fx-background-color: #25D366; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
+ private static final String BUTTON_ENTREGAR_STYLE = "-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 10 5 10; -fx-background-radius: 4; -fx-cursor: hand;";
 
  // UI Components
  @FXML private Button actualizarButton;
@@ -159,27 +156,34 @@ public class EntregasController {
  }
  });
 
- pendienteAccionesColumn.setCellFactory(param -> new TableCell<PedidoPendiente, Void>() {
- private final Button cobrarButton = new Button(" Cobrar Saldo");
- private final HBox hbox = new HBox(5);
+  pendienteAccionesColumn.setCellFactory(param -> new TableCell<PedidoPendiente, Void>() {
+  private final Button cobrarButton = new Button(" Cobrar Saldo");
+  private final Button entregarButton = new Button(" Entregar");
+  private final Button facturaButton = new Button(" Factura");
+  private final HBox hbox = new HBox(5);
 
- {
- cobrarButton.setStyle(BUTTON_COBRAR_STYLE);
- hbox.getChildren().setAll(cobrarButton);
- }
+  {
+  cobrarButton.setStyle(BUTTON_COBRAR_STYLE);
+  entregarButton.setStyle(BUTTON_ENTREGAR_STYLE);
+  entregarButton.setTooltip(new Tooltip("Marcar esta orden como entregada y mover al historial"));
+  facturaButton.setStyle(BUTTON_FACTURA_STYLE);
+  hbox.getChildren().setAll(cobrarButton, entregarButton, facturaButton);
+  }
 
- @Override
- protected void updateItem(Void item, boolean empty) {
- super.updateItem(item, empty);
- if (empty) {
- setGraphic(null);
- } else {
- PedidoPendiente pedido = getTableView().getItems().get(getIndex());
- cobrarButton.setOnAction(e -> cobrarSaldo(pedido));
- setGraphic(hbox);
- }
- }
- });
+  @Override
+  protected void updateItem(Void item, boolean empty) {
+  super.updateItem(item, empty);
+  if (empty) {
+  setGraphic(null);
+  } else {
+  PedidoPendiente pedido = getTableView().getItems().get(getIndex());
+  cobrarButton.setOnAction(e -> cobrarSaldo(pedido));
+  entregarButton.setOnAction(e -> marcarEntregado(pedido));
+  facturaButton.setOnAction(e -> verFacturaOrden(pedido.getId()));
+  setGraphic(hbox);
+  }
+  }
+  });
  }
 
  private void configurarTablaHistorial() {
@@ -300,17 +304,17 @@ public class EntregasController {
 
  pedidosPendientesList = FXCollections.observableArrayList();
 
- while (rs.next()) {
- pedidosPendientesList.add(new PedidoPendiente(
- rs.getInt("id_pedido"),
- rs.getString("nombre_cliente"),
- rs.getString("direccion"),
- rs.getDouble("total"),
- rs.getDouble("adelanto"),
- rs.getDouble("saldo"),
- rs.getString("tipo")
- ));
- }
+  while (rs.next()) {
+  pedidosPendientesList.add(new PedidoPendiente(
+  rs.getInt("id_orden"),
+  rs.getString("nombre_cliente"),
+  rs.getString("direccion"),
+  rs.getDouble("total"),
+  rs.getDouble("adelanto"),
+  rs.getDouble("saldo"),
+  rs.getString("tipo")
+  ));
+  }
 
  pedidosPendientesTable.setItems(pedidosPendientesList);
  actualizarTotalPendientes();
@@ -328,17 +332,17 @@ public class EntregasController {
 
  historialList = FXCollections.observableArrayList();
 
- while (rs.next()) {
- historialList.add(new EntregaHistorial(
- rs.getInt("id_pedido"),
- rs.getString("nombre_cliente"),
- rs.getString("fecha_entrega"),
- rs.getString("tipo"),
- rs.getDouble("total"),
- rs.getDouble("pagado"),
- rs.getString("metodo_pago") != null ? rs.getString("metodo_pago") : "Efectivo"
- ));
- }
+  while (rs.next()) {
+  historialList.add(new EntregaHistorial(
+  rs.getInt("id_orden"),
+  rs.getString("nombre_cliente"),
+  rs.getString("fecha_entrega"),
+  rs.getString("tipo"),
+  rs.getDouble("total"),
+  rs.getDouble("pagado"),
+  rs.getString("metodo_pago") != null ? rs.getString("metodo_pago") : "Efectivo"
+  ));
+  }
 
  historialTable.setItems(historialList);
  actualizarTotalHistorial();
@@ -350,33 +354,32 @@ public class EntregasController {
  }
 
  private void aplicarFiltrosHistorial() {
- StringBuilder sqlBuilder = new StringBuilder("""
- SELECT p.id_pedido, c.nombre + ' ' + c.apellido as nombre_cliente,
- CAST(p.fecha_entrega AS DATE) as fecha_entrega,
- CASE WHEN p.tipo_entrega = 'L' THEN 'Local' ELSE 'Delivery' END as tipo,
- p.total,
- COALESCE((SELECT SUM(monto) FROM pagos WHERE id_pedido = p.id_pedido), 0) as pagado,
- (SELECT TOP 1 metodo_pago FROM pagos WHERE id_pedido = p.id_pedido ORDER BY fecha_pago DESC) as metodo_pago
- FROM pedidos p
- INNER JOIN clientes c ON p.id_cliente = c.id_cliente
- WHERE p.estado = 'Entregado'
- """);
+  StringBuilder sqlBuilder = new StringBuilder("""
+  SELECT o.id_orden, o.cliente as nombre_cliente,
+  CAST(ISNULL(o.fecha_entregado, o.fecha_completado) AS DATE) as fecha_entrega,
+  CASE WHEN ISNULL(o.tipo_entrega, 'L') = 'L' THEN 'Local' ELSE 'Delivery' END as tipo,
+  o.precio_venta as total,
+  COALESCE((SELECT SUM(p.monto) FROM pagos p WHERE p.id_pedido = o.id_pedido), 0) as pagado,
+  (SELECT TOP 1 p.metodo_pago FROM pagos p WHERE p.id_pedido = o.id_pedido ORDER BY p.fecha_pago DESC) as metodo_pago
+  FROM ordenes_produccion o
+  WHERE o.estado = 'ENTREGADA'
+  """);
 
- java.util.ArrayList<String> condiciones = new java.util.ArrayList<>();
- java.util.ArrayList<Object> parametros = new java.util.ArrayList<>();
+  java.util.ArrayList<String> condiciones = new java.util.ArrayList<>();
+  java.util.ArrayList<Object> parametros = new java.util.ArrayList<>();
 
- if (fechaDesdePicker.getValue() != null) {
- condiciones.add("p.fecha_entrega >= ?");
- parametros.add(java.sql.Date.valueOf(fechaDesdePicker.getValue()));
- }
- if (fechaHastaPicker.getValue() != null) {
- condiciones.add("p.fecha_entrega <= ?");
- parametros.add(java.sql.Date.valueOf(fechaHastaPicker.getValue()));
- }
+  if (fechaDesdePicker.getValue() != null) {
+  condiciones.add("ISNULL(o.fecha_entregado, o.fecha_completado) >= ?");
+  parametros.add(java.sql.Date.valueOf(fechaDesdePicker.getValue()));
+  }
+  if (fechaHastaPicker.getValue() != null) {
+  condiciones.add("ISNULL(o.fecha_entregado, o.fecha_completado) <= ?");
+  parametros.add(java.sql.Date.valueOf(fechaHastaPicker.getValue()));
+  }
 
  String tipoSeleccionado = tipoEntregaFilter.getValue();
  if (!TIPO_TODOS.equals(tipoSeleccionado)) {
- condiciones.add("p.tipo_entrega = ?");
+ condiciones.add("o.tipo_entrega = ?");
  parametros.add(TIPO_LOCAL.equals(tipoSeleccionado) ? "L" : "D");
  }
 
@@ -384,7 +387,7 @@ public class EntregasController {
  sqlBuilder.append(" AND ").append(String.join(" AND ", condiciones));
  }
 
- sqlBuilder.append(" ORDER BY p.fecha_entrega DESC");
+ sqlBuilder.append(" ORDER BY ISNULL(o.fecha_entregado, o.fecha_completado) DESC");
 
  try (Connection conn = dbConnection.getConnection();
  PreparedStatement stmt = conn.prepareStatement(sqlBuilder.toString())) {
@@ -398,7 +401,7 @@ public class EntregasController {
  try (ResultSet rs = stmt.executeQuery()) {
  while (rs.next()) {
  resultados.add(new EntregaHistorial(
- rs.getInt("id_pedido"),
+ rs.getInt("id_orden"),
  rs.getString("nombre_cliente"),
  rs.getString("fecha_entrega"),
  rs.getString("tipo"),
@@ -409,8 +412,9 @@ public class EntregasController {
  }
  }
 
- historialTable.setItems(resultados);
- actualizarTotalHistorial();
+  historialList = resultados;
+  historialTable.setItems(resultados);
+  actualizarTotalHistorial();
 
  } catch (SQLException e) {
  LOGGER.log(Level.SEVERE, "Error al aplicar filtros: {0}", e.getMessage());
@@ -420,6 +424,32 @@ public class EntregasController {
 
  private void cobrarSaldo(PedidoPendiente pedido) {
  abrirModalEntrega(pedido);
+ }
+
+ private void marcarEntregado(PedidoPendiente pedido) {
+ Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+ confirm.setTitle("Marcar como Entregado");
+ confirm.setHeaderText("Orden #" + pedido.getId());
+ confirm.setContentText("¿Está seguro de marcar esta orden como entregada?");
+ confirm.showAndWait().ifPresent(r -> {
+ if (r != ButtonType.OK) return;
+ try (Connection conn = dbConnection.getConnection();
+ PreparedStatement stmt = conn.prepareStatement(
+ "UPDATE ordenes_produccion SET estado = 'ENTREGADA', fecha_entregado = GETDATE() WHERE id_orden = ? AND estado NOT IN ('ENTREGADA', 'CANCELADA')")) {
+ stmt.setInt(1, pedido.getId());
+ int filas = stmt.executeUpdate();
+ if (filas > 0) {
+ cargarPedidosPendientes();
+ cargarHistorial();
+ mostrarMensaje("Entregado", "Orden #" + pedido.getId() + " marcada como entregada correctamente.");
+ } else {
+ mostrarError("No se pudo marcar", "La orden ya fue entregada o cancelada anteriormente.");
+ }
+ } catch (SQLException e) {
+ LOGGER.log(Level.SEVERE, "Error al marcar entrega: {0}", e.getMessage());
+ mostrarError("Error de Base de Datos", "No se pudo marcar la entrega: " + e.getMessage());
+ }
+ });
  }
 
  private void abrirModalEntrega(PedidoPendiente pedido) {
@@ -446,21 +476,53 @@ public class EntregasController {
  }
  }
 
- private void generarFactura(EntregaHistorial entrega) {
- try {
- ReportService rs = new ReportService();
- java.util.Map<String, Object> params = new java.util.HashMap<>();
- params.put("ID_FACTURA", entrega.getId());
- net.sf.jasperreports.engine.JasperReport report = rs.compileReport("/reportes/Reporte_Factura.jrxml");
- net.sf.jasperreports.engine.JasperPrint print = rs.fillReport(report, params);
- rs.showReport(print);
+ private void verFacturaOrden(int idOrden) {
+ try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement("SELECT id_factura FROM facturas WHERE id_orden = ?")) {
+  stmt.setInt(1, idOrden);
+  try (ResultSet rs = stmt.executeQuery()) {
+  if (rs.next()) {
+  int facturaId = rs.getInt("id_factura");
+  ReportService rsrv = new ReportService();
+  java.util.Map<String, Object> params = new java.util.HashMap<>();
+  params.put("ID_FACTURA", facturaId);
+  net.sf.jasperreports.engine.JasperReport report = rsrv.compileReport("/reportes/Reporte_Factura.jrxml");
+  net.sf.jasperreports.engine.JasperPrint print = rsrv.fillReport(report, params);
+  rsrv.showReport(print);
+  } else {
+  mostrarError("Factura no encontrada",
+  "No se encontró ninguna factura para la orden #" + idOrden);
+  }
+  }
  } catch (Exception e) {
  LOGGER.log(Level.SEVERE, "Error al generar factura: {0}", e.getMessage());
- Alert alert = new Alert(Alert.AlertType.ERROR);
- alert.setTitle("Error al generar factura");
- alert.setHeaderText("No se pudo generar la factura");
- alert.setContentText(e.getMessage() + "\n\nVerifique que la factura exista en la base de datos.");
- alert.showAndWait();
+ mostrarError("Error al generar factura",
+  "No se pudo generar la factura: " + e.getMessage());
+ }
+ }
+
+ private void generarFactura(EntregaHistorial entrega) {
+ try (Connection conn = dbConnection.getConnection();
+  PreparedStatement stmt = conn.prepareStatement("SELECT id_factura FROM facturas WHERE id_orden = ?")) {
+  stmt.setInt(1, entrega.getId());
+  try (ResultSet rs = stmt.executeQuery()) {
+  if (rs.next()) {
+  int facturaId = rs.getInt("id_factura");
+  ReportService rsrv = new ReportService();
+  java.util.Map<String, Object> params = new java.util.HashMap<>();
+  params.put("ID_FACTURA", facturaId);
+  net.sf.jasperreports.engine.JasperReport report = rsrv.compileReport("/reportes/Reporte_Factura.jrxml");
+  net.sf.jasperreports.engine.JasperPrint print = rsrv.fillReport(report, params);
+  rsrv.showReport(print);
+  } else {
+  mostrarError("Factura no encontrada",
+  "No se encontró ninguna factura para la orden #" + entrega.getId());
+  }
+  }
+ } catch (Exception e) {
+ LOGGER.log(Level.SEVERE, "Error al generar factura: {0}", e.getMessage());
+ mostrarError("Error al generar factura",
+  "No se pudo generar la factura: " + e.getMessage());
  }
  }
 

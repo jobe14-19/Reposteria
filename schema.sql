@@ -369,7 +369,7 @@ BEGIN
 CREATE TABLE ordenes_produccion (
     id_orden INT IDENTITY(1,1) PRIMARY KEY,
     numero_orden NVARCHAR(20) NOT NULL UNIQUE,
-    estado NVARCHAR(20) DEFAULT 'ACTIVA' CHECK (estado IN ('ACTIVA', 'EN PRODUCCION', 'COMPLETADA', 'ENTREGADA', 'CANCELADA')),
+    estado NVARCHAR(20) DEFAULT 'ACTIVA' CHECK (estado IN ('ACTIVA', 'EN PRODUCCION', 'COMPLETADA', 'ENTREGADA', 'CANCELADA', 'LISTO_PARA_ENTREGAR')),
     categoria NVARCHAR(100),
     revestimiento NVARCHAR(100),
     sucursal NVARCHAR(100),
@@ -401,6 +401,7 @@ CREATE TABLE ordenes_produccion (
     fecha_creacion DATETIME DEFAULT GETDATE(),
     fecha_inicio DATETIME,
     fecha_completado DATETIME,
+    fecha_entregado DATETIME,
     usuario_crea NVARCHAR(100),
     progreso INT DEFAULT 0,
     pausado BIT DEFAULT 0,
@@ -431,6 +432,8 @@ BEGIN
         ALTER TABLE ordenes_produccion ADD estado_pago NVARCHAR(20) DEFAULT 'Pendiente';
     IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='id_pedido')
         ALTER TABLE ordenes_produccion ADD id_pedido INT;
+    IF NOT EXISTS (SELECT * FROM syscolumns WHERE id=OBJECT_ID('ordenes_produccion') AND name='fecha_entregado')
+        ALTER TABLE ordenes_produccion ADD fecha_entregado DATETIME;
 END
 GO
 
@@ -1016,6 +1019,16 @@ BEGIN
     (32, 2, N'Mezclar y hornear', N'Batir mantequilla, azucar, platano y harina. Hornear', 35),
     (32, 3, N'Decorar', N'Cubrir con frosting de canela y decorar con rodajas de platano', 10);
 END
+GO
+
+GO
+-- Migracion: Agregar estado LISTO_PARA_ENTREGAR a la tabla ordenes_produccion
+IF EXISTS (SELECT * FROM sys.check_constraints WHERE parent_object_id = OBJECT_ID('ordenes_produccion') AND name LIKE 'CK__ordenes_pr__estado%')
+BEGIN
+    ALTER TABLE ordenes_produccion DROP CONSTRAINT CK__ordenes_pr__estado;
+END
+GO
+ALTER TABLE ordenes_produccion ADD CONSTRAINT CK__ordenes_pr__estado CHECK (estado IN ('ACTIVA', 'EN PRODUCCION', 'COMPLETADA', 'ENTREGADA', 'CANCELADA', 'LISTO_PARA_ENTREGAR'));
 GO
 
 PRINT N'Base de datos Reposteria creada exitosamente.';

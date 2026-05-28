@@ -97,14 +97,41 @@
 
    <!-- Pago -->
    <VBox styleClass="detail-section">
-    <Label text="Informacion de Pago" styleClass="detail-header"/>
-   <HBox spacing="20">
-    <Label text="Forma:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
-    <Label fx:id="tipoPagoLabel" text="-" style="-fx-font-weight: bold;"/>
-    <Label text="Estado:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
-    <Label fx:id="estadoPagoLabel" text="-" />
-   </HBox>
-  </VBox>
+     <Label text="Pagos" styleClass="detail-header"/>
+
+    <!-- Resumen de estado -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+     <Label text="Estado:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+     <Label fx:id="estadoPagoBadge" text="-" />
+     <Label text="Total:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+     <Label fx:id="totalPagoLabel" text="RD$0.00" style="-fx-font-weight: bold;"/>
+     <Label text="Pagado:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+     <Label fx:id="pagadoLabel" text="RD$0.00" style="-fx-text-fill: #28A745; -fx-font-weight: bold;"/>
+     <Label text="Saldo:" styleClass="text-muted" style="-fx-font-weight: bold;"/>
+     <Label fx:id="saldoPendienteLabel" text="RD$0.00" style="-fx-text-fill: #DC3545; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <!-- Formulario de pago -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+     <Label text="Monto (RD$):" style="-fx-font-weight: bold;"/>
+     <TextField fx:id="montoPagoField" promptText="0.00" prefWidth="120"/>
+     <Label text="Metodo:" style="-fx-font-weight: bold;"/>
+     <ComboBox fx:id="metodoPagoCombo" prefWidth="160"/>
+     <Button fx:id="registrarPagoBtn" text="Registrar Pago" styleClass="btn-success" style="-fx-cursor: hand; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 10 25;"/>
+    </HBox>
+
+    <!-- Historial de pagos -->
+    <Label text="Historial de Pagos" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #555; -fx-padding: 5 0 0 0;"/>
+    <TableView fx:id="pagosTable" prefHeight="120" maxWidth="Infinity" styleClass="production-table">
+     <columns>
+      <TableColumn fx:id="pagoFechaCol" text="Fecha" prefWidth="160"/>
+      <TableColumn fx:id="pagoMontoCol" text="Monto" prefWidth="110"/>
+      <TableColumn fx:id="pagoMetodoCol" text="Metodo" prefWidth="140"/>
+      <TableColumn fx:id="pagoRefCol" text="Referencia" prefWidth="180"/>
+     </columns>
+     <placeholder><Label text="No hay pagos registrados."/></placeholder>
+    </TableView>
+   </VBox>
 
    <!-- Fechas Produccion -->
    <VBox styleClass="detail-section">

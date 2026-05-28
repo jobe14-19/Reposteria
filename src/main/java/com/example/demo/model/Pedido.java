@@ -22,7 +22,7 @@ public class Pedido {
  public static final String ESTADO_CANCELADO = "Cancelado";
 
  public static final String[] TIPOS_PAGO = {"Efectivo","Tarjeta de Credito","Tarjeta de Debito","Cheque","Transferencia","PayPal"};
- public static final String[] ESTADOS_PAGO = {"Pendiente","Pagado","En Proceso","Reembolsado"};
+ public static final String[] ESTADOS_PAGO = {"Pendiente","PAGADO","PAGADO_PARCIAL","Reembolsado"};
 
  public Pedido(int id, String nombreCliente, String fechaPedido, String fechaEntrega,
  String producto, double libras, double total, double adelanto, String estado) {

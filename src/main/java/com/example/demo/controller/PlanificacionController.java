@@ -394,9 +394,9 @@ public class PlanificacionController {
    Label estadoBadge = new Label(esPedido ? orden.getEstado() : orden.getEstado());
    estadoBadge.setStyle("-fx-font-size: 9px; -fx-text-fill: white; -fx-background-color: " + estadoColor + "; -fx-background-radius: 999px; -fx-padding: 1 8;");
    String pagoBg;
-   switch (orden.getEstadoPago()) {
-   case "Pagado": pagoBg = "#28A745"; break;
-   case "En Proceso": pagoBg = "#FF9800"; break;
+    switch (orden.getEstadoPago()) {
+    case "PAGADO": pagoBg = "#28A745"; break;
+    case "PAGADO_PARCIAL": pagoBg = "#FF9800"; break;
    default: pagoBg = "#DC3545";
    }
    Label pagoBadge = new Label(orden.getEstadoPago());

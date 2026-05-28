@@ -112,8 +112,8 @@ public class ClientePedidosController {
                 setText(est);
                 String bg;
                 switch (est) {
-                    case "Pagado": bg = "#28A745"; break;
-                    case "En Proceso": bg = "#FF9800"; break;
+                    case "PAGADO": bg = "#28A745"; break;
+                    case "PAGADO_PARCIAL": bg = "#FF9800"; break;
                     case "Pendiente": bg = "#DC3545"; break;
                     default: bg = "#6C757D";
                 }
@@ -198,7 +198,7 @@ public class ClientePedidosController {
         estadoPagoLabel.setStyle("-fx-font-weight: bold;");
 
         ComboBox<String> estadoPagoCombo = new ComboBox<>();
-        estadoPagoCombo.getItems().addAll("Pendiente", "Pagado", "En Proceso", "Reembolsado");
+        estadoPagoCombo.getItems().addAll("Pendiente", "PAGADO", "PAGADO_PARCIAL", "Reembolsado");
         estadoPagoCombo.setValue(p.getEstadoPago());
         Button cambiarPagoBtn = new Button("Cambiar Estado Pago");
         cambiarPagoBtn.setStyle("-fx-background-color: #8B5E3C; -fx-text-fill: white; -fx-font-weight: bold;");
@@ -222,7 +222,7 @@ public class ClientePedidosController {
 
         HBox pagoRow = new HBox(10, estadoPagoCombo, cambiarPagoBtn);
 
-        boolean puedePagar = !"Pagado".equals(p.getEstadoPago()) && p.getTotal() > 0 && PayPalConfig.isConfigured();
+        boolean puedePagar = !"PAGADO".equals(p.getEstadoPago()) && !"Pagado".equals(p.getEstadoPago()) && p.getTotal() > 0 && PayPalConfig.isConfigured();
         Button pagarBtn = new Button("Pagar con PayPal");
         pagarBtn.setStyle("-fx-background-color: #0070BA; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 4 12; -fx-background-radius: 4; -fx-cursor: hand;");
         pagarBtn.setVisible(puedePagar);
@@ -305,8 +305,8 @@ public class ClientePedidosController {
                 for (int i = 0; i < 100; i++) {
                     Thread.sleep(3000);
                     if (paypal.verificarPago(result.sessionId)) {
-                        new PedidoDAO().actualizarAdelantoYEstadoPago(p.getId(), p.getTotal(), "Pagado");
-                        new OrdenProduccionDAO().actualizarPagoPorIdPedido(p.getId(), p.getTotal(), "Pagado");
+                        new PedidoDAO().actualizarAdelantoYEstadoPago(p.getId(), p.getTotal(), "PAGADO");
+                        new OrdenProduccionDAO().actualizarPagoPorIdPedido(p.getId(), p.getTotal(), "PAGADO");
                         new PagoDAO().insertar(new Pago(0, p.getId(), p.getTotal(), null, "PayPal", "PayPal Checkout", "Pagado"));
                         confirmado = true;
                         break;

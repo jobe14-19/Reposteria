@@ -43,7 +43,7 @@ public class ClientePedidoFormController {
     private static final String[] MASAS = {"Tradicional","Esponjosa","Hojaldrada","Genovesa","Queque"};
     private static final String[] FORMAS = {"Redonda","Cuadrada","Rectangular","Corazon","Hexagonal","Personalizada"};
     private static final String[] TIPOS_PAGO = {"Efectivo","Tarjeta de Credito","Tarjeta de Debito","Cheque","Transferencia","PayPal"};
-    private static final String[] ESTADOS_PAGO = {"Pendiente","Pagado","En Proceso","Reembolsado"};
+    private static final String[] ESTADOS_PAGO = {"Pendiente","PAGADO","PAGADO_PARCIAL","Reembolsado"};
 
     @FXML private TextField clienteField;
     @FXML private TextField telefonoField;
@@ -265,8 +265,8 @@ public class ClientePedidoFormController {
                 for (int i = 0; i < 100; i++) {
                     Thread.sleep(3000);
                     if (paypal.verificarPago(result.sessionId)) {
-                        new PedidoDAO().actualizarAdelantoYEstadoPago(idPedido, total, "Pagado");
-                        new OrdenProduccionDAO().actualizarPagoPorIdPedido(idPedido, total, "Pagado");
+                        new PedidoDAO().actualizarAdelantoYEstadoPago(idPedido, total, "PAGADO");
+                        new OrdenProduccionDAO().actualizarPagoPorIdPedido(idPedido, total, "PAGADO");
                         Pago pago = new Pago(0, idPedido, total, null, "PayPal", "PayPal Checkout", "Pagado");
                         new PagoDAO().insertar(pago);
                         confirmado = true;
